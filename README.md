@@ -202,3 +202,4 @@ EMBEDDING_MODEL=text-embedding-3-small
 ## 📝 License
 
 MIT — Built for the TigerGraph GraphRAG Inference Hackathon 2026.
+
