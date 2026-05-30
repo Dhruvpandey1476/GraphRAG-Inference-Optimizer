@@ -48,27 +48,13 @@ state = AppState()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Initialize pipelines on startup."""
-    logger.info("🚀 Initializing GraphRAG Inference server...")
-
-    # Pipeline 1: LLM Only
-    state.llm_only = LLMOnly()
-
-    # Pipeline 2: Basic RAG (load pre-built FAISS index if available)
-    state.basic_rag = BasicRAG()
-
-    # Pipeline 3: GraphRAG with TigerGraph
-    try:
-        state.tg_client = TigerGraphClient()
-        state.tg_client.connect()
-        state.graph_rag = GraphRAG(state.tg_client)
-        logger.info("✅ TigerGraph connected")
-    except Exception as e:
-        logger.warning(f"⚠️  TigerGraph unavailable (demo mode): {e}")
-        state.graph_rag = None
-
+    """Initialize pipelines on-demand (lazy loading for free tier)."""
+    logger.info("🚀 GraphRAG server starting (Free Tier Mode - lazy loading)...")
+    
+    # Don't load models at startup to save memory
+    # They'll be loaded on first request
     state.initialized = True
-    logger.info("✅ All pipelines ready")
+    logger.info("✅ Ready to serve (models loaded on-demand)")
     yield
     logger.info("👋 Shutting down...")
 
@@ -137,6 +123,34 @@ def calculate_cost(prompt_tokens: int, completion_tokens: int) -> float:
             completion_tokens / 1000 * OUTPUT_COST_PER_1K)
 
 
+def init_pipelines_if_needed():
+    """Lazy initialization of pipelines on first use."""
+    if state.llm_only is not None:
+        return  # Already initialized
+    
+    logger.info("⏳ Initializing pipelines on first request...")
+    try:
+        state.llm_only = LLMOnly()
+        logger.info("✅ LLM-Only pipeline ready")
+    except Exception as e:
+        logger.warning(f"⚠️  LLM-Only pipeline failed: {e}")
+    
+    try:
+        state.basic_rag = BasicRAG()
+        logger.info("✅ Basic RAG pipeline ready")
+    except Exception as e:
+        logger.warning(f"⚠️  Basic RAG pipeline failed: {e}")
+    
+    try:
+        state.tg_client = TigerGraphClient()
+        state.tg_client.connect()
+        state.graph_rag = GraphRAG(state.tg_client)
+        logger.info("✅ GraphRAG pipeline ready")
+    except Exception as e:
+        logger.warning(f"⚠️  GraphRAG unavailable: {e}")
+        state.graph_rag = None
+
+
 # ─── Endpoints ───────────────────────────────────────────────────────────────
 
 @app.get("/health", response_model=HealthResponse)
@@ -155,9 +169,9 @@ async def compare_pipelines(req: QueryRequest):
     Core endpoint: run all 3 pipelines on the same question.
     Returns answers + full metrics side-by-side.
     """
-    if not state.initialized:
-        raise HTTPException(503, "Pipelines not yet initialized")
-
+    # Lazy-load pipelines on first request
+    init_pipelines_if_needed()
+    
     question = req.question.strip()
     if not question:
         raise HTTPException(400, "Question cannot be empty")
