@@ -6,8 +6,10 @@ services:
     runtime: python-3.11
     
     buildCommand: |
-      apt-get update && apt-get install -y nodejs npm
-      pip install -r requirements.txt
+      apt-get update && \
+      apt-get install -y build-essential python3-dev nodejs npm && \
+      pip install --upgrade pip setuptools wheel && \
+      pip install --no-cache-dir -r requirements.txt && \
       cd frontend && npm install && npm run build && cd ..
     
     startCommand: |
