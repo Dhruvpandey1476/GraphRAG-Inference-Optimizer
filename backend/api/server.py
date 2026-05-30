@@ -326,45 +326,32 @@ async def ingest_text(payload: dict):
 
 # ─── Serve React Frontend ─────────────────────────────────────────────────────
 
-# Check if frontend build exists
+# Serve built React app
 FRONTEND_BUILD_PATH = Path(__file__).parent.parent.parent / "frontend" / "dist"
-FRONTEND_STATIC_PATH = FRONTEND_BUILD_PATH / "static"
-DASHBOARD_PATH = Path(__file__).parent.parent.parent / "dashboard.html"
 
-if FRONTEND_BUILD_PATH.exists() and FRONTEND_STATIC_PATH.exists():
-    # Serve built React app
-    app.mount("/static", StaticFiles(directory=FRONTEND_STATIC_PATH), name="static")
+if FRONTEND_BUILD_PATH.exists():
+    app.mount("/static", StaticFiles(directory=FRONTEND_BUILD_PATH / "static"), name="static")
     
     @app.get("/")
     async def serve_frontend():
         """Serve React app index.html"""
         index_path = FRONTEND_BUILD_PATH / "index.html"
-        if index_path.exists():
-            return FileResponse(str(index_path))
-        return FileResponse(str(DASHBOARD_PATH), media_type="text/html")
+        return FileResponse(str(index_path))
     
     @app.get("/{path:path}")
     async def serve_frontend_catch_all(path: str):
         """Serve React app (catch-all for client-side routing)"""
-        index_path = FRONTEND_BUILD_PATH / "index.html"
         if path.startswith("api/") or path.startswith("health") or path.startswith("docs") or path.startswith("redoc"):
-            # Don't serve HTML for API routes
             raise HTTPException(404)
-        if index_path.exists():
-            return FileResponse(str(index_path))
-        raise HTTPException(404)
+        index_path = FRONTEND_BUILD_PATH / "index.html"
+        return FileResponse(str(index_path))
 else:
-    # Development mode or frontend not built - serve interactive dashboard
-    logger.warning("Frontend build not found. Serving dashboard.html")
-    logger.info(f"Expected React build at: {FRONTEND_BUILD_PATH}")
+    logger.warning("Frontend build not found at: %s", FRONTEND_BUILD_PATH)
     
     @app.get("/")
     async def root():
-        """Serve interactive HTML dashboard"""
-        if DASHBOARD_PATH.exists():
-            return FileResponse(str(DASHBOARD_PATH), media_type="text/html")
         return {
             "service": "GraphRAG Inference Dashboard API",
             "status": "running",
-            "documentation": "/docs",
+            "documentation": "/docs"
         }

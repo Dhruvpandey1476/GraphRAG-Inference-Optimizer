@@ -1,4 +1,20 @@
-# Use Python 3.11 slim image
+# Stage 1: Build frontend with Node
+FROM node:18-alpine AS frontend-builder
+
+WORKDIR /build/frontend
+
+# Copy frontend files
+COPY frontend/package.json frontend/package-lock.json ./
+COPY frontend/vite.config.js ./
+COPY frontend/index.html ./
+COPY frontend/src ./src
+
+# Install and build frontend
+RUN npm install --legacy-peer-deps --no-audit && \
+    npm run build && \
+    echo "✅ Frontend built successfully"
+
+# Stage 2: Runtime with Python + built frontend
 FROM python:3.11-slim
 
 WORKDIR /app
@@ -7,15 +23,9 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y \
     build-essential \
     python3-dev \
-    nodejs \
-    npm \
-    git \
     && rm -rf /var/lib/apt/lists/*
 
-# Increase Node memory for builds
-ENV NODE_OPTIONS=--max-old-space-size=1024
-
-# Copy requirements
+# Copy Python requirements
 COPY requirements.txt .
 
 # Install Python dependencies
@@ -25,10 +35,14 @@ RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
 # Copy application code
 COPY . .
 
-# Copy and run frontend build script
-COPY build-frontend.sh .
-RUN chmod +x build-frontend.sh && ./build-frontend.sh
+# Copy built frontend from stage 1
+COPY --from=frontend-builder /build/frontend/dist ./frontend/dist
 
+# Verify frontend was built
+RUN echo "Verifying frontend build..." && \
+    ls -la frontend/dist/ && \
+    [ -f frontend/dist/index.html ] && echo "✅ index.html exists" || echo "❌ index.html missing" && \
+    [ -d frontend/dist/assets ] && echo "✅ assets folder exists" || echo "❌ assets folder missing"
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
