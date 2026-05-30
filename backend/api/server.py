@@ -328,10 +328,11 @@ async def ingest_text(payload: dict):
 
 # Check if frontend build exists
 FRONTEND_BUILD_PATH = Path(__file__).parent.parent.parent / "frontend" / "dist"
+FRONTEND_STATIC_PATH = FRONTEND_BUILD_PATH / "static"
 
-if FRONTEND_BUILD_PATH.exists():
+if FRONTEND_BUILD_PATH.exists() and FRONTEND_STATIC_PATH.exists():
     # Serve built React app
-    app.mount("/static", StaticFiles(directory=FRONTEND_BUILD_PATH / "static"), name="static")
+    app.mount("/static", StaticFiles(directory=FRONTEND_STATIC_PATH), name="static")
     
     @app.get("/")
     async def serve_frontend():
@@ -355,7 +356,8 @@ else:
     # Development mode or frontend not built
     logger.warning("Frontend build not found. Using API-only mode.")
     logger.info(f"Expected at: {FRONTEND_BUILD_PATH}")
-    logger.info("Build frontend: cd frontend && npm run build")
+    logger.info(f"Static path exists: {FRONTEND_STATIC_PATH.exists()}")
+    logger.info("Build frontend: cd frontend && npm install && npm run build")
     
     @app.get("/")
     async def root():

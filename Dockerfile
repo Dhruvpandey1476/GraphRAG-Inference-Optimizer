@@ -22,11 +22,20 @@ RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
 # Copy application code
 COPY . .
 
-# Build frontend
+# Build frontend with detailed output and error handling
 RUN cd frontend && \
-    npm install --legacy-peer-deps && \
+    echo "Installing npm dependencies..." && \
+    npm install --legacy-peer-deps --verbose && \
+    echo "Building frontend with Vite..." && \
     npm run build && \
+    echo "Build output:" && \
+    ls -la . && \
+    echo "Dist folder:" && \
+    ls -la dist/ || echo "WARNING: dist folder not created" && \
+    echo "Static folder:" && \
+    ls -la dist/static/ || echo "WARNING: static folder not created" && \
     cd ..
+
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
