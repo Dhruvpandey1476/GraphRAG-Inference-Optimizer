@@ -1,3 +1,13 @@
+---
+title: GraphRAG Inference Optimizer
+emoji: 🐯
+colorFrom: blue
+colorTo: green
+sdk: docker
+pinned: true
+license: mit
+---
+
 # 🐯 GraphRAG Inference Optimizer
 ### TigerGraph GraphRAG Inference Hackathon — Round 2 Submission
 
