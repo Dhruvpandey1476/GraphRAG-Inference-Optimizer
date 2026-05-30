@@ -25,19 +25,9 @@ RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
 # Copy application code
 COPY . .
 
-# Build frontend with detailed output and error handling
-RUN cd frontend && \
-    echo "Node version:" && node --version && \
-    echo "NPM version:" && npm --version && \
-    echo "Installing npm dependencies..." && \
-    npm install --legacy-peer-deps --no-audit 2>&1 && \
-    echo "NPM install completed successfully" && \
-    echo "Running vite build..." && \
-    npm run build 2>&1 && \
-    echo "Vite build completed successfully" && \
-    if [ -d "dist" ]; then echo "✅ dist/ exists"; ls -la dist/ | head -20; else echo "❌ dist/ does not exist"; fi && \
-    cd .. && \
-    echo "Frontend build process complete"
+# Copy and run frontend build script
+COPY build-frontend.sh .
+RUN chmod +x build-frontend.sh && ./build-frontend.sh
 
 
 # Set environment variables
