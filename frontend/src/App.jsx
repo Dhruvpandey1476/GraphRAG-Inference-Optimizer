@@ -5,7 +5,8 @@ import {
 } from "recharts";
 import { Zap, Database, GitBranch, Search, TrendingDown, Award, Clock, DollarSign, CheckCircle, AlertCircle, Loader } from "lucide-react";
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8001";
+// Use VITE_API_URL if set, otherwise use current origin (HuggingFace Spaces) or localhost:8001 (dev)
+const API_BASE = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' ? window.location.origin : "http://localhost:8001");
 
 const PIPELINES = [
   { id: "llm_only",  label: "LLM Only",  icon: Zap,       color: "#ef4444", dimColor: "rgba(239,68,68,0.12)",    desc: "No retrieval · Parametric only" },
