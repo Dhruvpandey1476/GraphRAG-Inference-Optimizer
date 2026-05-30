@@ -328,25 +328,29 @@ async def ingest_text(payload: dict):
 
 # Serve built React app
 FRONTEND_BUILD_PATH = Path(__file__).parent.parent.parent / "frontend" / "dist"
+FRONTEND_ASSETS_PATH = FRONTEND_BUILD_PATH / "assets"
 
-if FRONTEND_BUILD_PATH.exists():
-    app.mount("/static", StaticFiles(directory=FRONTEND_BUILD_PATH / "static"), name="static")
-    
+# Only mount assets if they exist
+if FRONTEND_ASSETS_PATH.exists():
+    app.mount("/assets", StaticFiles(directory=FRONTEND_ASSETS_PATH), name="assets")
+    logger.info(f"✅ Mounted assets from {FRONTEND_ASSETS_PATH}")
+
+if FRONTEND_BUILD_PATH.exists() and (FRONTEND_BUILD_PATH / "index.html").exists():
     @app.get("/")
     async def serve_frontend():
         """Serve React app index.html"""
-        index_path = FRONTEND_BUILD_PATH / "index.html"
-        return FileResponse(str(index_path))
+        return FileResponse(str(FRONTEND_BUILD_PATH / "index.html"))
     
     @app.get("/{path:path}")
     async def serve_frontend_catch_all(path: str):
         """Serve React app (catch-all for client-side routing)"""
         if path.startswith("api/") or path.startswith("health") or path.startswith("docs") or path.startswith("redoc"):
             raise HTTPException(404)
-        index_path = FRONTEND_BUILD_PATH / "index.html"
-        return FileResponse(str(index_path))
+        return FileResponse(str(FRONTEND_BUILD_PATH / "index.html"))
+    
+    logger.info(f"✅ Frontend served from {FRONTEND_BUILD_PATH}")
 else:
-    logger.warning("Frontend build not found at: %s", FRONTEND_BUILD_PATH)
+    logger.warning(f"⚠️ Frontend build not found at: {FRONTEND_BUILD_PATH}")
     
     @app.get("/")
     async def root():
