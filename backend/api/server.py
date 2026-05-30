@@ -329,6 +329,7 @@ async def ingest_text(payload: dict):
 # Check if frontend build exists
 FRONTEND_BUILD_PATH = Path(__file__).parent.parent.parent / "frontend" / "dist"
 FRONTEND_STATIC_PATH = FRONTEND_BUILD_PATH / "static"
+FALLBACK_PATH = Path(__file__).parent.parent.parent / "fallback.html"
 
 if FRONTEND_BUILD_PATH.exists() and FRONTEND_STATIC_PATH.exists():
     # Serve built React app
@@ -346,25 +347,25 @@ if FRONTEND_BUILD_PATH.exists() and FRONTEND_STATIC_PATH.exists():
     async def serve_frontend_catch_all(path: str):
         """Serve React app (catch-all for client-side routing)"""
         index_path = FRONTEND_BUILD_PATH / "index.html"
-        if path.startswith("api/") or path.startswith("health"):
+        if path.startswith("api/") or path.startswith("health") or path.startswith("docs") or path.startswith("redoc"):
             # Don't serve HTML for API routes
             raise HTTPException(404)
         if index_path.exists():
             return FileResponse(str(index_path))
         raise HTTPException(404)
 else:
-    # Development mode or frontend not built
-    logger.warning("Frontend build not found. Using API-only mode.")
+    # Development mode or frontend not built - serve fallback HTML
+    logger.warning("Frontend build not found. Using fallback.html")
     logger.info(f"Expected at: {FRONTEND_BUILD_PATH}")
-    logger.info(f"Static path exists: {FRONTEND_STATIC_PATH.exists()}")
-    logger.info("Build frontend: cd frontend && npm install && npm run build")
     
     @app.get("/")
     async def root():
+        """Serve fallback HTML page"""
+        if FALLBACK_PATH.exists():
+            return FileResponse(str(FALLBACK_PATH), media_type="text/html")
         return {
             "service": "GraphRAG Inference Dashboard API",
             "status": "running",
             "documentation": "/docs",
             "frontend": "not_built",
-            "build_instructions": "cd frontend && npm install && npm run build",
         }
