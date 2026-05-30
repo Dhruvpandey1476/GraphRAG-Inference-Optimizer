@@ -29,6 +29,10 @@ ENV/
 env/
 .venv
 
+# Large data files (not tracked, downloaded separately)
+data/arxiv_bulk/
+data/_cache/
+
 # IDE & Editor
 .vscode/
 .idea/
