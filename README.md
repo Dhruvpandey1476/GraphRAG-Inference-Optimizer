@@ -44,15 +44,19 @@ TigerGraph Savanna         OpenAI / Claude
 
 1. **`backend/rag/basic_rag.py`** — Baseline: vector similarity top-K retrieval
 2. **`backend/rag/graph_rag.py`** — GraphRAG: entity-anchored subgraph traversal
-3. **`backend/graph/tigergraph_client.py`** — TigerGraph connection + GSQL queries
-4. **`backend/graph/schema.py`** — Knowledge graph schema definition
+3. **`backend/rag/llm_only.py`** — No-retrieval baseline: pure LLM inference
+4. **`backend/graph/tigergraph_client.py`** — TigerGraph connection + GSQL queries
 5. **`backend/graph/ingestion.py`** — Document → Knowledge Graph pipeline
-6. **`backend/llm/judge.py`** — LLM-as-a-Judge evaluation
-7. **`backend/api/server.py`** — FastAPI server exposing all endpoints
-8. **`evaluation/benchmark.py`** — Full benchmark runner (head-to-head comparison)
-9. **`frontend/`** — React dashboard with live token tracking & charts
-10. **`docs/blog_post.md`** — Full technical blog post
-11. **`docs/architecture.md`** — Deep-dive architecture doc
+6. **`backend/llm/gemini_client.py`** — Google Gemini API wrapper
+7. **`backend/llm/judge.py`** — LLM-as-Judge evaluation with realistic 1-10 scoring
+8. **`backend/api/server.py`** — FastAPI server with /health and /query/compare endpoints
+9. **`evaluation/benchmark.py`** — 50-query benchmark comparing all 3 pipelines
+10. **`evaluation/metrics.py`** — BERTScore F1, token counting, cost calculations
+11. **`evaluation/report_generator.py`** — Auto HTML report generation
+12. **`frontend/`** — React + Vite dashboard with live query execution and metrics
+13. **`docs/blog_post.md`** — Full technical blog post for publication
+14. **`docs/architecture.md`** — System architecture deep-dive
+15. **`docs/demo_video_script.md`** — 2-3 minute demo narration script
 
 ---
 
@@ -113,45 +117,63 @@ python evaluation/benchmark.py --queries data/eval_queries.json --output results
 
 ```
 graphrag-hackathon/
-├── README.md
-├── requirements.txt
-├── .env.example
-├── backend/
+├── README.md                          # Project documentation
+├── requirements.txt                   # Python dependencies
+├── .env.example                       # Environment variables template
+├── .gitignore                         # Git ignore rules
+├── .gitattributes                     # Line ending configuration
+│
+├── backend/                           # Core inference backend
+│   ├── api/
+│   │   └── server.py                  # FastAPI server (port 8000)
 │   ├── rag/
-│   │   ├── basic_rag.py          # Baseline RAG
-│   │   └── graph_rag.py          # GraphRAG pipeline
+│   │   ├── llm_only.py               # Baseline: pure LLM (no retrieval)
+│   │   ├── basic_rag.py              # Baseline: vector similarity RAG
+│   │   └── graph_rag.py              # GraphRAG: entity-anchored subgraph
 │   ├── graph/
-│   │   ├── tigergraph_client.py  # TigerGraph SDK wrapper
-│   │   ├── schema.py             # Graph schema
-│   │   └── ingestion.py          # Doc → KG ingestion
-│   ├── llm/
-│   │   ├── client.py             # LLM API wrapper
-│   │   └── judge.py              # LLM-as-Judge
-│   └── api/
-│       └── server.py             # FastAPI app
-├── evaluation/
-│   ├── benchmark.py              # Benchmark runner
-│   ├── metrics.py                # BERTScore, token counting
-│   └── report_generator.py       # Auto HTML report
-├── frontend/
+│   │   ├── tigergraph_client.py      # TigerGraph connection & GSQL
+│   │   └── ingestion.py              # Document → KG pipeline
+│   └── llm/
+│       ├── gemini_client.py          # Google Gemini API wrapper
+│       └── judge.py                  # LLM-as-Judge evaluator
+│
+├── evaluation/                        # Benchmark & metrics
+│   ├── benchmark.py                  # 50-query benchmark runner
+│   ├── metrics.py                    # BERTScore, token counting, costs
+│   └── report_generator.py           # HTML report generation
+│
+├── frontend/                          # React dashboard
 │   ├── src/
-│   │   ├── App.jsx               # Main dashboard
-│   │   ├── components/
-│   │   │   ├── TokenChart.jsx
-│   │   │   ├── AccuracyGauge.jsx
-│   │   │   ├── GraphVisualizer.jsx
-│   │   │   └── ComparisonTable.jsx
-│   │   └── api.js
-│   └── package.json
-├── scripts/
-│   ├── setup_tigergraph.py
-│   └── ingest_documents.py
-├── data/
-│   ├── sample_docs/
-│   └── eval_queries.json
-└── docs/
-    ├── blog_post.md
-    └── architecture.md
+│   │   ├── App.jsx                   # Main dashboard component
+│   │   ├── main.jsx                  # React entry point
+│   │   └── index.css                 # Styles
+│   ├── index.html                    # HTML entry point
+│   ├── package.json                  # Node dependencies
+│   ├── vite.config.js                # Vite build config
+│   └── .env                          # Frontend API URL
+│
+├── scripts/                           # Setup & utility scripts
+│   ├── setup_tigergraph.py           # Initialize TigerGraph schema
+│   ├── ingest_documents.py           # Load documents into KG
+│   ├── download_arxiv_bulk.py        # Download arXiv papers
+│   ├── count_tokens_gemini.py        # Gemini token counting
+│   └── verify_tokens_gemini.py       # Verify token counts
+│
+├── docs/                              # Documentation
+│   ├── architecture.md               # System architecture
+│   ├── blog_post.md                 # Technical blog post
+│   ├── demo_video_script.md         # 2-3 min demo narration
+│   └── ARCHITECTURE_DIAGRAM.svg      # Visual architecture
+│
+├── data/                              # Evaluation data
+│   ├── eval_queries.json             # 50 evaluation queries
+│   ├── eval_queries_16.json          # 16 test queries
+│   └── sample_docs/
+│       └── ai_knowledge_base.md      # Sample knowledge base
+│
+└── results/                           # Benchmark results
+    ├── benchmark_20260530_115007.json # Latest benchmark data
+    └── report_FINAL.html             # Latest HTML report
 ```
 
 ---
