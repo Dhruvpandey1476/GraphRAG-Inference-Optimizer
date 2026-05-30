@@ -77,26 +77,36 @@ cp .env.example .env
 # Fill in your TigerGraph Savanna credentials + OpenAI key
 ```
 
-### 3. Set Up TigerGraph Schema
+### 3. Download ArXiv Dataset
+
+The benchmark uses 17,317 arXiv papers (131.2M tokens) for evaluation. Download them:
+
+```bash
+python scripts/download_arxiv_bulk.py
+# Downloads to data/arxiv_bulk/ (~3-4 GB)
+# (Excluded from Git due to size)
+```
+
+### 4. Set Up TigerGraph Schema
 
 ```bash
 python scripts/setup_tigergraph.py
 ```
 
-### 4. Ingest Documents
+### 5. Ingest Documents
 
 ```bash
-python scripts/ingest_documents.py --data data/sample_docs/
+python scripts/ingest_documents.py --data data/arxiv_bulk/
 ```
 
-### 5. Run Backend API
+### 6. Run Backend API
 
 ```bash
 # From the project root (graphrag-hackathon/):
 uvicorn backend.api.server:app --reload --port 8000
 ```
 
-### 6. Run Frontend Dashboard
+### 7. Run Frontend Dashboard
 
 ```bash
 cd frontend
@@ -105,10 +115,12 @@ npm run dev
 # Open http://localhost:5173
 ```
 
-### 7. Run Full Benchmark
+### 8. Run Full Benchmark
 
 ```bash
 python evaluation/benchmark.py --queries data/eval_queries.json --output results/
+# Runs 50-query benchmark comparing all 3 RAG pipelines
+# Generates report_FINAL.html with metrics
 ```
 
 ---
@@ -165,11 +177,14 @@ graphrag-hackathon/
 │   ├── demo_video_script.md         # 2-3 min demo narration
 │   └── ARCHITECTURE_DIAGRAM.svg      # Visual architecture
 │
-├── data/                              # Evaluation data
-│   ├── eval_queries.json             # 50 evaluation queries
-│   ├── eval_queries_16.json          # 16 test queries
-│   └── sample_docs/
-│       └── ai_knowledge_base.md      # Sample knowledge base
+├── data/                              # Evaluation data (queries in Git, papers require download)
+│   ├── eval_queries.json             # 50 benchmark queries with ground truth
+│   ├── eval_queries_16.json          # 16 test queries for quick validation
+│   ├── sample_docs/
+│   │   └── ai_knowledge_base.md      # Sample knowledge base for testing
+│   ├── arxiv_bulk/                   # 17,317 arXiv papers (NOT in Git - download via script)
+│   │   └── hf_*.txt                  # Individual arXiv papers
+│   └── arxiv_papers/                 # Additional papers (optional)
 │
 └── results/                           # Benchmark results
     ├── benchmark_20260530_115007.json # Latest benchmark data
@@ -178,7 +193,32 @@ graphrag-hackathon/
 
 ---
 
-## 🎯 Why This Wins
+## 📊 Evaluation Data
+
+### Query Files
+- **`eval_queries.json`** — 50 expert-crafted questions covering:
+  - Transformer architectures & attention mechanisms
+  - BERT vs GPT differences
+  - LLM hallucinations & factual accuracy
+  - Knowledge graphs & graph-based retrieval
+  - RAG system evaluation & metrics
+  
+  Each query includes a ground-truth answer for evaluation.
+
+- **`eval_queries_16.json`** — Quick validation set (16 queries, ~2 min runtime)
+
+### Dataset
+- **`data/arxiv_bulk/`** — 17,317 arXiv papers in Computer Science (2018-2024)
+  - **131.2M tokens** (verified by Gemini API)
+  - Exceeds 100M token requirement by 31%
+  - Excluded from Git (3-4 GB) — download via `python scripts/download_arxiv_bulk.py`
+
+### Why Separate Query & Data Files
+1. **eval_queries.json** = Standardized benchmark (runs against any data source)
+2. **arxiv_bulk/** = Large external knowledge base (for information retrieval)
+3. **Separation** = Allows comparing GraphRAG vs Basic RAG vs LLM-Only on the same queries
+
+---
 
 1. **Token Reduction (30% weight)**: We show concrete, reproducible 75%+ token savings via graph-native retrieval — the graph gives us *exactly* what's needed, not a pile of potentially-relevant chunks.
 
