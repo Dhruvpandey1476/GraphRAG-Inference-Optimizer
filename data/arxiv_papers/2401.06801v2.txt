@@ -1,0 +1,3 @@
+Graph-of-Thought: Utilizing Large Language Models to Solve Complex and Dynamic Business Problems
+
+This paper presents Graph-of-Thought (GoT), a new model for workflow automation that enhances the flexibility and efficiency of Large Language Models (LLMs) in complex task execution. GoT advances beyond traditional linear and tree-like cognitive models with a graph structure that enables dynamic path selection. The open-source engine GoTFlow demonstrates the practical application of GoT, facilitating automated, data-driven decision-making across various domains. Despite challenges in complexity and transparency, GoTFlow's potential for improving business processes is significant, promising advancements in both efficiency and decision quality with continuous development.
