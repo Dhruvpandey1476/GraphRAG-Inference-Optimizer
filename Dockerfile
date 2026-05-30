@@ -12,6 +12,9 @@ RUN apt-get update && apt-get install -y \
     git \
     && rm -rf /var/lib/apt/lists/*
 
+# Increase Node memory for builds
+ENV NODE_OPTIONS=--max-old-space-size=1024
+
 # Copy requirements
 COPY requirements.txt .
 
@@ -24,17 +27,17 @@ COPY . .
 
 # Build frontend with detailed output and error handling
 RUN cd frontend && \
+    echo "Node version:" && node --version && \
+    echo "NPM version:" && npm --version && \
     echo "Installing npm dependencies..." && \
-    npm install --legacy-peer-deps --verbose && \
-    echo "Building frontend with Vite..." && \
-    npm run build && \
-    echo "Build output:" && \
-    ls -la . && \
-    echo "Dist folder:" && \
-    ls -la dist/ || echo "WARNING: dist folder not created" && \
-    echo "Static folder:" && \
-    ls -la dist/static/ || echo "WARNING: static folder not created" && \
-    cd ..
+    npm install --legacy-peer-deps --no-audit 2>&1 && \
+    echo "NPM install completed successfully" && \
+    echo "Running vite build..." && \
+    npm run build 2>&1 && \
+    echo "Vite build completed successfully" && \
+    if [ -d "dist" ]; then echo "✅ dist/ exists"; ls -la dist/ | head -20; else echo "❌ dist/ does not exist"; fi && \
+    cd .. && \
+    echo "Frontend build process complete"
 
 
 # Set environment variables
