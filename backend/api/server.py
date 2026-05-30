@@ -329,7 +329,7 @@ async def ingest_text(payload: dict):
 # Check if frontend build exists
 FRONTEND_BUILD_PATH = Path(__file__).parent.parent.parent / "frontend" / "dist"
 FRONTEND_STATIC_PATH = FRONTEND_BUILD_PATH / "static"
-FALLBACK_PATH = Path(__file__).parent.parent.parent / "fallback.html"
+DASHBOARD_PATH = Path(__file__).parent.parent.parent / "dashboard.html"
 
 if FRONTEND_BUILD_PATH.exists() and FRONTEND_STATIC_PATH.exists():
     # Serve built React app
@@ -341,7 +341,7 @@ if FRONTEND_BUILD_PATH.exists() and FRONTEND_STATIC_PATH.exists():
         index_path = FRONTEND_BUILD_PATH / "index.html"
         if index_path.exists():
             return FileResponse(str(index_path))
-        return {"message": "Frontend not built. Run: cd frontend && npm run build"}
+        return FileResponse(str(DASHBOARD_PATH), media_type="text/html")
     
     @app.get("/{path:path}")
     async def serve_frontend_catch_all(path: str):
@@ -354,18 +354,17 @@ if FRONTEND_BUILD_PATH.exists() and FRONTEND_STATIC_PATH.exists():
             return FileResponse(str(index_path))
         raise HTTPException(404)
 else:
-    # Development mode or frontend not built - serve fallback HTML
-    logger.warning("Frontend build not found. Using fallback.html")
-    logger.info(f"Expected at: {FRONTEND_BUILD_PATH}")
+    # Development mode or frontend not built - serve interactive dashboard
+    logger.warning("Frontend build not found. Serving dashboard.html")
+    logger.info(f"Expected React build at: {FRONTEND_BUILD_PATH}")
     
     @app.get("/")
     async def root():
-        """Serve fallback HTML page"""
-        if FALLBACK_PATH.exists():
-            return FileResponse(str(FALLBACK_PATH), media_type="text/html")
+        """Serve interactive HTML dashboard"""
+        if DASHBOARD_PATH.exists():
+            return FileResponse(str(DASHBOARD_PATH), media_type="text/html")
         return {
             "service": "GraphRAG Inference Dashboard API",
             "status": "running",
             "documentation": "/docs",
-            "frontend": "not_built",
         }
