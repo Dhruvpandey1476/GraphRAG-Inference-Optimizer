@@ -104,11 +104,65 @@ class BasicRAG:
                 logger.info(f"✅ Loaded FAISS index from {faiss_path} ({len(self.chunks)} chunks, {self.index.ntotal} vectors)")
             except Exception as e:
                 logger.error(f"❌ Failed to load FAISS index: {e}", exc_info=True)
-                # Create new empty index as fallback
-                self.index = faiss.IndexFlatIP(EMBEDDING_DIM)
-                logger.warning("Continuing with empty FAISS index")
+                # Fall through to build from sample docs
+                self._build_index_from_sample_docs()
         else:
-            logger.warning(f"⚠️  FAISS index not found at {faiss_path}. Data directory exists: {faiss_path.parent.exists()}")
+            logger.warning(f"⚠️  FAISS index not found at {faiss_path}. Building from sample documents...")
+            self._build_index_from_sample_docs()
+
+    def _build_index_from_sample_docs(self):
+        """Dynamically build FAISS index from sample documents in data/sample_docs/"""
+        sample_docs_dir = Path(__file__).resolve().parent.parent.parent / "data" / "sample_docs"
+        
+        if not sample_docs_dir.exists():
+            logger.warning(f"Sample docs directory not found at {sample_docs_dir}")
+            return
+        
+        # Load all .md and .txt files
+        doc_files = list(sample_docs_dir.glob("*.md")) + list(sample_docs_dir.glob("*.txt"))
+        if not doc_files:
+            logger.warning(f"No documents found in {sample_docs_dir}")
+            return
+        
+        logger.info(f"Loading {len(doc_files)} documents from {sample_docs_dir}...")
+        
+        # Split documents into chunks
+        CHUNK_SIZE = int(os.getenv("CHUNK_SIZE", 512))
+        CHUNK_OVERLAP = int(os.getenv("CHUNK_OVERLAP", 64))
+        
+        for doc_file in doc_files:
+            try:
+                with open(doc_file, "r", encoding="utf-8", errors="ignore") as f:
+                    content = f.read()
+                
+                # Simple chunking: split by size with overlap
+                for i in range(0, len(content), CHUNK_SIZE - CHUNK_OVERLAP):
+                    chunk = content[i : i + CHUNK_SIZE]
+                    if len(chunk.strip()) > 50:  # Only keep non-empty chunks
+                        self.chunks.append(chunk)
+                        self.chunk_metadata.append({
+                            "source": doc_file.name,
+                            "start_pos": i,
+                        })
+                
+                logger.info(f"  ✅ Loaded {doc_file.name} ({len(content)} chars)")
+            except Exception as e:
+                logger.warning(f"Failed to load {doc_file.name}: {e}")
+        
+        # Embed all chunks
+        if self.chunks:
+            try:
+                logger.info(f"Embedding {len(self.chunks)} chunks...")
+                embeddings = self._embed_batch(self.chunks)
+                vectors = np.array(embeddings, dtype="float32")
+                faiss.normalize_L2(vectors)
+                self.index.add(vectors)
+                logger.info(f"✅ Built FAISS index with {self.index.ntotal} vectors from {len(self.chunks)} chunks")
+            except Exception as e:
+                logger.error(f"Failed to embed chunks: {e}")
+                self.chunks = []  # Clear on failure
+        else:
+            logger.warning("No chunks extracted from documents")
 
     def add_documents(self, chunks: list[str], metadata: list[dict] = None):
         """Add document chunks to the FAISS index."""
