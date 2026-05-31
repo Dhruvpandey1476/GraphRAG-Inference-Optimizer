@@ -33,10 +33,16 @@ def _get_groq_client():
 JUDGE_PROMPT = """You are an impartial AI judge evaluating the quality of an answer to a question.
 
 Score the answer on a scale of 1-10 based on:
-- Correctness (is the information accurate based on the context?)
-- Completeness (does it fully answer the question?)
-- Clarity (is it well-structured and easy to understand?)
-- Relevance (does it stay on topic?)
+- Correctness (is the information accurate and factually sound?)
+- Completeness (does it fully answer the question without gaps?)
+- Clarity (is it well-structured, concise, and easy to understand?)
+- Relevance (does it stay on topic and avoid irrelevant information?)
+
+Be strict and differentiate between good and poor answers. Use the full 1-10 scale:
+- 1-3: Poor, inaccurate, incomplete, or irrelevant
+- 4-6: Acceptable, some issues but generally on track  
+- 7-8: Good, mostly accurate and complete with minor issues
+- 9-10: Excellent, accurate, comprehensive, and well-structured
 
 Return ONLY a JSON object with this exact format:
 {{
@@ -52,7 +58,8 @@ Question: {question}
 
 Ground Truth (if available): {ground_truth}
 
-Answer to evaluate: {answer}
+Answer to evaluate:
+{answer}
 """
 
 
