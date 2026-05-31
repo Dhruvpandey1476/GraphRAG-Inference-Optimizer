@@ -112,7 +112,7 @@ class BasicRAG:
             self._build_index_from_sample_docs()
 
     def _build_index_from_sample_docs(self):
-        """Dynamically build FAISS index from sample documents in data/sample_docs/"""
+        """Dynamically build FAISS index from sample documents with semantic chunking"""
         sample_docs_dir = Path(__file__).resolve().parent.parent.parent / "data" / "sample_docs"
         
         if not sample_docs_dir.exists():
@@ -127,26 +127,45 @@ class BasicRAG:
         
         logger.info(f"Loading {len(doc_files)} documents from {sample_docs_dir}...")
         
-        # Split documents into chunks
-        CHUNK_SIZE = int(os.getenv("CHUNK_SIZE", 512))
-        CHUNK_OVERLAP = int(os.getenv("CHUNK_OVERLAP", 64))
-        
         for doc_file in doc_files:
             try:
                 with open(doc_file, "r", encoding="utf-8", errors="ignore") as f:
                     content = f.read()
                 
-                # Simple chunking: split by size with overlap
-                for i in range(0, len(content), CHUNK_SIZE - CHUNK_OVERLAP):
-                    chunk = content[i : i + CHUNK_SIZE]
-                    if len(chunk.strip()) > 50:  # Only keep non-empty chunks
-                        self.chunks.append(chunk)
+                # Semantic chunking: split by sections and paragraphs
+                sections = content.split("##")
+                for section_idx, section in enumerate(sections):
+                    # Split each section into paragraphs
+                    paragraphs = section.split("\n\n")
+                    
+                    # Group smaller paragraphs together, keep larger ones separate
+                    current_chunk = ""
+                    for para in paragraphs:
+                        para = para.strip()
+                        if not para:
+                            continue
+                        
+                        if len(current_chunk) + len(para) < 1000:  # Combine paragraphs up to 1000 chars
+                            if current_chunk:
+                                current_chunk += "\n\n"
+                            current_chunk += para
+                        else:
+                            if current_chunk:
+                                self.chunks.append(current_chunk)
+                                self.chunk_metadata.append({
+                                    "source": doc_file.name,
+                                    "section": section_idx,
+                                })
+                            current_chunk = para
+                    
+                    if current_chunk:
+                        self.chunks.append(current_chunk)
                         self.chunk_metadata.append({
                             "source": doc_file.name,
-                            "start_pos": i,
+                            "section": section_idx,
                         })
                 
-                logger.info(f"  ✅ Loaded {doc_file.name} ({len(content)} chars)")
+                logger.info(f"  ✅ Loaded {doc_file.name} ({len(content)} chars → {len([c for c in self.chunks if c.split('###')[0].startswith(doc_file.name.split('.')[0][:20])])} semantic chunks)")
             except Exception as e:
                 logger.warning(f"Failed to load {doc_file.name}: {e}")
         
