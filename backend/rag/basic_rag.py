@@ -87,7 +87,12 @@ class BasicRAG:
         self.chunk_metadata: list[dict] = []
         
         # Try to load pre-built FAISS index from disk
-        faiss_path = Path(__file__).parent.parent.parent / "data" / "faiss_index.pkl"
+        # Use absolute path: work up from this file → backend → graphrag-hackathon → data
+        faiss_path = Path(__file__).resolve().parent.parent.parent / "data" / "faiss_index.pkl"
+        
+        logger.info(f"Attempting to load FAISS index from: {faiss_path}")
+        logger.info(f"Path exists: {faiss_path.exists()}")
+        
         if faiss_path.exists():
             try:
                 import pickle
@@ -96,11 +101,14 @@ class BasicRAG:
                     self.index = data["index"]
                     self.chunks = data["chunks"]
                     self.chunk_metadata = data.get("metadata", [])
-                logger.info(f"✅ Loaded FAISS index from {faiss_path} ({len(self.chunks)} chunks)")
+                logger.info(f"✅ Loaded FAISS index from {faiss_path} ({len(self.chunks)} chunks, {self.index.ntotal} vectors)")
             except Exception as e:
-                logger.warning(f"Failed to load FAISS index: {e}")
+                logger.error(f"❌ Failed to load FAISS index: {e}", exc_info=True)
                 # Create new empty index as fallback
                 self.index = faiss.IndexFlatIP(EMBEDDING_DIM)
+                logger.warning("Continuing with empty FAISS index")
+        else:
+            logger.warning(f"⚠️  FAISS index not found at {faiss_path}. Data directory exists: {faiss_path.parent.exists()}")
 
     def add_documents(self, chunks: list[str], metadata: list[dict] = None):
         """Add document chunks to the FAISS index."""
