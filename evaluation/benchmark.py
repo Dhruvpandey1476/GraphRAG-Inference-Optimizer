@@ -344,8 +344,16 @@ if __name__ == "__main__":
                         help="Path to eval queries JSON")
     parser.add_argument("--output", default="results/", help="Output directory")
     parser.add_argument("--dataset", default="custom", help="Dataset name")
+    parser.add_argument("--num_queries", type=int, default=None,
+                        help="Limit number of queries to run (default: all)")
     args = parser.parse_args()
 
     runner = BenchmarkRunner(output_dir=args.output)
     queries = runner.load_queries(args.queries)
+    
+    # Limit to num_queries if specified
+    if args.num_queries and args.num_queries > 0:
+        queries = queries[:args.num_queries]
+        logger.info(f"Limited to {len(queries)} queries")
+    
     runner.run(queries, dataset_name=args.dataset)
