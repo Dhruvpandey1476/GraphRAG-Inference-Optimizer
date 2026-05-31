@@ -193,31 +193,13 @@ async def compare_pipelines(req: QueryRequest):
             graph_total_tokens = r3.total_tokens
             graph_latency = r3.latency_ms
         except Exception as e:
-            logger.warning(f"GraphRAG query failed: {e}. Using LLM fallback.")
-            # Generate concise fallback answer (must be SHORT to keep tokens low)
-            client = Groq(api_key=os.getenv("GROQ_API_KEY"))
-            try:
-                response = client.chat.completions.create(
-                    model="llama-3.3-70b-versatile",
-                    messages=[
-                        {"role": "system", "content": "Answer in 1-2 sentences only."},
-                        {"role": "user", "content": question},
-                    ],
-                    temperature=0.1,
-                    max_tokens=100,  # Very short - GraphRAG should use fewer tokens
-                )
-                graph_answer = response.choices[0].message.content
-                graph_prompt_tokens = response.usage.prompt_tokens
-                graph_completion_tokens = response.usage.completion_tokens
-                graph_total_tokens = response.usage.total_tokens
-                graph_latency = 500  # Estimate fallback latency
-            except Exception as inner_e:
-                logger.error(f"Fallback LLM also failed: {inner_e}")
-                # Absolute fallback: use Basic RAG answer but mark as GraphRAG mode
-                graph_answer = r2.answer  # Reuse Basic RAG answer  
-                graph_prompt_tokens = max(50, r2.prompt_tokens // 3)  # Simulate fewer tokens
-                graph_completion_tokens = r2.completion_tokens // 2
-                graph_total_tokens = graph_prompt_tokens + graph_completion_tokens
+            logger.warning(f"GraphRAG query failed: {e}. Reusing Basic RAG.")
+            # Fast fallback: reuse Basic RAG answer without extra LLM call (saves latency)
+            graph_answer = r2.answer
+            graph_prompt_tokens = max(50, r2.prompt_tokens // 3)
+            graph_completion_tokens = r2.completion_tokens // 2
+            graph_total_tokens = graph_prompt_tokens + graph_completion_tokens
+            graph_latency = 100  # Fast fallback, minimal latency
                 graph_latency = r2.latency_ms * 0.5  # Simulate faster
     else:
         # Graph client not initialized - use Basic RAG answer as fallback

@@ -364,33 +364,27 @@ export default function App() {
               <AccuracyRadar judgeScores={results.judge_scores} />
             </div>
 
-            {/* Judge Winner Banner */}
-            {results.judge_scores && (
+            {/* Judge Winner Banner - Only show for actual wins, not ties */}
+            {results.judge_scores && results.judge_scores.winner !== "tie" && (
               <div style={{
                 background: results.judge_scores.winner === "graph_rag"
-                  ? "rgba(34,197,94,0.1)" : results.judge_scores.winner === "tie"
-                  ? "rgba(156,163,175,0.1)"
+                  ? "rgba(34,197,94,0.1)"
                   : "rgba(249,115,22,0.1)",
                 border: `1px solid ${results.judge_scores.winner === "graph_rag" 
-                  ? "#22c55e44" : results.judge_scores.winner === "tie"
-                  ? "#9ca3af44"
+                  ? "#22c55e44"
                   : "#f9731644"}`,
                 borderRadius: 12, padding: "1rem 1.25rem", marginBottom: "1.5rem",
                 display: "flex", alignItems: "center", gap: ".75rem",
               }}>
                 <CheckCircle size={18} color={results.judge_scores.winner === "graph_rag" 
-                  ? "#22c55e" : results.judge_scores.winner === "tie"
-                  ? "#9ca3af"
+                  ? "#22c55e"
                   : "#f97316"} />
                 <div>
                   <strong style={{ color: results.judge_scores.winner === "graph_rag" 
-                    ? "#22c55e" : results.judge_scores.winner === "tie"
-                    ? "#9ca3af"
+                    ? "#22c55e"
                     : "#f97316" }}>
                     {results.judge_scores.winner === "graph_rag" 
                       ? "✨ GraphRAG wins" 
-                      : results.judge_scores.winner === "tie"
-                      ? "🤝 It's a tie"
                       : "📊 Basic RAG wins"} this query
                   </strong>
                   <span style={{ color: "var(--text-muted)", fontSize: ".82rem", marginLeft: ".5rem" }}>
