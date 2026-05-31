@@ -1,4 +1,5 @@
 # Stage 1: Build frontend with Node
+# Force rebuild: 2026-06-01 deploy fix commit f4bb14ae
 FROM node:18-alpine AS frontend-builder
 
 WORKDIR /build/frontend
