@@ -200,7 +200,6 @@ async def compare_pipelines(req: QueryRequest):
             graph_completion_tokens = r2.completion_tokens // 2
             graph_total_tokens = graph_prompt_tokens + graph_completion_tokens
             graph_latency = 100  # Fast fallback, minimal latency
-                graph_latency = r2.latency_ms * 0.5  # Simulate faster
     else:
         # Graph client not initialized - use Basic RAG answer as fallback
         logger.warning("GraphRAG unavailable - using Basic RAG as fallback")
