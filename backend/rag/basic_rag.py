@@ -124,16 +124,32 @@ class BasicRAG:
         t0 = time.time()
 
         # 1. Embed the query
-        query_embedding = self._embed(question)
-        query_vec = np.array([query_embedding], dtype="float32")
-        faiss.normalize_L2(query_vec)
+        try:
+            query_embedding = self._embed(question)
+            if not query_embedding or len(query_embedding) == 0:
+                raise ValueError("Empty embedding returned")
+            query_vec = np.array([query_embedding], dtype="float32")
+            faiss.normalize_L2(query_vec)
+        except Exception as e:
+            logger.error(f"Embedding failed: {e}. Using fallback retrieval.")
+            query_vec = None
 
         # 2. Retrieve top-K similar chunks
-        if self.index.ntotal == 0:
-            retrieved = ["[No documents indexed]"]
+        retrieved = []
+        if query_vec is not None and self.index.ntotal > 0:
+            try:
+                distances, indices = self.index.search(query_vec, min(top_k, self.index.ntotal))
+                retrieved = [self.chunks[i] for i in indices[0] if i < len(self.chunks)]
+                logger.info(f"✅ Retrieved {len(retrieved)} chunks from FAISS (ntotal: {self.index.ntotal})")
+            except Exception as e:
+                logger.error(f"FAISS search failed: {e}. Falling back to first chunks.")
+                retrieved = self.chunks[:top_k]
+        elif self.chunks:
+            # Fallback: return first K chunks if embedding/search fails
+            logger.warning(f"⚠️ Embedding or index unavailable. Using first {top_k} chunks as fallback.")
+            retrieved = self.chunks[:top_k]
         else:
-            distances, indices = self.index.search(query_vec, min(top_k, self.index.ntotal))
-            retrieved = [self.chunks[i] for i in indices[0] if i < len(self.chunks)]
+            retrieved = ["[No documents available. Please ingest documents first.]"]
 
         # 3. Build context (this is where tokens pile up)
         context = "\n\n---\n\n".join(retrieved)
