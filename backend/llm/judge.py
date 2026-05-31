@@ -20,6 +20,18 @@ _genai_client = None
 LLM_MODEL = "gemini-2.0-flash"
 
 
+def _clean_json_response(response_text: str) -> str:
+    """Clean Gemini response that may be wrapped in markdown code blocks."""
+    text = response_text.strip()
+    if text.startswith("```json"):
+        text = text[7:]
+    elif text.startswith("```"):
+        text = text[3:]
+    if text.endswith("```"):
+        text = text[:-3]
+    return text.strip()
+
+
 def _get_genai_client():
     """Lazily initialize Gemini client to ensure .env is loaded."""
     global _genai_client
@@ -93,7 +105,11 @@ def llm_judge(question: str, answer: str, ground_truth: str = "") -> JudgeScore:
                 max_output_tokens=300,
             )
         )
-        data = json.loads(response.text)
+        # Clean markdown wrappers from response
+        cleaned_text = _clean_json_response(response.text)
+        if not cleaned_text:
+            raise ValueError("Empty response from Gemini")
+        data = json.loads(cleaned_text)
         return JudgeScore(
             overall=float(data.get("score", 5)),
             correctness=float(data.get("correctness", 5)),

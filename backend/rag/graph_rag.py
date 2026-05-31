@@ -36,6 +36,18 @@ _genai_client = None
 encoder = tiktoken.get_encoding("cl100k_base")
 
 
+def _clean_json_response(response_text: str) -> str:
+    """Clean Gemini response that may be wrapped in markdown code blocks."""
+    text = response_text.strip()
+    if text.startswith("```json"):
+        text = text[7:]
+    elif text.startswith("```"):
+        text = text[3:]
+    if text.endswith("```"):
+        text = text[:-3]
+    return text.strip()
+
+
 def _get_genai_client():
     """Lazily initialize Gemini client to ensure .env is loaded."""
     global _genai_client
@@ -82,9 +94,12 @@ def extract_query_entities(question: str) -> list[str]:
                 max_output_tokens=150,
             )
         )
-        raw = response.text
+        # Clean markdown wrappers from response
+        cleaned_text = _clean_json_response(response.text)
+        if not cleaned_text:
+            raise ValueError("Empty response from Gemini")
         # Handle both {"entities": [...]} and [...] formats
-        parsed = json.loads(raw)
+        parsed = json.loads(cleaned_text)
         if isinstance(parsed, list):
             return parsed
         for key in ["entities", "names", "keywords"]:
