@@ -363,36 +363,6 @@ export default function App() {
               <TokenChart results={results} />
               <AccuracyRadar judgeScores={results.judge_scores} />
             </div>
-
-            {/* Judge Winner Banner - Only show for actual wins, not ties */}
-            {results.judge_scores && results.judge_scores.winner !== "tie" && (
-              <div style={{
-                background: results.judge_scores.winner === "graph_rag"
-                  ? "rgba(34,197,94,0.1)"
-                  : "rgba(249,115,22,0.1)",
-                border: `1px solid ${results.judge_scores.winner === "graph_rag" 
-                  ? "#22c55e44"
-                  : "#f9731644"}`,
-                borderRadius: 12, padding: "1rem 1.25rem", marginBottom: "1.5rem",
-                display: "flex", alignItems: "center", gap: ".75rem",
-              }}>
-                <CheckCircle size={18} color={results.judge_scores.winner === "graph_rag" 
-                  ? "#22c55e"
-                  : "#f97316"} />
-                <div>
-                  <strong style={{ color: results.judge_scores.winner === "graph_rag" 
-                    ? "#22c55e"
-                    : "#f97316" }}>
-                    {results.judge_scores.winner === "graph_rag" 
-                      ? "✨ GraphRAG wins" 
-                      : "📊 Basic RAG wins"} this query
-                  </strong>
-                  <span style={{ color: "var(--text-muted)", fontSize: ".82rem", marginLeft: ".5rem" }}>
-                    (score improvement: {results.judge_scores.improvement > 0 ? "+" : ""}{results.judge_scores.improvement?.toFixed(1)} pts)
-                  </span>
-                </div>
-              </div>
-            )}
           </>
         )}
 
