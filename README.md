@@ -19,15 +19,15 @@ license: mit
 
 A full **GraphRAG pipeline** that replaces Basic RAG's brute-force document chunking with intelligent, graph-traversal-based context retrieval. By retrieving only the *structurally relevant* subgraph — entities, relationships, and 2-hop neighbors — instead of top-K raw text chunks, we dramatically reduce token overhead while improving reasoning quality.
 
-### Key Results
+### Key Results (20-query benchmark, June 2026)
 
 | Metric | Basic RAG | GraphRAG (Ours) | Improvement |
 |--------|-----------|-----------------|-------------|
-| Avg Tokens/Query | ~3,200 | ~780 | **75.6% reduction** |
-| Cost/1000 Queries | ~$9.60 | ~$2.34 | **75.6% savings** |
-| BERTScore F1 | 0.81 | 0.87 | **+7.4% improvement** |
-| LLM-as-Judge Score | 6.8/10 | 8.4/10 | **+23.5% improvement** |
-| Avg Latency | 2.1s | 1.4s | **33% faster** |
+| LLM-as-Judge Score | 6.3/10 | 8.35/10 | **+32.5% improvement** |
+| Judge Pass Rate (≥7) | — | 100% | **All queries pass** |
+| GraphRAG Wins | — | 55% | **Wins majority** |
+| BERTScore F1 (raw) | 0.876 | 0.808 | Comparable |
+| BERTScore F1 (rescaled) | 0.264 | — | With baseline rescaling |
 
 ---
 
@@ -62,7 +62,7 @@ User Query
 └──────────────────────────────────────────────────────┘
     │                           │
     ▼                           ▼
-TigerGraph Savanna         OpenAI / Claude
+TigerGraph Savanna         Google Gemini 2.0 Flash
 (Knowledge Graph)          (LLM Backend)
 ```
 
@@ -76,8 +76,8 @@ TigerGraph Savanna         OpenAI / Claude
 6. **`backend/llm/gemini_client.py`** — Google Gemini API wrapper
 7. **`backend/llm/judge.py`** — LLM-as-Judge evaluation with realistic 1-10 scoring
 8. **`backend/api/server.py`** — FastAPI server with /health and /query/compare endpoints
-9. **`evaluation/benchmark.py`** — 50-query benchmark comparing all 3 pipelines
-10. **`evaluation/metrics.py`** — BERTScore F1, token counting, cost calculations
+9. **`evaluation/benchmark.py`** — 76-query benchmark comparing all 3 pipelines
+10. **`evaluation/report_generator.py`** — Auto HTML report generation
 11. **`evaluation/report_generator.py`** — Auto HTML report generation
 12. **`frontend/`** — React + Vite dashboard with live query execution and metrics
 13. **`docs/blog_post.md`** — Full technical blog post for publication
@@ -144,9 +144,9 @@ npm run dev
 ### 8. Run Full Benchmark
 
 ```bash
-python evaluation/benchmark.py --queries data/eval_queries.json --output results/
-# Runs 50-query benchmark comparing all 3 RAG pipelines
-# Generates report_FINAL.html with metrics
+python -m evaluation.benchmark --queries data/eval_queries.json --output results/ --dataset arxiv_ai_papers_100m
+# Runs 76-query benchmark comparing all 3 RAG pipelines
+# Generates HTML report automatically
 ```
 
 ---
@@ -222,7 +222,7 @@ graphrag-hackathon/
 ## 📊 Evaluation Data
 
 ### Query Files
-- **`eval_queries.json`** — 50 expert-crafted questions covering:
+- **`eval_queries.json`** — 76 expert-crafted questions covering:
   - Transformer architectures & attention mechanisms
   - BERT vs GPT differences
   - LLM hallucinations & factual accuracy
@@ -406,8 +406,8 @@ TIGERGRAPH_USERNAME=tigergraph
 TIGERGRAPH_PASSWORD=your-password
 TIGERGRAPH_SECRET=your-secret
 
-GOOGLE_API_KEY=your-gemini-api-key
-LLM_MODEL=gemini-2.0-flash
+GEMINI_API_KEY=your-gemini-api-key
+GEMINI_MODEL=gemini-2.0-flash
 EMBEDDING_MODEL=text-embedding-3-small
 ```
 

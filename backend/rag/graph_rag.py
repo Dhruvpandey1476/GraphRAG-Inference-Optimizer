@@ -2,6 +2,8 @@
 GraphRAG Pipeline — The Core Innovation
 Entity-anchored subgraph traversal → structured context → LLM
 
+DEPLOYMENT VERSION: 20260601-v3-DIFFERENT-FALLBACK-PROMPT-FIX
+
 Instead of dumping top-K text chunks (expensive, noisy),
 we:
 1. Extract entities from the query (LLM-based with regex fallback)
@@ -201,6 +203,7 @@ Question: {question}
 Provide a detailed, accurate answer using the graph context and your expertise:"""
             temperature = 0.1
             max_tokens = 500
+            logger.info(f"🎯 GraphRAG PROMPT STRATEGY: Using GRAPH DATA ({num_entities} entities, {num_rels} rels)")
         else:
             # No graph data found — use LLM's parametric knowledge with DIFFERENT reasoning strategy
             # This produces different answers than BasicRAG (which uses context-only prompts)
@@ -222,6 +225,7 @@ Provide a comprehensive, multi-faceted answer:"""
             # Use slightly higher temperature for more creative responses when no context
             temperature = 0.3
             max_tokens = 600
+            logger.info(f"⚠️  GraphRAG PROMPT STRATEGY: Using FALLBACK (graph empty or no entities found). Using 5-step structured analysis with temp={temperature}, max_tokens={max_tokens}")
 
         # 5. Call Gemini via shared client (accurate token counts)
         result = gemini_generate(
