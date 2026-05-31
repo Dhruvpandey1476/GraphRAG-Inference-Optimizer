@@ -9,26 +9,27 @@ import json
 import logging
 from pathlib import Path
 from dataclasses import dataclass
-from groq import Groq
+import google.generativeai as genai
 from dotenv import load_dotenv
 
 # Load .env from project root
 load_dotenv(Path(__file__).parent.parent.parent / ".env", override=True)
 logger = logging.getLogger(__name__)
 
-_groq_client = None
-LLM_MODEL = os.getenv("LLM_MODEL", "llama-3.3-70b-versatile")
+_genai_client = None
+LLM_MODEL = "gemini-2.0-flash"
 
 
-def _get_groq_client():
-    """Lazily initialize Groq client to ensure .env is loaded."""
-    global _groq_client
-    if _groq_client is None:
-        api_key = os.getenv("GROQ_API_KEY")
+def _get_genai_client():
+    """Lazily initialize Gemini client to ensure .env is loaded."""
+    global _genai_client
+    if _genai_client is None:
+        api_key = os.getenv("GEMINI_API_KEY")
         if not api_key:
-            raise ValueError("GROQ_API_KEY not found in environment. Check your .env file.")
-        _groq_client = Groq(api_key=api_key)
-    return _groq_client
+            raise ValueError("GEMINI_API_KEY not found in environment. Check your .env file.")
+        genai.configure(api_key=api_key)
+        _genai_client = genai.GenerativeModel(LLM_MODEL)
+    return _genai_client
 
 JUDGE_PROMPT = """You are an impartial AI judge evaluating the quality of an answer to a question.
 
@@ -84,17 +85,15 @@ def llm_judge(question: str, answer: str, ground_truth: str = "") -> JudgeScore:
         answer=answer,
     )
     try:
-        client = _get_groq_client()
-        response = client.chat.completions.create(
-            model=LLM_MODEL,
-            messages=[
-                {"role": "system", "content": "You are an impartial judge. Return only valid JSON."},
-                {"role": "user", "content": prompt},
-            ],
-            temperature=0,
-            max_tokens=300,
+        client = _get_genai_client()
+        response = client.generate_content(
+            prompt,
+            generation_config=genai.types.GenerationConfig(
+                temperature=0,
+                max_output_tokens=300,
+            )
         )
-        data = json.loads(response.choices[0].message.content)
+        data = json.loads(response.text)
         return JudgeScore(
             overall=float(data.get("score", 5)),
             correctness=float(data.get("correctness", 5)),

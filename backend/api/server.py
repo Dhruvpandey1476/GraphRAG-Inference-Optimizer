@@ -18,7 +18,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from dotenv import load_dotenv
-from groq import Groq
+import google.generativeai as genai
 
 # Load .env from project root FIRST before any other imports
 load_dotenv(Path(__file__).parent.parent.parent / ".env", override=True)
