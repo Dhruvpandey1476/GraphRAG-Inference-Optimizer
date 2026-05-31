@@ -19,7 +19,6 @@ from pathlib import Path
 from datetime import datetime
 from dataclasses import dataclass, asdict
 
-import tiktoken
 from tqdm import tqdm
 from dotenv import load_dotenv
 
@@ -38,8 +37,6 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(message)s",
 )
 logger = logging.getLogger(__name__)
-
-encoder = tiktoken.get_encoding("cl100k_base")
 
 INPUT_COST_PER_1K = 0.00015
 OUTPUT_COST_PER_1K = 0.0006
@@ -113,6 +110,8 @@ class BenchmarkSummary:
 
     bert_score_basic_f1: float
     bert_score_graph_f1: float
+    bert_score_basic_f1_raw: float
+    bert_score_graph_f1_raw: float
 
     graph_wins_pct: float
     llm_judge_pass_rate_graph: float  # pct of queries where score >= 7
@@ -251,7 +250,7 @@ class BenchmarkRunner:
         n = len(results)
         summary = BenchmarkSummary(
             total_queries=n,
-            timestamp=datetime.utcnow().isoformat(),
+            timestamp=datetime.now().isoformat(),
             dataset=dataset_name,
             avg_tokens_llm=round(sum(r.llm_tokens for r in results) / n, 1),
             avg_tokens_basic=round(sum(r.basic_tokens for r in results) / n, 1),
@@ -270,6 +269,8 @@ class BenchmarkRunner:
             avg_judge_score_graph=round(sum(r.graph_judge_score for r in results) / n, 2),
             bert_score_basic_f1=round(bert_basic["f1"], 4),
             bert_score_graph_f1=round(bert_graph["f1"], 4),
+            bert_score_basic_f1_raw=round(bert_basic.get("f1_raw", bert_basic["f1"]), 4),
+            bert_score_graph_f1_raw=round(bert_graph.get("f1_raw", bert_graph["f1"]), 4),
             graph_wins_pct=round(sum(1 for r in results if r.graph_wins_judge) / n * 100, 1),
             llm_judge_pass_rate_graph=round(
                 sum(1 for r in results if r.graph_judge_score >= 7) / n * 100, 1
@@ -281,7 +282,7 @@ class BenchmarkRunner:
         return summary
 
     def _save_results(self, results, summary):
-        ts = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+        ts = datetime.now().strftime("%Y%m%d_%H%M%S")
 
         # Full JSON
         out = {
@@ -294,10 +295,13 @@ class BenchmarkRunner:
         logger.info(f"📄 Results saved: {json_path}")
 
         # Also generate HTML report
-        from evaluation.report_generator import generate_html_report
-        html_path = self.output_dir / f"report_{ts}.html"
-        generate_html_report(out, str(html_path))
-        logger.info(f"📊 HTML report: {html_path}")
+        try:
+            from evaluation.report_generator import generate_html_report
+            html_path = self.output_dir / f"report_{ts}.html"
+            generate_html_report(out, str(html_path))
+            logger.info(f"HTML report: {html_path}")
+        except Exception as e:
+            logger.warning(f"HTML report generation failed (non-critical): {e}")
 
     def _print_summary(self, s: BenchmarkSummary):
         print(f"""
@@ -316,9 +320,9 @@ class BenchmarkRunner:
 ║    LLM-Only:  {s.avg_judge_score_llm:<44.2f}║
 ║    Basic RAG: {s.avg_judge_score_basic:<44.2f}║
 ║    GraphRAG:  {s.avg_judge_score_graph:<44.2f}║
-║  BERTScore F1                                            ║
-║    Basic RAG: {s.bert_score_basic_f1:<44.4f}║
-║    GraphRAG:  {s.bert_score_graph_f1:<44.4f}║
+║  BERTScore F1 (rescaled / raw)                           ║
+║    Basic RAG: {s.bert_score_basic_f1:<20.4f}/ {s.bert_score_basic_f1_raw:<21.4f}║
+║    GraphRAG:  {s.bert_score_graph_f1:<20.4f}/ {s.bert_score_graph_f1_raw:<21.4f}║
 ╠══════════════════════════════════════════════════════════╣
 ║  LATENCY (avg ms)                                        ║
 ║    Basic RAG: {s.avg_latency_basic_ms:<44.1f}║

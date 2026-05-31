@@ -1,47 +1,36 @@
 """
-LLM-as-a-Judge Evaluation
-Scores answers on correctness, completeness, and relevance.
-Also computes BERTScore F1.
+LLM-as-a-Judge Evaluation (1-10 Scale)
+Uses Gemini for structured grading + BERTScore F1 with rescaling.
+Meets TigerGraph Hackathon Round 2 requirements.
 """
 
 import os
+import re
 import json
 import logging
 from pathlib import Path
 from dataclasses import dataclass
-import google.generativeai as genai
 from dotenv import load_dotenv
 
-# Load .env from project root
 load_dotenv(Path(__file__).parent.parent.parent / ".env", override=True)
 logger = logging.getLogger(__name__)
 
-_genai_client = None
-LLM_MODEL = "gemini-2.0-flash"
+
+# ─── Shared Gemini for judge ─────────────────────────────────────────────────
+
+def _judge_gemini_call(prompt: str) -> str:
+    """Call Gemini for judge evaluation."""
+    from .gemini_client import gemini_generate
+    result = gemini_generate(
+        system_prompt="You are an impartial AI judge. Return only valid JSON.",
+        user_prompt=prompt,
+        temperature=0,
+        max_tokens=300,
+    )
+    return result["answer"]
 
 
-def _clean_json_response(response_text: str) -> str:
-    """Clean Gemini response that may be wrapped in markdown code blocks."""
-    text = response_text.strip()
-    if text.startswith("```json"):
-        text = text[7:]
-    elif text.startswith("```"):
-        text = text[3:]
-    if text.endswith("```"):
-        text = text[:-3]
-    return text.strip()
-
-
-def _get_genai_client():
-    """Lazily initialize Gemini client to ensure .env is loaded."""
-    global _genai_client
-    if _genai_client is None:
-        api_key = os.getenv("GEMINI_API_KEY")
-        if not api_key:
-            raise ValueError("GEMINI_API_KEY not found in environment. Check your .env file.")
-        genai.configure(api_key=api_key)
-        _genai_client = genai.GenerativeModel(LLM_MODEL)
-    return _genai_client
+# ─── 1-10 Scale Judge ────────────────────────────────────────────────────────
 
 JUDGE_PROMPT = """You are an impartial AI judge evaluating the quality of an answer to a question.
 
@@ -72,8 +61,7 @@ Question: {question}
 Ground Truth (if available): {ground_truth}
 
 Answer to evaluate:
-{answer}
-"""
+{answer}"""
 
 
 @dataclass
@@ -88,7 +76,7 @@ class JudgeScore:
 
 def llm_judge(question: str, answer: str, ground_truth: str = "") -> JudgeScore:
     """
-    Use LLM to score an answer on multiple dimensions.
+    Use LLM to score an answer on multiple dimensions (1-10).
     Returns structured scores.
     """
     prompt = JUDGE_PROMPT.format(
@@ -97,19 +85,14 @@ def llm_judge(question: str, answer: str, ground_truth: str = "") -> JudgeScore:
         answer=answer,
     )
     try:
-        client = _get_genai_client()
-        response = client.generate_content(
-            prompt,
-            generation_config=genai.types.GenerationConfig(
-                temperature=0,
-                max_output_tokens=300,
-            )
-        )
-        # Clean markdown wrappers from response
-        cleaned_text = _clean_json_response(response.text)
-        if not cleaned_text:
-            raise ValueError("Empty response from Gemini")
-        data = json.loads(cleaned_text)
+        raw = _judge_gemini_call(prompt)
+        # Clean markdown wrappers
+        text = raw.strip()
+        if text.startswith("```"):
+            text = re.sub(r"^```(?:json)?\s*", "", text)
+            text = re.sub(r"\s*```$", "", text)
+
+        data = json.loads(text)
         return JudgeScore(
             overall=float(data.get("score", 5)),
             correctness=float(data.get("correctness", 5)),
@@ -123,38 +106,65 @@ def llm_judge(question: str, answer: str, ground_truth: str = "") -> JudgeScore:
         return JudgeScore(5.0, 5.0, 5.0, 5.0, 5.0, f"Evaluation failed: {e}")
 
 
+# ─── BERTScore ───────────────────────────────────────────────────────────────
+
 def compute_bert_score(predictions: list[str], references: list[str]) -> dict:
     """
     Compute BERTScore F1 between predicted answers and ground truths.
-    Returns precision, recall, f1 (averaged).
+    Uses roberta-large with rescale_with_baseline=True as required.
+    Returns both rescaled and raw F1 scores.
     """
     try:
-        from bert_score import score as bert_score_fn
-        P, R, F1 = bert_score_fn(
-            predictions,
-            references,
+        import evaluate
+        bertscore = evaluate.load("bertscore")
+
+        model_type = "roberta-large"
+
+        # Compute raw first (no rescaling)
+        results_raw = bertscore.compute(
+            predictions=predictions,
+            references=references,
             lang="en",
-            model_type="distilbert-base-uncased",
-            verbose=False,
+            model_type=model_type,
         )
+        raw_f1 = sum(results_raw["f1"]) / len(results_raw["f1"])
+
+        # Compute with rescaling
+        results = bertscore.compute(
+            predictions=predictions,
+            references=references,
+            lang="en",
+            model_type=model_type,
+            rescale_with_baseline=True,
+        )
+
+        f1_scores = results["f1"]
+        precision_scores = results["precision"]
+        recall_scores = results["recall"]
+
+        avg_f1 = sum(f1_scores) / len(f1_scores)
+        avg_precision = sum(precision_scores) / len(precision_scores)
+        avg_recall = sum(recall_scores) / len(recall_scores)
+
         return {
-            "precision": float(P.mean()),
-            "recall": float(R.mean()),
-            "f1": float(F1.mean()),
+            "precision": round(float(avg_precision), 4),
+            "recall": round(float(avg_recall), 4),
+            "f1": round(float(avg_f1), 4),        # rescaled
+            "f1_raw": round(float(raw_f1), 4),     # raw
         }
     except ImportError:
-        logger.warning("bert-score not installed. Skipping BERTScore computation.")
-        return {"precision": 0.0, "recall": 0.0, "f1": 0.0}
+        logger.warning("evaluate/bert-score not installed. Skipping BERTScore.")
+        return {"precision": 0.0, "recall": 0.0, "f1": 0.0, "f1_raw": 0.0}
     except Exception as e:
         logger.error(f"BERTScore computation failed: {e}")
-        return {"precision": 0.0, "recall": 0.0, "f1": 0.0}
+        return {"precision": 0.0, "recall": 0.0, "f1": 0.0, "f1_raw": 0.0}
 
+
+# ─── Side-by-side Comparison ─────────────────────────────────────────────────
 
 def compare_answers(question: str, basic_rag_answer: str, graph_rag_answer: str,
                     ground_truth: str = "") -> dict:
-    """
-    Side-by-side LLM judge comparison of Basic RAG vs GraphRAG answers.
-    """
+    """Side-by-side LLM judge comparison of Basic RAG vs GraphRAG answers."""
     basic_score = llm_judge(question, basic_rag_answer, ground_truth)
     graph_score = llm_judge(question, graph_rag_answer, ground_truth)
 

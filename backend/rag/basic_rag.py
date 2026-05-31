@@ -13,36 +13,23 @@ from pathlib import Path
 from dataclasses import dataclass
 import numpy as np
 import faiss
-import tiktoken
-import google.generativeai as genai
 from dotenv import load_dotenv
+
+from ..llm.gemini_client import gemini_generate
 
 # Load .env from project root
 load_dotenv(Path(__file__).parent.parent.parent / ".env", override=True)
 logger = logging.getLogger(__name__)
 
 TOP_K = int(os.getenv("TOP_K_BASIC_RAG", 5))
-LLM_MODEL = "gemini-2.0-flash"
 EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "text-embedding-3-small")
 EMBEDDING_DIM = 384  # sentence-transformers all-MiniLM-L6-v2
 
-# Delay client creation until first use
-_genai_client = None
 _sentence_transformer = None
 USE_SENTENCE_TRANSFORMERS = os.getenv("USE_SENTENCE_TRANSFORMERS", "true").lower() == "true"
-encoder = tiktoken.get_encoding("cl100k_base")
 
 
-def _get_genai_client():
-    """Lazily initialize Gemini client to ensure .env is loaded."""
-    global _genai_client
-    if _genai_client is None:
-        api_key = os.getenv("GEMINI_API_KEY")
-        if not api_key:
-            raise ValueError("GEMINI_API_KEY not found in environment. Check your .env file.")
-        genai.configure(api_key=api_key)
-        _genai_client = genai.GenerativeModel(LLM_MODEL)
-    return _genai_client
+# Gemini calls go through shared gemini_client.gemini_generate()
 
 
 def _get_sentence_transformer():
@@ -249,29 +236,22 @@ Question: {question}
 
 Answer:"""
 
-        # 5. Call LLM
-        client = _get_genai_client()
-        full_prompt = f"{system_prompt}\n\n{user_prompt}"
-        response = client.generate_content(
-            full_prompt,
-            generation_config=genai.types.GenerationConfig(
-                temperature=0.1,
-                max_output_tokens=512,
-            )
+        # 5. Call Gemini via shared client (accurate token counts)
+        result = gemini_generate(
+            system_prompt=system_prompt,
+            user_prompt=user_prompt,
+            temperature=0.1,
+            max_tokens=512,
         )
 
         latency_ms = (time.time() - t0) * 1000
-        
-        # Estimate token counts
-        prompt_tokens = len(encoder.encode(full_prompt))
-        completion_tokens = len(encoder.encode(response.text))
 
         return RAGResult(
-            answer=response.text,
+            answer=result["answer"],
             retrieved_chunks=retrieved,
-            prompt_tokens=prompt_tokens,
-            completion_tokens=completion_tokens,
-            total_tokens=prompt_tokens + completion_tokens,
+            prompt_tokens=result["prompt_tokens"],
+            completion_tokens=result["completion_tokens"],
+            total_tokens=result["total_tokens"],
             latency_ms=latency_ms,
             method="basic_rag",
         )
@@ -338,7 +318,8 @@ Answer:"""
         return [[0.0] * 384 for _ in texts]
 
     def count_tokens(self, text: str) -> int:
-        return len(encoder.encode(text))
+        from ..llm.gemini_client import count_tokens_gemini
+        return count_tokens_gemini(text)
 
     def get_index_stats(self) -> dict:
         return {
