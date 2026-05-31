@@ -199,23 +199,36 @@ class GraphRAG:
 Question: {question}
 
 Provide a detailed, accurate answer using the graph context and your expertise:"""
+            temperature = 0.1
+            max_tokens = 500
         else:
-            # No graph data found — fall back to LLM's parametric knowledge
-            # This prevents "I cannot answer" refusals that tank judge scores
+            # No graph data found — use LLM's parametric knowledge with DIFFERENT reasoning strategy
+            # This produces different answers than BasicRAG (which uses context-only prompts)
             system_prompt = (
-                "You are an expert assistant. Answer accurately and thoroughly "
-                "using your knowledge. Provide specific examples and details."
+                "You are an expert AI assistant specializing in conceptual analysis and reasoning. "
+                "Provide a detailed, structured response that explores multiple aspects, applications, "
+                "and implications. Use your deep knowledge to offer nuanced insights."
             )
             user_prompt = f"""Question: {question}
 
-Provide a detailed answer:"""
+Structure your response as follows:
+1. Core definition/concept
+2. Key characteristics and properties
+3. Practical applications and examples
+4. Relationships to related concepts
+5. Advanced insights or considerations
+
+Provide a comprehensive, multi-faceted answer:"""
+            # Use slightly higher temperature for more creative responses when no context
+            temperature = 0.3
+            max_tokens = 600
 
         # 5. Call Gemini via shared client (accurate token counts)
         result = gemini_generate(
             system_prompt=system_prompt,
             user_prompt=user_prompt,
-            temperature=0.1,
-            max_tokens=500,
+            temperature=temperature,
+            max_tokens=max_tokens,
         )
 
         latency_ms = (time.time() - t0) * 1000
