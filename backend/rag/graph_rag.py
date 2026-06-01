@@ -207,39 +207,29 @@ Provide a detailed, accurate answer using the graph context and your expertise:"
             max_tokens = 4000
             logger.info(f"🎯 GraphRAG PROMPT STRATEGY: Using GRAPH DATA ({num_entities} entities, {num_rels} rels)")
         else:
-            # No graph data found — use LLM's parametric knowledge with DIFFERENT reasoning strategy
-            # This produces different answers than BasicRAG (which uses context-only prompts)
+            # No graph data found — use Chain-of-Thought reasoning with entity relationship thinking
+            # Explicitly ask LLM to think like a knowledge graph, making it DIFFERENT from BasicRAG
             system_prompt = (
-                "You are an expert AI assistant specializing in conceptual analysis and reasoning. "
-                "Provide a detailed, structured response that explores multiple aspects, applications, "
-                "and implications. Use your deep knowledge to offer nuanced insights."
+                "You are an expert reasoning assistant trained to think in terms of knowledge graphs. "
+                "When answering questions, identify key ENTITIES, their RELATIONSHIPS, and PROPERTIES. "
+                "Structure your reasoning as if traversing a graph of interconnected concepts. "
+                "Be concise but comprehensive."
             )
-            user_prompt = f"""CONCEPTUAL ANALYSIS REQUEST (Knowledge Graph Analysis Mode - No Retrieved Documents)
+            user_prompt = f"""Question: {question}
 
-Question: {question}
+Analyze this as a knowledge graph traversal problem:
 
-Provide a comprehensive, structured analysis following this framework:
+1. KEY ENTITIES: What are the main entities/concepts involved?
+2. ENTITY PROPERTIES: What defines each entity?
+3. RELATIONSHIPS: How do these entities connect?
+4. REASONING PATH: What's the logical traversal through these connections?
+5. ANSWER: Synthesize the path into a concise but complete answer.
 
-1. CORE DEFINITION/CONCEPT
-   Define and explain the fundamental concept
-
-2. KEY CHARACTERISTICS AND PROPERTIES
-   What are the essential attributes and features?
-
-3. PRACTICAL APPLICATIONS AND EXAMPLES
-   Where and how is this applied in real-world scenarios?
-
-4. RELATIONSHIPS TO RELATED CONCEPTS
-   How does this relate to other important concepts?
-
-5. ADVANCED INSIGHTS AND CONSIDERATIONS
-   What deeper implications or nuances should be understood?
-
-Structure your response clearly using the framework above:"""
-            # Use slightly higher temperature for more creative responses when no context
-            temperature = 0.3
-            max_tokens = 4000
-            logger.info(f"⚠️  GraphRAG PROMPT STRATEGY: Using FALLBACK (graph empty or no entities found). Using 5-step structured analysis with temp={temperature}, max_tokens={max_tokens}")
+Provide a CONCISE answer structured around the entity-relationship graph thinking:"""
+            # Use moderate temperature for focused reasoning
+            temperature = 0.15
+            max_tokens = 1500
+            logger.info(f"⚠️  GraphRAG PROMPT STRATEGY: Using FALLBACK (graph empty). Using entity-relationship chain-of-thought reasoning with temp={temperature}, max_tokens={max_tokens}")
 
         # 5. Call Gemini via shared client (accurate token counts)
         result = gemini_generate(
