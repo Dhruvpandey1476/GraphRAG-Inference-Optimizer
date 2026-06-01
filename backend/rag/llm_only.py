@@ -41,21 +41,16 @@ class LLMOnly:
         t0 = time.time()
 
         system_prompt = (
-            "You are a direct, concise assistant. Provide SHORT, focused answers. "
-            "Use bullet points. Avoid lengthy paragraphs. Be factual and brief."
+            "You are a knowledgeable assistant. Answer the following question "
+            "as accurately and thoroughly as possible using your training knowledge. "
+            "Provide specific details, examples, and explanations."
         )
-
-        user_prompt = f"""Give a SHORT answer with key points:
-
-{question}
-
-Format: Use bullet points. Keep it brief."""
 
         result = gemini_generate(
             system_prompt=system_prompt,
-            user_prompt=user_prompt,
+            user_prompt=question,
             temperature=0.1,
-            max_tokens=1200,
+            max_tokens=1024,
         )
 
         latency_ms = (time.time() - t0) * 1000
