@@ -407,7 +407,7 @@ TIGERGRAPH_PASSWORD=your-password
 TIGERGRAPH_SECRET=your-secret
 
 GEMINI_API_KEY=your-gemini-api-key
-GEMINI_MODEL=gemini-2.0-flash
+GEMINI_MODEL=gemini-2.5-flash
 EMBEDDING_MODEL=text-embedding-3-small
 ```
 
