@@ -214,16 +214,28 @@ Provide a detailed, accurate answer using the graph context and your expertise:"
                 "Provide a detailed, structured response that explores multiple aspects, applications, "
                 "and implications. Use your deep knowledge to offer nuanced insights."
             )
-            user_prompt = f"""Question: {question}
+            user_prompt = f"""CONCEPTUAL ANALYSIS REQUEST (Knowledge Graph Analysis Mode - No Retrieved Documents)
 
-Structure your response as follows:
-1. Core definition/concept
-2. Key characteristics and properties
-3. Practical applications and examples
-4. Relationships to related concepts
-5. Advanced insights or considerations
+Question: {question}
 
-Provide a comprehensive, multi-faceted answer:"""
+Provide a comprehensive, structured analysis following this framework:
+
+1. CORE DEFINITION/CONCEPT
+   Define and explain the fundamental concept
+
+2. KEY CHARACTERISTICS AND PROPERTIES
+   What are the essential attributes and features?
+
+3. PRACTICAL APPLICATIONS AND EXAMPLES
+   Where and how is this applied in real-world scenarios?
+
+4. RELATIONSHIPS TO RELATED CONCEPTS
+   How does this relate to other important concepts?
+
+5. ADVANCED INSIGHTS AND CONSIDERATIONS
+   What deeper implications or nuances should be understood?
+
+Structure your response clearly using the framework above:"""
             # Use slightly higher temperature for more creative responses when no context
             temperature = 0.3
             max_tokens = 600
