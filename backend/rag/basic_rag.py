@@ -241,7 +241,7 @@ Answer:"""
             system_prompt=system_prompt,
             user_prompt=user_prompt,
             temperature=0.1,
-            max_tokens=512,
+            max_tokens=4000,
         )
 
         latency_ms = (time.time() - t0) * 1000

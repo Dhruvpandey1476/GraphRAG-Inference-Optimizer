@@ -204,7 +204,7 @@ Question: {question}
 
 Provide a detailed, accurate answer using the graph context and your expertise:"""
             temperature = 0.1
-            max_tokens = 500
+            max_tokens = 4000
             logger.info(f"🎯 GraphRAG PROMPT STRATEGY: Using GRAPH DATA ({num_entities} entities, {num_rels} rels)")
         else:
             # No graph data found — use LLM's parametric knowledge with DIFFERENT reasoning strategy
@@ -238,7 +238,7 @@ Provide a comprehensive, structured analysis following this framework:
 Structure your response clearly using the framework above:"""
             # Use slightly higher temperature for more creative responses when no context
             temperature = 0.3
-            max_tokens = 600
+            max_tokens = 4000
             logger.info(f"⚠️  GraphRAG PROMPT STRATEGY: Using FALLBACK (graph empty or no entities found). Using 5-step structured analysis with temp={temperature}, max_tokens={max_tokens}")
 
         # 5. Call Gemini via shared client (accurate token counts)

@@ -56,7 +56,7 @@ Provide a well-structured, comprehensive answer that explains concepts clearly."
             system_prompt=system_prompt,
             user_prompt=user_prompt,
             temperature=0.2,
-            max_tokens=600,
+            max_tokens=4000,
         )
 
         latency_ms = (time.time() - t0) * 1000
