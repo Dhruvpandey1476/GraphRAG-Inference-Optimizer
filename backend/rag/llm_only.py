@@ -41,15 +41,22 @@ class LLMOnly:
         t0 = time.time()
 
         system_prompt = (
-            "You are a knowledgeable assistant. Answer the following question "
-            "as accurately as possible using your training knowledge."
+            "You are an expert and knowledgeable assistant. Provide thorough, "
+            "accurate answers using your deep training knowledge. Be comprehensive "
+            "and explain concepts clearly."
         )
+
+        user_prompt = f"""Answer this question in detail:
+
+{question}
+
+Provide a well-structured, comprehensive answer that explains concepts clearly."""
 
         result = gemini_generate(
             system_prompt=system_prompt,
-            user_prompt=question,
-            temperature=0.1,
-            max_tokens=512,
+            user_prompt=user_prompt,
+            temperature=0.2,
+            max_tokens=600,
         )
 
         latency_ms = (time.time() - t0) * 1000
