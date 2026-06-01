@@ -207,29 +207,17 @@ Provide a detailed, accurate answer using the graph context and your expertise:"
             max_tokens = 4000
             logger.info(f"🎯 GraphRAG PROMPT STRATEGY: Using GRAPH DATA ({num_entities} entities, {num_rels} rels)")
         else:
-            # No graph data found — use Chain-of-Thought reasoning with entity relationship thinking
-            # Explicitly ask LLM to think like a knowledge graph, making it DIFFERENT from BasicRAG
+            # No graph data — use CONCISE direct answer (minimal tokens)
+            # GraphRAG should be EFFICIENT, not verbose
             system_prompt = (
-                "You are an expert reasoning assistant trained to think in terms of knowledge graphs. "
-                "When answering questions, identify key ENTITIES, their RELATIONSHIPS, and PROPERTIES. "
-                "Structure your reasoning as if traversing a graph of interconnected concepts. "
-                "Be concise but comprehensive."
+                "You are a concise expert assistant. Provide direct, focused answers. "
+                "Be brief but accurate. Avoid lengthy elaborations."
             )
-            user_prompt = f"""Question: {question}
-
-Analyze this as a knowledge graph traversal problem:
-
-1. KEY ENTITIES: What are the main entities/concepts involved?
-2. ENTITY PROPERTIES: What defines each entity?
-3. RELATIONSHIPS: How do these entities connect?
-4. REASONING PATH: What's the logical traversal through these connections?
-5. ANSWER: Synthesize the path into a concise but complete answer.
-
-Provide a CONCISE answer structured around the entity-relationship graph thinking:"""
-            # Use moderate temperature for focused reasoning
-            temperature = 0.15
-            max_tokens = 1500
-            logger.info(f"⚠️  GraphRAG PROMPT STRATEGY: Using FALLBACK (graph empty). Using entity-relationship chain-of-thought reasoning with temp={temperature}, max_tokens={max_tokens}")
+            user_prompt = f"""Answer concisely: {question}"""
+            # Keep it SHORT and efficient
+            temperature = 0.1
+            max_tokens = 800
+            logger.info(f"⚠️  GraphRAG PROMPT STRATEGY: Using FALLBACK (graph empty). Concise direct answer with max_tokens={max_tokens}")
 
         # 5. Call Gemini via shared client (accurate token counts)
         result = gemini_generate(
