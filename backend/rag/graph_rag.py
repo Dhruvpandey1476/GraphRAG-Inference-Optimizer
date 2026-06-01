@@ -187,6 +187,8 @@ class GraphRAG:
         has_graph_context = bool(context.strip())
         num_entities = len(subgraph.get("entities", []))
         num_rels = len(subgraph.get("relationships", []))
+        
+        logger.info(f"DEBUG: has_graph_context={has_graph_context}, num_entities={num_entities}, context_len={len(context)}")
 
         if has_graph_context and num_entities > 0:
             # We have graph data — use it as primary source
