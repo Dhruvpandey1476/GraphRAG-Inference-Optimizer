@@ -62,7 +62,7 @@ User Query
 └──────────────────────────────────────────────────────┘
     │                           │
     ▼                           ▼
-TigerGraph Savanna         Google Gemini 2.0 Flash
+TigerGraph Savanna         Google Gemini 2.5 Flash
 (Knowledge Graph)          (LLM Backend)
 ```
 
