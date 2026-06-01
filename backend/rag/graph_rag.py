@@ -207,17 +207,22 @@ Provide a detailed, accurate answer using the graph context and your expertise:"
             max_tokens = 4000
             logger.info(f"🎯 GraphRAG PROMPT STRATEGY: Using GRAPH DATA ({num_entities} entities, {num_rels} rels)")
         else:
-            # No graph data — use CONCISE direct answer (minimal tokens)
-            # GraphRAG should be EFFICIENT, not verbose
+            # No graph data — use entity-relationship structured answer
+            # Force different thinking pattern than other pipelines
             system_prompt = (
-                "You are a concise expert assistant. Provide direct, focused answers. "
-                "Be brief but accurate. Avoid lengthy elaborations."
+                "You are an expert analyst. Think in terms of ENTITIES and RELATIONSHIPS. "
+                "Structure your answer around key concepts and how they connect."
             )
-            user_prompt = f"""Answer concisely: {question}"""
+            user_prompt = f"""Analyze from an entity-relationship perspective:
+
+{question}
+
+Structure: 1) Key entities, 2) How they relate, 3) Synthesis.
+Keep it structured and concise."""
             # Keep it SHORT and efficient
             temperature = 0.1
             max_tokens = 800
-            logger.info(f"⚠️  GraphRAG PROMPT STRATEGY: Using FALLBACK (graph empty). Concise direct answer with max_tokens={max_tokens}")
+            logger.info(f"⚠️  GraphRAG PROMPT STRATEGY: Using FALLBACK (graph empty). Entity-relationship analysis with max_tokens={max_tokens}")
 
         # 5. Call Gemini via shared client (accurate token counts)
         result = gemini_generate(

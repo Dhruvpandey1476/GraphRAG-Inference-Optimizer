@@ -41,11 +41,15 @@ class LLMOnly:
         t0 = time.time()
 
         system_prompt = (
-            "You are a helpful assistant. Answer directly and concisely. "
-            "Avoid unnecessary elaboration."
+            "You are a direct, concise assistant. Provide SHORT, focused answers. "
+            "Use bullet points. Avoid lengthy paragraphs. Be factual and brief."
         )
 
-        user_prompt = f"""Answer this question briefly: {question}"""
+        user_prompt = f"""Give a SHORT answer with key points:
+
+{question}
+
+Format: Use bullet points. Keep it brief."""
 
         result = gemini_generate(
             system_prompt=system_prompt,
