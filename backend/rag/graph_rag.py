@@ -218,17 +218,17 @@ Provide a detailed, accurate answer using the graph context and your expertise:"
             logger.info(f"🎯 GraphRAG PROMPT STRATEGY: Using GRAPH DATA ({num_entities} entities, {num_rels} rels)")
         else:
             # No graph data found — fall back to LLM's parametric knowledge
-            # This prevents "I cannot answer" refusals that tank judge scores
+            # Use same efficiency as LLM-Only when graph is empty
             system_prompt = (
-                "You are an expert assistant. Answer accurately and thoroughly "
-                "using your knowledge. Provide specific examples and details."
+                "You are a knowledgeable expert. Answer concisely and accurately. "
+                "Use structured thinking: identify key concepts and their relationships."
             )
             user_prompt = f"""Question: {question}
 
-Provide a detailed, comprehensive answer:"""
+Structure your answer: 1) Key concepts, 2) Relationships, 3) Summary. Be concise."""
             temperature = 0.1
-            max_tokens = 1024
-            logger.info(f"GraphRAG: No graph context found, using parametric fallback")
+            max_tokens = 800
+            logger.info(f"GraphRAG: No graph context found, using fast parametric fallback (800 tokens max)")
 
         # 5. Call Gemini via shared client (accurate token counts)
         result = gemini_generate(
