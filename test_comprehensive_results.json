@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-02 16:04:08",
+  "timestamp": "2026-06-02 16:14:21",
   "queries_tested": 5,
   "results": [
     {
@@ -7,21 +7,21 @@
       "pipelines": {
         "llm_only": {
           "tokens": 339,
-          "latency_ms": 5550.511121749878,
-          "judge_score": 8.0,
+          "latency_ms": 4645.68305015564,
+          "judge_score": 7.0,
           "answer_preview": "In Natural Language Processing (NLP), a **Transformer** is a groundbreaking neur"
         },
         "basic_rag": {
-          "tokens": 1821,
-          "latency_ms": 31969.3603515625,
+          "tokens": 1822,
+          "latency_ms": 31584.502458572388,
           "judge_score": 9.0,
           "answer_preview": "A Transformer in Natural Language Processing (NLP) is an architecture introduced"
         },
         "graph_rag": {
-          "tokens": 148,
-          "latency_ms": 2506.1702728271484,
+          "tokens": 174,
+          "latency_ms": 3335.3850841522217,
           "judge_score": 9.0,
-          "answer_preview": "\u2022 A neural network architecture, introduced in 2017, designed to handle sequenti"
+          "answer_preview": "\u2022 A neural network architecture designed to handle sequential data, particularly"
         }
       }
     },
@@ -30,21 +30,21 @@
       "pipelines": {
         "llm_only": {
           "tokens": 339,
-          "latency_ms": 2158.4298610687256,
-          "judge_score": 9.0,
+          "latency_ms": 2366.9962882995605,
+          "judge_score": 7.0,
           "answer_preview": "The landscape of Natural Language Processing (NLP) has been revolutionized by tw"
         },
         "basic_rag": {
-          "tokens": 1325,
-          "latency_ms": 1972.912311553955,
+          "tokens": 1326,
+          "latency_ms": 1890.9907341003418,
           "judge_score": 9.0,
           "answer_preview": "BERT and GPT differ in their underlying Transformer architecture and pre-trainin"
         },
         "graph_rag": {
-          "tokens": 145,
-          "latency_ms": 2839.5016193389893,
+          "tokens": 171,
+          "latency_ms": 2683.0084323883057,
           "judge_score": 9.0,
-          "answer_preview": "\u2022 BERT is a bidirectional encoder, processing text from both left-to-right and r"
+          "answer_preview": "\u2022 BERT is a bidirectional transformer, processing text from both left-to-right a"
         }
       }
     },
@@ -53,21 +53,21 @@
       "pipelines": {
         "llm_only": {
           "tokens": 335,
-          "latency_ms": 2714.477777481079,
-          "judge_score": 9.0,
+          "latency_ms": 2393.165111541748,
+          "judge_score": 7.0,
           "answer_preview": "Let's delve into the fascinating world of **Attention Mechanisms**.\n\nAt its core"
         },
         "basic_rag": {
-          "tokens": 1622,
-          "latency_ms": 2370.055913925171,
+          "tokens": 1635,
+          "latency_ms": 2705.8167457580566,
           "judge_score": 9.0,
           "answer_preview": "Attention mechanisms are a core innovation of the Transformer architecture, allo"
         },
         "graph_rag": {
-          "tokens": 148,
-          "latency_ms": 2754.2381286621094,
+          "tokens": 167,
+          "latency_ms": 2578.120470046997,
           "judge_score": 9.0,
-          "answer_preview": "\u2022 Attention mechanisms allow neural networks to selectively focus on relevant pa"
+          "answer_preview": "\u2022 Attention mechanisms allow neural networks to focus on specific parts of the i"
         }
       }
     },
@@ -75,20 +75,20 @@
       "query": "What is the relationship between transformers and language models?",
       "pipelines": {
         "llm_only": {
-          "tokens": 341,
-          "latency_ms": 2894.155263900757,
-          "judge_score": 9.0,
+          "tokens": 342,
+          "latency_ms": 3055.4020404815674,
+          "judge_score": 8.0,
           "answer_preview": "The relationship between transformers and language models is fundamental and sym"
         },
         "basic_rag": {
-          "tokens": 1636,
-          "latency_ms": 2701.5724182128906,
+          "tokens": 1727,
+          "latency_ms": 4168.707370758057,
           "judge_score": 9.0,
           "answer_preview": "The Transformer architecture is fundamental to modern large language models. It "
         },
         "graph_rag": {
-          "tokens": 153,
-          "latency_ms": 2748.953104019165,
+          "tokens": 163,
+          "latency_ms": 2689.6300315856934,
           "judge_score": 9.0,
           "answer_preview": "\u2022 Transformers are a specific neural network architecture that revolutionized th"
         }
@@ -98,34 +98,34 @@
       "query": "How do pre-trained models improve NLP performance?",
       "pipelines": {
         "llm_only": {
-          "tokens": 341,
-          "latency_ms": 2724.4863510131836,
-          "judge_score": 7.0,
+          "tokens": 342,
+          "latency_ms": 2821.46954536438,
+          "judge_score": 8.0,
           "answer_preview": "Pre-trained models have revolutionized Natural Language Processing (NLP) by sign"
         },
         "basic_rag": {
-          "tokens": 1718,
-          "latency_ms": 2641.085147857666,
+          "tokens": 1786,
+          "latency_ms": 3296.185255050659,
           "judge_score": 9.0,
           "answer_preview": "Pre-trained models significantly improve NLP performance by acquiring vast knowl"
         },
         "graph_rag": {
-          "tokens": 149,
-          "latency_ms": 2430.9988021850586,
+          "tokens": 153,
+          "latency_ms": 2346.3382720947266,
           "judge_score": 9.0,
-          "answer_preview": "\u2022 They learn general language representations from vast text corpora, capturing "
+          "answer_preview": "\u2022 Pre-trained models capture general language patterns and semantic relationship"
         }
       }
     }
   ],
   "summary": {
     "avg_tokens": {
-      "llm_only": 339.0,
-      "basic_rag": 1624.4,
-      "graph_rag": 148.6
+      "llm_only": 339.4,
+      "basic_rag": 1659.2,
+      "graph_rag": 165.6
     },
     "avg_judge_scores": {
-      "llm_only": 8.4,
+      "llm_only": 7.4,
       "basic_rag": 9.0,
       "graph_rag": 9.0
     },

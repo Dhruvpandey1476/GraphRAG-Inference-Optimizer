@@ -211,40 +211,42 @@ class GraphRAG:
             # We have graph data — use it but STAY ULTRA-CONCISE for token efficiency
             # For hackathon: GraphRAG must be most efficient, not most verbose
             system_prompt = (
-                "You are a concise expert. Use the graph knowledge below to answer. "
-                "Respond with EXACTLY 3 bullet points, each max 1 sentence. "
-                "NO intro/outro. Only bullets with graph insights."
+                "CRITICAL INSTRUCTION: You MUST respond with ONLY 3 bullet points. "
+                "NO headers, NO sections, NO paragraphs, NO intro/outro. "
+                "Format: • Point 1 text\n• Point 2 text\n• Point 3 text\n"
+                "If you generate anything else, you have FAILED. 3 bullets only."
             )
-            user_prompt = f"""Graph ({num_entities} entities):
-{context}
+            user_prompt = f"""Graph context: {context}
 
-Q: {question}
+Question: {question}
 
-EXACTLY 3 BULLETS using graph knowledge:
-• Point 1:
-• Point 2:
-• Point 3:"""
+Respond with ONLY these 3 bullets:
+• 
+• 
+• """
             temperature = 0.1
-            max_tokens = 250  # Keep graph-enhanced answers concise for token efficiency
-            logger.warning(f"🟢 GraphRAG WITH GRAPH: Using graph-enhanced 3-bullet format ({num_entities} entities, {num_rels} rels, 250 tokens MAX)")
+            max_tokens = 100  # EXTREME: force absolute brevity with graph data
+            logger.warning(f"🟢 GraphRAG WITH GRAPH: Using graph-enhanced 3-bullet format ({num_entities} entities, {num_rels} rels, 100 tokens MAX)")
             logger.info(f"🎯 GraphRAG PROMPT STRATEGY: Using GRAPH DATA ({num_entities} entities, {num_rels} rels)")
         else:
             # No graph data found — use ULTRA-CONCISE fallback
             # GraphRAG advantage: even without graph, it's the MOST TOKEN-EFFICIENT
             # AGGRESSIVE: Bullet format with EXACT 3-item count
             system_prompt = (
-                "You are a hyper-concise expert. You MUST respond with EXACTLY 3 bullet points. "
-                "Each bullet: max 1 sentence. NO exceptions. NO intro/outro text. Only bullets."
+                "CRITICAL INSTRUCTION: You MUST respond with ONLY 3 bullet points. "
+                "NO headers, NO sections, NO paragraphs, NO intro/outro. "
+                "Format: • Point 1 text\n• Point 2 text\n• Point 3 text\n"
+                "If you generate anything else, you have FAILED. 3 bullets only."
             )
-            user_prompt = f"""Q: {question}
+            user_prompt = f"""Question: {question}
 
-RESPOND WITH EXACTLY 3 BULLETS:
-• Point 1:
-• Point 2:
-• Point 3:"""
+Respond with ONLY these 3 bullets:
+• 
+• 
+• """
             temperature = 0.1
-            max_tokens = 150  # ULTRA-AGGRESSIVE: force extreme brevity
-            logger.warning(f"🔴 GraphRAG FALLBACK (NO GRAPH): Using 3-bullet format (150 tokens MAX)")
+            max_tokens = 80  # EXTREME: ultra-aggressive token limit forces 3 bullets
+            logger.warning(f"🔴 GraphRAG FALLBACK (NO GRAPH): Using 3-bullet format (80 tokens MAX)")
             logger.warning(f"DEBUG: FALLBACK TRIGGERED - has_graph_context={has_graph_context}, num_entities={num_entities}")
 
         # 5. Call Gemini via shared client (accurate token counts)
