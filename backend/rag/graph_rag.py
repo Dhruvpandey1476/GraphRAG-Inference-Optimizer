@@ -166,37 +166,29 @@ class GraphRAG:
         Returns answer + full token accounting.
         """
         t0 = time.time()
-        graph_traversal_ms = 0  # Initialize here to avoid UnboundLocalError
-
-        # PRE-CHECK: If graph is known to be empty, skip entity extraction overhead
-        # This prevents wasting 200-300ms on entity extraction when graph is empty
-        is_graph_empty = False
+        graph_traversal_ms = 0
+        entities = []
+        subgraph = {"entities": [], "relationships": [], "documents": []}
+        
+        # Try to get graph data (fast-fail if empty)
         try:
-            is_graph_empty = self.tg.is_empty() if hasattr(self.tg, 'is_empty') else False
+            # Test if graph has any entities - if not, skip expensive entity extraction
+            test_vertices = self.tg.conn.getVertices("Entity", limit=1)
+            if test_vertices:
+                # Graph has data, do entity extraction and traversal
+                entities = extract_query_entities(question)
+                
+                t_graph_start = time.time()
+                subgraph = self.tg.get_entity_subgraph(
+                    entity_names=entities,
+                    max_hops=max_hops,
+                    max_neighbors=max_neighbors,
+                )
+                graph_traversal_ms = (time.time() - t_graph_start) * 1000
         except Exception as e:
-            logger.error(f"is_empty() check failed: {e}, defaulting to False (will try entity extraction)")
-        
-        logger.warning(f"DEBUG: is_graph_empty = {is_graph_empty}")
-        
-        if is_graph_empty:
-            # Skip entity extraction entirely when graph is empty
-            entities = []
-            subgraph = {"entities": [], "relationships": [], "documents": []}
-            logger.warning("🟡 FAST PATH: Graph detected as EMPTY, skipping entity extraction")
-        else:
-            logger.warning("🟠 FULL PATH: Graph not empty, proceeding with entity extraction")
-            # 1. Extract entities from the query (seed for traversal)
-            entities = extract_query_entities(question)
-            logger.info(f"Query entities: {entities}")
-
-            # 2. Traverse TigerGraph to get subgraph
-            t_graph_start = time.time()
-            subgraph = self.tg.get_entity_subgraph(
-                entity_names=entities,
-                max_hops=max_hops,
-                max_neighbors=max_neighbors,
-            )
-            graph_traversal_ms = (time.time() - t_graph_start) * 1000
+            # Graph lookup failed or empty, use fallback
+            logger.debug(f"Graph traversal failed: {e}, using LLM-only fallback")
+            pass
 
         # 3. Serialize subgraph into compact structured context
         context = serialize_subgraph(subgraph)
@@ -204,9 +196,6 @@ class GraphRAG:
         # 4. Build prompt — balance quality with token efficiency
         has_graph_context = bool(context.strip())
         num_entities = len(subgraph.get("entities", []))
-        num_rels = len(subgraph.get("relationships", []))
-        
-        logger.info(f"DEBUG: has_graph_context={has_graph_context}, num_entities={num_entities}, context_len={len(context)}")
 
         if has_graph_context and num_entities > 0:
             # We have graph data — provide quality context-grounded answer
@@ -224,7 +213,6 @@ Provide 3 key bullet points that answer this question based on the context:
 •"""
             temperature = 0.1
             max_tokens = 120
-            logger.warning(f"🟢 GraphRAG WITH GRAPH: 120 tokens MAX (quality mode)")
         else:
             # No graph data found — use quality fallback
             system_prompt = """You are an expert assistant. 
@@ -238,7 +226,6 @@ Provide 3 key bullet points that answer this question:
 •"""
             temperature = 0.1
             max_tokens = 120
-            logger.warning(f"🔴 GraphRAG FALLBACK: 120 tokens MAX (quality mode)")
 
         # 5. Call Gemini via shared client (accurate token counts)
         # Use JSON schema to force 3-bullet format
@@ -264,8 +251,6 @@ Provide 3 key bullet points that answer this question:
         elif len(bullet_lines) < 3 and len(lines) > 0:
             # If no bullets found, try to create bullets from first 3 lines
             answer = '\n'.join(['• ' + l if not l.startswith('•') else l for l in lines[:3]])
-        
-        logger.warning(f"✅ GraphRAG POST-PROCESS: Enforced 3-bullet format, final answer length: {len(answer)} chars")
 
         latency_ms = (time.time() - t0) * 1000
 
