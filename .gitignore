@@ -48,6 +48,42 @@ data/_cache/
 .env.*.local
 .env.production
 
+# Test Files (not tracked)
+test_*.py
+verify_*.py
+check_*.py
+fix_*.py
+gen_*.py
+populate_*.py
+
+# Results & Output
+results/
+*.html
+*.json.backup
+
+# Deployment Files (not tracked)
+DEPLOY.sh
+DEPLOY.bat
+DEPLOYMENT_*.md
+QUICK_DEPLOY*.md
+API_KEYS_*.md
+TESTING_SUMMARY.md
+WINNING_NARRATIVE.md
+ROUND2_*.md
+FINAL_SUBMISSION_*.md
+GITHUB_SUBMISSION_*.md
+HUGGINGFACE_DEPLOY.md
+PDF_REPORT_*.md
+BENCHMARK_RESULTS_*.md
+DELIVERY_MANIFEST.sh
+SOCIAL_MEDIA_TEMPLATES.md
+README_COMPREHENSIVE.md
+WINNING_NARRATIVE.md
+
+# Old Configuration
+render.yaml
+.rebuild.txt
+
 # Node/Frontend
 node_modules/
 frontend/dist/
