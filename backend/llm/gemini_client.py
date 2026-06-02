@@ -1,6 +1,6 @@
 """
 Shared Gemini Client — Used by all 3 pipelines + judge.
-Provides a unified interface for LLM calls via Google Gemini API.
+Uses the new google.genai SDK with thinking disabled for token efficiency.
 """
 
 import os
@@ -12,35 +12,31 @@ from dotenv import load_dotenv
 load_dotenv(Path(__file__).parent.parent.parent / ".env", override=True)
 logger = logging.getLogger(__name__)
 
-_gemini_model = None
+_client = None
 GEMINI_MODEL_NAME = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
 
 
-def _get_gemini_model():
-    """Lazily initialize Gemini model."""
-    global _gemini_model
-    if _gemini_model is None:
-        import google.generativeai as genai
+def _get_client():
+    """Lazily initialize Genai client."""
+    global _client
+    if _client is None:
+        from google import genai
         api_key = os.getenv("GEMINI_API_KEY")
         if not api_key:
-            raise ValueError(
-                "GEMINI_API_KEY not found in environment. "
-                "DM Devanshu on WhatsApp to get your $50 Gemini API key."
-            )
-        genai.configure(api_key=api_key)
-        _gemini_model = genai.GenerativeModel(GEMINI_MODEL_NAME)
-        logger.info(f"✅ Gemini model initialized: {GEMINI_MODEL_NAME}")
-    return _gemini_model
+            raise ValueError("GEMINI_API_KEY not found in environment.")
+        _client = genai.Client(api_key=api_key)
+        logger.info(f"Gemini client initialized: {GEMINI_MODEL_NAME}")
+    return _client
 
 
 def gemini_generate(
     system_prompt: str,
     user_prompt: str,
     temperature: float = 0.1,
-    max_tokens: int = 512,
+    max_tokens: int = 1024,
 ) -> dict:
     """
-    Generate a response using Gemini API.
+    Generate a response using Gemini API with thinking disabled.
     
     Returns dict with:
         - answer: str
@@ -48,27 +44,29 @@ def gemini_generate(
         - completion_tokens: int
         - total_tokens: int
     """
-    model = _get_gemini_model()
-    
-    # Gemini uses a combined prompt approach
-    full_prompt = f"{system_prompt}\n\n{user_prompt}"
-    
-    generation_config = {
-        "temperature": temperature,
-        "max_output_tokens": max_tokens,
-    }
-    
-    response = model.generate_content(
-        full_prompt,
-        generation_config=generation_config,
+    from google.genai import types
+
+    client = _get_client()
+
+    config = types.GenerateContentConfig(
+        temperature=temperature,
+        max_output_tokens=max_tokens,
+        system_instruction=system_prompt,
+        thinking_config=types.ThinkingConfig(thinking_budget=0),
     )
-    
-    # Extract token counts from usage metadata
+
+    response = client.models.generate_content(
+        model=GEMINI_MODEL_NAME,
+        contents=user_prompt,
+        config=config,
+    )
+
+    # Extract token counts
     usage = response.usage_metadata
-    prompt_tokens = getattr(usage, "prompt_token_count", 0)
-    completion_tokens = getattr(usage, "candidates_token_count", 0)
-    total_tokens = getattr(usage, "total_token_count", prompt_tokens + completion_tokens)
-    
+    prompt_tokens = getattr(usage, "prompt_token_count", 0) or 0
+    completion_tokens = getattr(usage, "candidates_token_count", 0) or 0
+    total_tokens = prompt_tokens + completion_tokens
+
     return {
         "answer": response.text,
         "prompt_tokens": prompt_tokens,
@@ -79,6 +77,9 @@ def gemini_generate(
 
 def count_tokens_gemini(text: str) -> int:
     """Count tokens using Gemini's native tokenizer."""
-    model = _get_gemini_model()
-    result = model.count_tokens(text)
+    client = _get_client()
+    result = client.models.count_tokens(
+        model=GEMINI_MODEL_NAME,
+        contents=text,
+    )
     return result.total_tokens
