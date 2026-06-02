@@ -5,8 +5,19 @@ import {
 } from "recharts";
 import { Zap, Database, GitBranch, Search, TrendingDown, Award, Clock, DollarSign, CheckCircle, AlertCircle, Loader } from "lucide-react";
 
-// Use VITE_API_URL if set, otherwise use current origin (HuggingFace Spaces) or localhost:8001 (dev)
-const API_BASE = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' ? window.location.origin : "http://localhost:8001");
+// Use VITE_API_URL if set, otherwise detect automatically
+let API_BASE;
+if (import.meta.env.VITE_API_URL) {
+  API_BASE = import.meta.env.VITE_API_URL;
+} else if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+  // Development: backend on localhost:8000
+  API_BASE = 'http://localhost:8000';
+} else if (typeof window !== 'undefined') {
+  // Production: backend on same origin
+  API_BASE = window.location.origin;
+} else {
+  API_BASE = 'http://localhost:8000';
+}
 
 const PIPELINES = [
   { id: "llm_only",  label: "LLM Only",  icon: Zap,       color: "#ef4444", dimColor: "rgba(239,68,68,0.12)",    desc: "No retrieval · Parametric only" },

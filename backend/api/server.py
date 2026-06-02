@@ -22,11 +22,18 @@ from dotenv import load_dotenv
 # Load .env from project root FIRST before any other imports
 load_dotenv(Path(__file__).parent.parent.parent / ".env", override=True)
 
-from ..rag.llm_only import LLMOnly
-from ..rag.basic_rag import BasicRAG
-from ..rag.graph_rag import GraphRAG
-from ..graph.tigergraph_client import TigerGraphClient
-from ..llm.judge import llm_judge, compare_answers
+# Use absolute imports to work with any uvicorn invocation directory
+import sys
+from pathlib import Path
+project_root = Path(__file__).parent.parent.parent
+if str(project_root) not in sys.path:
+    sys.path.insert(0, str(project_root))
+
+from backend.rag.llm_only import LLMOnly
+from backend.rag.basic_rag import BasicRAG
+from backend.rag.graph_rag import GraphRAG
+from backend.graph.tigergraph_client import TigerGraphClient
+from backend.llm.judge import llm_judge, compare_answers
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -194,7 +201,7 @@ async def compare_pipelines(req: QueryRequest):
         except Exception as e:
             logger.warning(f"GraphRAG query failed: {e}. Using graph-style LLM fallback.")
             # Make a SEPARATE LLM call with graph-framing (NOT copying Basic RAG)
-            from ..llm.gemini_client import gemini_generate
+            from backend.llm.gemini_client import gemini_generate
             t_fb = time.time()
             fb = gemini_generate(
                 system_prompt=(

@@ -166,6 +166,7 @@ class GraphRAG:
         Returns answer + full token accounting.
         """
         t0 = time.time()
+        graph_traversal_ms = 0  # Initialize here to avoid UnboundLocalError
 
         # PRE-CHECK: If graph is known to be empty, skip entity extraction overhead
         # This prevents wasting 200-300ms on entity extraction when graph is empty
