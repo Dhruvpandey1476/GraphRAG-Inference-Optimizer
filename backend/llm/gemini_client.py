@@ -33,18 +33,39 @@ def gemini_generate(
     user_prompt: str,
     temperature: float = 0.1,
     max_tokens: int = 1024,
+    use_json_schema: bool = False,
 ) -> dict:
     """Generate a response using Gemini API with thinking disabled."""
     from google.genai import types
 
     client = _get_client()
 
-    config = types.GenerateContentConfig(
-        temperature=temperature,
-        max_output_tokens=max_tokens,
-        system_instruction=system_prompt,
-        thinking_config=types.ThinkingConfig(thinking_budget=0),
-    )
+    config_kwargs = {
+        "temperature": temperature,
+        "max_output_tokens": max_tokens,
+        "system_instruction": system_prompt,
+        "thinking_config": types.ThinkingConfig(thinking_budget=0),
+    }
+
+    # Only use JSON schema for GraphRAG to force 3-bullet format
+    if use_json_schema:
+        response_schema = {
+            "type": "object",
+            "properties": {
+                "bullets": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "minItems": 3,
+                    "maxItems": 3,
+                    "description": "Exactly 3 bullet points"
+                }
+            },
+            "required": ["bullets"]
+        }
+        config_kwargs["response_mime_type"] = "application/json"
+        config_kwargs["response_schema"] = response_schema
+
+    config = types.GenerateContentConfig(**config_kwargs)
 
     response = client.models.generate_content(
         model=GEMINI_MODEL_NAME,
@@ -56,8 +77,19 @@ def gemini_generate(
     prompt_tokens = getattr(usage, "prompt_token_count", 0) or 0
     completion_tokens = getattr(usage, "candidates_token_count", 0) or 0
 
+    # Parse JSON response if applicable
+    import json
+    answer = response.text
+    if use_json_schema:
+        try:
+            data = json.loads(response.text)
+            bullets = data.get("bullets", [])[:3]  # Take only first 3
+            answer = '\n'.join([f"• {b}" for b in bullets])
+        except:
+            answer = response.text
+
     return {
-        "answer": response.text,
+        "answer": answer,
         "prompt_tokens": prompt_tokens,
         "completion_tokens": completion_tokens,
         "total_tokens": prompt_tokens + completion_tokens,

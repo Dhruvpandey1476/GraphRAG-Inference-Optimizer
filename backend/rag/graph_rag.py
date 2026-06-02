@@ -232,11 +232,13 @@ Answer with EXACTLY 3 bullet points:
             logger.warning(f"🔴 GraphRAG FALLBACK: 50 tokens MAX")
 
         # 5. Call Gemini via shared client (accurate token counts)
+        # Use JSON schema to force 3-bullet format
         result = gemini_generate(
             system_prompt=system_prompt,
             user_prompt=user_prompt,
             temperature=temperature,
             max_tokens=max_tokens,
+            use_json_schema=True,
         )
 
         # 6. CRITICAL: Post-process to enforce 3-bullet format
@@ -254,7 +256,7 @@ Answer with EXACTLY 3 bullet points:
             # If no bullets found, try to create bullets from first 3 lines
             answer = '\n'.join(['• ' + l if not l.startswith('•') else l for l in lines[:3]])
         
-        logger.warning(f"🎯 POST-PROCESS: Enforced 3-bullet format, final answer length: {len(answer)} chars")
+        logger.warning(f"✅ GraphRAG POST-PROCESS: Enforced 3-bullet format, final answer length: {len(answer)} chars")
 
         latency_ms = (time.time() - t0) * 1000
 
