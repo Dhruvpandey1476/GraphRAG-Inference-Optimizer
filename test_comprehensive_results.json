@@ -1,0 +1,138 @@
+{
+  "timestamp": "2026-06-02 15:56:11",
+  "queries_tested": 5,
+  "results": [
+    {
+      "query": "What is a transformer in NLP?",
+      "pipelines": {
+        "llm_only": {
+          "tokens": 339,
+          "latency_ms": 4563.2758140563965,
+          "judge_score": 7.0,
+          "answer_preview": "In Natural Language Processing (NLP), a **Transformer** is a groundbreaking neur"
+        },
+        "basic_rag": {
+          "tokens": 1777,
+          "latency_ms": 29673.011541366577,
+          "judge_score": 9.0,
+          "answer_preview": "A Transformer in Natural Language Processing (NLP) is an architecture introduced"
+        },
+        "graph_rag": {
+          "tokens": 156,
+          "latency_ms": 2595.5772399902344,
+          "judge_score": 9.0,
+          "answer_preview": "\u2022 A transformer is a neural network architecture designed for processing sequent"
+        }
+      }
+    },
+    {
+      "query": "How does BERT differ from GPT?",
+      "pipelines": {
+        "llm_only": {
+          "tokens": 339,
+          "latency_ms": 2318.904399871826,
+          "judge_score": 9.0,
+          "answer_preview": "The world of Natural Language Processing (NLP) has been revolutionized by powerf"
+        },
+        "basic_rag": {
+          "tokens": 1329,
+          "latency_ms": 1874.7432231903076,
+          "judge_score": 9.0,
+          "answer_preview": "BERT and GPT differ in their underlying Transformer architecture and pre-trainin"
+        },
+        "graph_rag": {
+          "tokens": 145,
+          "latency_ms": 2494.948625564575,
+          "judge_score": 9.0,
+          "answer_preview": "\u2022 BERT is a bidirectional encoder, processing text from both left-to-right and r"
+        }
+      }
+    },
+    {
+      "query": "Explain attention mechanisms",
+      "pipelines": {
+        "llm_only": {
+          "tokens": 335,
+          "latency_ms": 2672.19877243042,
+          "judge_score": 9.0,
+          "answer_preview": "Let's delve into the fascinating world of **Attention Mechanisms**.\n\nAt its core"
+        },
+        "basic_rag": {
+          "tokens": 1635,
+          "latency_ms": 2487.7166748046875,
+          "judge_score": 9.0,
+          "answer_preview": "Attention mechanisms are a core innovation of the Transformer architecture, allo"
+        },
+        "graph_rag": {
+          "tokens": 147,
+          "latency_ms": 2861.258029937744,
+          "judge_score": 9.0,
+          "answer_preview": "\u2022 Attention mechanisms allow neural networks to selectively focus on relevant pa"
+        }
+      }
+    },
+    {
+      "query": "What is the relationship between transformers and language models?",
+      "pipelines": {
+        "llm_only": {
+          "tokens": 342,
+          "latency_ms": 2375.671863555908,
+          "judge_score": 9.0,
+          "answer_preview": "The relationship between transformers and language models is fundamental and sym"
+        },
+        "basic_rag": {
+          "tokens": 1636,
+          "latency_ms": 2200.9127140045166,
+          "judge_score": 9.0,
+          "answer_preview": "The Transformer architecture is fundamental to modern large language models. It "
+        },
+        "graph_rag": {
+          "tokens": 153,
+          "latency_ms": 2258.478879928589,
+          "judge_score": 9.0,
+          "answer_preview": "\u2022 Transformers are a specific neural network architecture that revolutionized th"
+        }
+      }
+    },
+    {
+      "query": "How do pre-trained models improve NLP performance?",
+      "pipelines": {
+        "llm_only": {
+          "tokens": 342,
+          "latency_ms": 2245.213508605957,
+          "judge_score": 7.0,
+          "answer_preview": "Pre-trained models have revolutionized Natural Language Processing (NLP) by sign"
+        },
+        "basic_rag": {
+          "tokens": 1774,
+          "latency_ms": 2675.2071380615234,
+          "judge_score": 9.0,
+          "answer_preview": "Pre-trained models significantly improve NLP performance by acquiring vast knowl"
+        },
+        "graph_rag": {
+          "tokens": 141,
+          "latency_ms": 2589.7316932678223,
+          "judge_score": 9.0,
+          "answer_preview": "\u2022 They learn rich, general language representations from vast text corpora.\n\u2022 Th"
+        }
+      }
+    }
+  ],
+  "summary": {
+    "avg_tokens": {
+      "llm_only": 339.4,
+      "basic_rag": 1630.2,
+      "graph_rag": 148.4
+    },
+    "avg_judge_scores": {
+      "llm_only": 8.2,
+      "basic_rag": 9.0,
+      "graph_rag": 9.0
+    },
+    "judge_score_varies": {
+      "llm_only": true,
+      "basic_rag": false,
+      "graph_rag": false
+    }
+  }
+}
