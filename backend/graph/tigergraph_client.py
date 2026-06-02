@@ -189,6 +189,18 @@ class TigerGraphClient:
 
     # ─── Graph Retrieval ───────────────────────────────────────────
 
+    def is_empty(self) -> bool:
+        """Fast check: is the graph empty? Used to skip expensive entity extraction."""
+        try:
+            if not self.conn:
+                return True
+            # Quick check: get vertex count
+            result = self.conn.getVertexCount("Entity")
+            return result == 0
+        except Exception as e:
+            logger.warning(f"is_empty() check failed: {e}, assuming graph is empty")
+            return True
+
     def get_entity_subgraph(self, entity_names: list[str], max_hops: int = 2,
                              max_neighbors: int = 10) -> dict:
         """

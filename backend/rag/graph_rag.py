@@ -167,18 +167,28 @@ class GraphRAG:
         """
         t0 = time.time()
 
-        # 1. Extract entities from the query (seed for traversal)
-        entities = extract_query_entities(question)
-        logger.info(f"Query entities: {entities}")
+        # PRE-CHECK: If graph is known to be empty, skip entity extraction overhead
+        # This prevents wasting 200-300ms on entity extraction when graph is empty
+        is_graph_empty = self.tg.is_empty() if hasattr(self.tg, 'is_empty') else False
+        
+        if is_graph_empty:
+            # Skip entity extraction entirely when graph is empty
+            entities = []
+            subgraph = {"entities": [], "relationships": [], "documents": []}
+            logger.info("FAST PATH: Graph is empty, skipping entity extraction overhead")
+        else:
+            # 1. Extract entities from the query (seed for traversal)
+            entities = extract_query_entities(question)
+            logger.info(f"Query entities: {entities}")
 
-        # 2. Traverse TigerGraph to get subgraph
-        t_graph_start = time.time()
-        subgraph = self.tg.get_entity_subgraph(
-            entity_names=entities,
-            max_hops=max_hops,
-            max_neighbors=max_neighbors,
-        )
-        graph_traversal_ms = (time.time() - t_graph_start) * 1000
+            # 2. Traverse TigerGraph to get subgraph
+            t_graph_start = time.time()
+            subgraph = self.tg.get_entity_subgraph(
+                entity_names=entities,
+                max_hops=max_hops,
+                max_neighbors=max_neighbors,
+            )
+            graph_traversal_ms = (time.time() - t_graph_start) * 1000
 
         # 3. Serialize subgraph into compact structured context
         context = serialize_subgraph(subgraph)
