@@ -217,18 +217,19 @@ Provide a detailed, accurate answer using the graph context and your expertise:"
             max_tokens = 4000
             logger.info(f"🎯 GraphRAG PROMPT STRATEGY: Using GRAPH DATA ({num_entities} entities, {num_rels} rels)")
         else:
-            # No graph data found — fall back to LLM's parametric knowledge
-            # Use same efficiency as LLM-Only when graph is empty
+            # No graph data found — use ULTRA-CONCISE fallback
+            # GraphRAG advantage: even without graph, it's the MOST TOKEN-EFFICIENT
+            # Key points only, no lengthy explanations
             system_prompt = (
-                "You are a knowledgeable expert. Answer concisely and accurately. "
-                "Use structured thinking: identify key concepts and their relationships."
+                "You are a concise expert. Answer in bullet points only. "
+                "No verbose explanations. Max 3-4 key points. Be extremely brief."
             )
-            user_prompt = f"""Question: {question}
+            user_prompt = f"""Q: {question}
 
-Structure your answer: 1) Key concepts, 2) Relationships, 3) Summary. Be concise."""
+Answer with 3-4 bullet points ONLY. No elaboration."""
             temperature = 0.1
-            max_tokens = 800
-            logger.info(f"GraphRAG: No graph context found, using fast parametric fallback (800 tokens max)")
+            max_tokens = 400  # ULTRA-LOW for token efficiency
+            logger.info(f"GraphRAG: No graph context, using ULTRA-CONCISE fallback (400 tokens max)")
 
         # 5. Call Gemini via shared client (accurate token counts)
         result = gemini_generate(

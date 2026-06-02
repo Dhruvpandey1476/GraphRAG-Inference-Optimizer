@@ -50,7 +50,7 @@ class LLMOnly:
             system_prompt=system_prompt,
             user_prompt=question,
             temperature=0.1,
-            max_tokens=1024,
+            max_tokens=600,
         )
 
         latency_ms = (time.time() - t0) * 1000
