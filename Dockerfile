@@ -1,5 +1,6 @@
 # Stage 1: Build frontend with Node
-# Force rebuild: 2026-06-02 graph traversal fix with fuzzy entity matching (commit 4215b931, 8d2485c4)
+# CACHE BUSTER v3: 2026-06-02 21:40:00Z - BasicRAG fairness fix + graph traversal + deployment rebuild
+# Latest commits: 799cd4dc (fairness), 9d7f1961 (rebuild), 8d2485c4 (timestamp)
 FROM node:18-alpine AS frontend-builder
 
 WORKDIR /build/frontend
@@ -28,6 +29,11 @@ RUN apt-get update && apt-get install -y \
 
 # Copy Python requirements
 COPY requirements.txt .
+
+# CACHE BUSTER: Force rebuild for latest fixes (299cd4dc)
+RUN echo "🔄 REBUILDING with latest fixes - $(date)" && \
+    echo "Latest commits: 799cd4dc (BasicRAG fairness), 9d7f1961 (rebuild), 8d2485c4 (timestamp)" && \
+    echo "Deployed at: 2026-06-02T21:40:00Z"
 
 # Install Python dependencies
 RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
