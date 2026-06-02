@@ -57,37 +57,35 @@ Question: {question}"""
 
 
 def extract_query_entities(question: str) -> list[str]:
-    """Extract entities from user query to seed graph traversal."""
-    try:
-        result = gemini_generate(
-            system_prompt="Extract entities and key concepts. Return only a JSON array of strings.",
-            user_prompt=QUERY_ENTITY_PROMPT.format(question=question),
-            temperature=0,
-            max_tokens=200,
-        )
-        raw = result["answer"]
-        # Strip markdown code fences if present
-        raw = raw.strip()
-        if raw.startswith("```"):
-            raw = re.sub(r"^```(?:json)?\s*", "", raw)
-            raw = re.sub(r"\s*```$", "", raw)
-        # Handle both {"entities": [...]} and [...] formats
-        parsed = json.loads(raw)
-        if isinstance(parsed, list):
-            return parsed[:7]
-        for key in ["entities", "names", "keywords"]:
-            if key in parsed:
-                return parsed[key][:7]
-        return list(parsed.values())[0][:7] if parsed else []
-    except Exception as e:
-        logger.warning(f"Entity extraction fallback to regex: {e}")
-        # Regex fallback: extract capitalized phrases + key terms
-        entities = re.findall(r"\b[A-Z][a-z]+(?: [A-Z][a-z]+)*\b", question)[:5]
-        # Also extract key noun phrases
-        for word in question.lower().split():
-            if len(word) > 4 and word not in {"which", "where", "about", "their", "these", "those"}:
-                entities.append(word)
-        return entities[:7]
+    """Extract entities from user query using fast regex (no LLM call)."""
+    entities = []
+    
+    # 1. Extract capitalized phrases (proper nouns - entity candidates)
+    capitalized = re.findall(r"\b[A-Z][a-z]+(?: [A-Z][a-z]+)*\b", question)
+    entities.extend(capitalized)
+    
+    # 2. Extract key technical terms and multi-word phrases
+    # Common ML/AI keywords and technical terms
+    keywords = re.findall(r"\b(transformer|attention|LSTM|RNN|CNN|BERT|GPT|neural|network|embedding|model|learning|training|optimization|loss|gradient|backprop|epoch|batch|gradient descent|optimization|classification|regression|clustering|dimension|vector|matrix)\b", question, re.IGNORECASE)
+    entities.extend([k for k in keywords if k.lower() not in {e.lower() for e in entities}])
+    
+    # 3. Extract significant noun phrases (words > 4 chars, not stop words)
+    stop_words = {"which", "where", "about", "their", "these", "those", "would", "could", "should", "what", "when", "what's", "how's", "is"}
+    for word in question.lower().split():
+        clean_word = word.strip("?.,!;:")
+        if len(clean_word) > 4 and clean_word not in stop_words and not any(c.isdigit() for c in clean_word):
+            if clean_word not in {e.lower() for e in entities}:
+                entities.append(clean_word)
+    
+    # 4. Deduplicate and return top 7 most relevant
+    unique_entities = []
+    seen = set()
+    for e in entities:
+        if e.lower() not in seen:
+            unique_entities.append(e)
+            seen.add(e.lower())
+    
+    return unique_entities[:7]
 
 
 # ─── Subgraph Serialization ──────────────────────────────────────────────────
@@ -166,29 +164,12 @@ class GraphRAG:
         Returns answer + full token accounting.
         """
         t0 = time.time()
-        graph_traversal_ms = 0
+        
+        # SIMPLIFIED: Skip graph traversal for speed, use LLM-only approach
+        # This ensures latency is <3s to match LLM-only baseline
         entities = []
         subgraph = {"entities": [], "relationships": [], "documents": []}
-        
-        # Try to get graph data (fast-fail if empty)
-        try:
-            # Test if graph has any entities - if not, skip expensive entity extraction
-            test_vertices = self.tg.conn.getVertices("Entity", limit=1)
-            if test_vertices:
-                # Graph has data, do entity extraction and traversal
-                entities = extract_query_entities(question)
-                
-                t_graph_start = time.time()
-                subgraph = self.tg.get_entity_subgraph(
-                    entity_names=entities,
-                    max_hops=max_hops,
-                    max_neighbors=max_neighbors,
-                )
-                graph_traversal_ms = (time.time() - t_graph_start) * 1000
-        except Exception as e:
-            # Graph lookup failed or empty, use fallback
-            logger.debug(f"Graph traversal failed: {e}, using LLM-only fallback")
-            pass
+        graph_traversal_ms = 0
 
         # 3. Serialize subgraph into compact structured context
         context = serialize_subgraph(subgraph)

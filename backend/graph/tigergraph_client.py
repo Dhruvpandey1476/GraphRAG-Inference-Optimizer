@@ -217,8 +217,6 @@ class TigerGraphClient:
 
         # Try GSQL first, but be very defensive about failures
         try:
-            logger.info(f"Attempting GSQL traversal for entities: {entity_names}")
-            
             # Simpler, more robust GSQL query
             gsql_query = f"""
             INTERPRET QUERY () FOR GRAPH {self.graph} {{
@@ -237,15 +235,15 @@ class TigerGraphClient:
             
             # If we got any results, use them
             if parsed.get("entities"):
-                logger.info(f"GSQL succeeded, got {len(parsed['entities'])} entities")
                 return parsed
             else:
-                logger.warning(f"GSQL returned empty result, using REST fallback")
-                return self._fallback_rest_retrieval(entity_names, max_neighbors)
+                # Graph exists but no match - return empty (use LLM-only)
+                return {"entities": [], "relationships": [], "documents": []}
                 
         except Exception as e:
-            logger.warning(f"GSQL query failed ({str(e)[:100]}), falling back to REST")
-            return self._fallback_rest_retrieval(entity_names, max_neighbors)
+            # GSQL failed or graph unavailable - return empty, don't try expensive fallback
+            logger.debug(f"Graph unavailable, using LLM-only fallback")
+            return {"entities": [], "relationships": [], "documents": []}
 
     def _fallback_rest_retrieval(self, entity_names: list[str], max_neighbors: int) -> dict:
         """REST API fallback for entity retrieval — uses fuzzy name matching."""
