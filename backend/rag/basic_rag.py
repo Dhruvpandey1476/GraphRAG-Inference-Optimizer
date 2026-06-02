@@ -225,15 +225,16 @@ class BasicRAG:
 
         # 4. Build prompt
         system_prompt = (
-            "You are an assistant grounded in provided documents. Answer based ONLY on the context. "
-            "Cite sources from the context. If context is insufficient, acknowledge it."
+            "You are an expert assistant. Use the provided context when available. "
+            "If context is insufficient, leverage your knowledge to provide a helpful answer. "
+            "Always prioritize context when it's available."
         )
         user_prompt = f"""Context from documents:
 {context}
 
 Question: {question}
 
-Based on the context above, provide a comprehensive answer with citations:"""
+Provide a comprehensive answer using the context if available, or general knowledge:"""
 
         # 5. Call Gemini via shared client (accurate token counts)
         result = gemini_generate(
