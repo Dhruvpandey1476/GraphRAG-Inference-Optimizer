@@ -12,7 +12,7 @@ load_dotenv(Path(__file__).parent.parent.parent / ".env", override=True)
 logger = logging.getLogger(__name__)
 
 _client = None
-GEMINI_MODEL_NAME = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+GEMINI_MODEL_NAME = (os.getenv("GEMINI_MODEL", "gemini-2.5-flash") or "").strip()
 
 
 def _get_client():
@@ -20,7 +20,7 @@ def _get_client():
     global _client
     if _client is None:
         from google import genai
-        api_key = os.getenv("GEMINI_API_KEY")
+        api_key = (os.getenv("GEMINI_API_KEY") or "").strip()
         if not api_key:
             raise ValueError("GEMINI_API_KEY not found in environment.")
         _client = genai.Client(api_key=api_key)

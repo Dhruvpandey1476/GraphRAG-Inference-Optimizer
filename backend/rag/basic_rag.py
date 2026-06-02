@@ -21,12 +21,12 @@ from ..llm.gemini_client import gemini_generate
 load_dotenv(Path(__file__).parent.parent.parent / ".env", override=True)
 logger = logging.getLogger(__name__)
 
-TOP_K = int(os.getenv("TOP_K_BASIC_RAG", 5))
-EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "text-embedding-3-small")
+TOP_K = int((os.getenv("TOP_K_BASIC_RAG", "5") or "5").strip())
+EMBEDDING_MODEL = (os.getenv("EMBEDDING_MODEL", "text-embedding-3-small") or "").strip()
 EMBEDDING_DIM = 384  # sentence-transformers all-MiniLM-L6-v2
 
 _sentence_transformer = None
-USE_SENTENCE_TRANSFORMERS = os.getenv("USE_SENTENCE_TRANSFORMERS", "true").lower() == "true"
+USE_SENTENCE_TRANSFORMERS = (os.getenv("USE_SENTENCE_TRANSFORMERS", "true") or "true").lower().strip() == "true"
 
 
 # Gemini calls go through shared gemini_client.gemini_generate()

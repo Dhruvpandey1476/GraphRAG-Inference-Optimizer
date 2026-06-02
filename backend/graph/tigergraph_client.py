@@ -18,13 +18,13 @@ class TigerGraphClient:
     """Production-ready TigerGraph client for GraphRAG operations."""
 
     def __init__(self):
-        self.host = os.getenv("TIGERGRAPH_HOST", "localhost")
-        self.graph = os.getenv("TIGERGRAPH_GRAPH", "GraphRAGDemo")
-        self.username = os.getenv("TIGERGRAPH_USERNAME", "tigergraph")
-        self.password = os.getenv("TIGERGRAPH_PASSWORD", "tigergraph")
-        self.secret = os.getenv("TIGERGRAPH_SECRET", "")
-        self.port = int(os.getenv("TIGERGRAPH_PORT", "443"))
-        self.use_ssl = os.getenv("TIGERGRAPH_USE_SSL", "true").lower() == "true"
+        self.host = (os.getenv("TIGERGRAPH_HOST", "localhost") or "").strip()
+        self.graph = (os.getenv("TIGERGRAPH_GRAPH", "GraphRAGDemo") or "").strip()
+        self.username = (os.getenv("TIGERGRAPH_USERNAME", "tigergraph") or "").strip()
+        self.password = (os.getenv("TIGERGRAPH_PASSWORD", "tigergraph") or "").strip()
+        self.secret = (os.getenv("TIGERGRAPH_SECRET", "") or "").strip()
+        self.port = int((os.getenv("TIGERGRAPH_PORT", "443") or "443").strip())
+        self.use_ssl = (os.getenv("TIGERGRAPH_USE_SSL", "true") or "true").lower().strip() == "true"
         self.conn: Optional[tg.TigerGraphConnection] = None
 
     def connect(self) -> "TigerGraphClient":

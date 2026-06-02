@@ -29,8 +29,8 @@ from ..llm.gemini_client import gemini_generate
 load_dotenv(Path(__file__).parent.parent.parent / ".env", override=True)
 logger = logging.getLogger(__name__)
 
-MAX_HOPS = int(os.getenv("MAX_HOPS_GRAPH_RAG", 2))
-MAX_NEIGHBORS = int(os.getenv("MAX_NEIGHBORS", 10))
+MAX_HOPS = int((os.getenv("MAX_HOPS_GRAPH_RAG", "2") or "2").strip())
+MAX_NEIGHBORS = int((os.getenv("MAX_NEIGHBORS", "10") or "10").strip())
 
 
 @dataclass
