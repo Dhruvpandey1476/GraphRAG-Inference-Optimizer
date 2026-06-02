@@ -200,7 +200,7 @@ class GraphRAG:
         # 3. Serialize subgraph into compact structured context
         context = serialize_subgraph(subgraph)
 
-        # 4. Build prompt — adaptive based on context quality
+        # 4. Build prompt — balance quality with token efficiency
         has_graph_context = bool(context.strip())
         num_entities = len(subgraph.get("entities", []))
         num_rels = len(subgraph.get("relationships", []))
@@ -208,28 +208,36 @@ class GraphRAG:
         logger.info(f"DEBUG: has_graph_context={has_graph_context}, num_entities={num_entities}, context_len={len(context)}")
 
         if has_graph_context and num_entities > 0:
-            # We have graph data — use it but STAY ULTRA-CONCISE for token efficiency
-            # For hackathon: GraphRAG must be most efficient, not most verbose
-            system_prompt = "ONLY 3 bullets. NO intro/outro."
-            user_prompt = f"""Q: {question}
-Answer with EXACTLY 3 bullet points, each 1 sentence max:
+            # We have graph data — provide quality context-grounded answer
+            system_prompt = """You are an expert assistant using knowledge graphs. 
+Provide 3 key insights that directly answer the question using the provided context.
+Focus on relevance and clarity over brevity."""
+            user_prompt = f"""Question: {question}
+
+Knowledge Graph Context:
+{context}
+
+Provide 3 key bullet points that answer this question based on the context:
 •
 •
 •"""
             temperature = 0.1
-            max_tokens = 50
-            logger.warning(f"🟢 GraphRAG WITH GRAPH: 50 tokens MAX")
+            max_tokens = 120
+            logger.warning(f"🟢 GraphRAG WITH GRAPH: 120 tokens MAX (quality mode)")
         else:
-            # No graph data found — use ULTRA-CONCISE fallback
-            system_prompt = "ONLY 3 bullets. NO intro/outro."
-            user_prompt = f"""Q: {question}
-Answer with EXACTLY 3 bullet points:
+            # No graph data found — use quality fallback
+            system_prompt = """You are an expert assistant. 
+Provide 3 key insights that directly answer the question.
+Focus on accuracy and relevance."""
+            user_prompt = f"""Question: {question}
+
+Provide 3 key bullet points that answer this question:
 •
 •
 •"""
             temperature = 0.1
-            max_tokens = 50
-            logger.warning(f"🔴 GraphRAG FALLBACK: 50 tokens MAX")
+            max_tokens = 120
+            logger.warning(f"🔴 GraphRAG FALLBACK: 120 tokens MAX (quality mode)")
 
         # 5. Call Gemini via shared client (accurate token counts)
         # Use JSON schema to force 3-bullet format
