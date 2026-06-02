@@ -122,7 +122,7 @@ graphrag-hackathon/
 ├── docs/                              # Documentation
 │   ├── architecture.md               # System design
 │   ├── blog_post.md                  # Technical blog
-│   └── demo_video_script.md          # Demo narration
+│   
 │
 ├── data/
 │   ├── eval_queries_16.json          # 16 test queries
