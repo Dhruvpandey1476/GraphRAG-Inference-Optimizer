@@ -208,21 +208,25 @@ class GraphRAG:
         logger.info(f"DEBUG: has_graph_context={has_graph_context}, num_entities={num_entities}, context_len={len(context)}")
 
         if has_graph_context and num_entities > 0:
-            # We have graph data — use it as primary source
+            # We have graph data — use it but STAY ULTRA-CONCISE for token efficiency
+            # For hackathon: GraphRAG must be most efficient, not most verbose
             system_prompt = (
-                "You are an expert assistant with access to a structured knowledge graph. "
-                "Use the graph facts below as your primary source, and supplement with "
-                "your own knowledge to provide a thorough, accurate answer."
+                "You are a concise expert. Use the graph knowledge below to answer. "
+                "Respond with EXACTLY 3 bullet points, each max 1 sentence. "
+                "NO intro/outro. Only bullets with graph insights."
             )
-            user_prompt = f"""Knowledge Graph ({num_entities} entities, {num_rels} relationships):
+            user_prompt = f"""Graph ({num_entities} entities):
 {context}
 
-Question: {question}
+Q: {question}
 
-Provide a detailed, accurate answer using the graph context and your expertise:"""
+EXACTLY 3 BULLETS using graph knowledge:
+• Point 1:
+• Point 2:
+• Point 3:"""
             temperature = 0.1
-            max_tokens = 4000
-            logger.warning(f"🟢 GraphRAG WITH GRAPH: Using full context ({num_entities} entities, {num_rels} rels, context_len={len(context)})")
+            max_tokens = 250  # Keep graph-enhanced answers concise for token efficiency
+            logger.warning(f"🟢 GraphRAG WITH GRAPH: Using graph-enhanced 3-bullet format ({num_entities} entities, {num_rels} rels, 250 tokens MAX)")
             logger.info(f"🎯 GraphRAG PROMPT STRATEGY: Using GRAPH DATA ({num_entities} entities, {num_rels} rels)")
         else:
             # No graph data found — use ULTRA-CONCISE fallback
