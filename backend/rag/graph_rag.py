@@ -215,21 +215,26 @@ Question: {question}
 Provide a detailed, accurate answer using the graph context and your expertise:"""
             temperature = 0.1
             max_tokens = 4000
+            logger.warning(f"🟢 GraphRAG WITH GRAPH: Using full context ({num_entities} entities, {num_rels} rels, context_len={len(context)})")
             logger.info(f"🎯 GraphRAG PROMPT STRATEGY: Using GRAPH DATA ({num_entities} entities, {num_rels} rels)")
         else:
             # No graph data found — use ULTRA-CONCISE fallback
             # GraphRAG advantage: even without graph, it's the MOST TOKEN-EFFICIENT
-            # Key points only, no lengthy explanations
+            # AGGRESSIVE: Bullet format with EXACT 3-item count
             system_prompt = (
-                "You are a concise expert. Answer in bullet points only. "
-                "No verbose explanations. Max 3-4 key points. Be extremely brief."
+                "You are a hyper-concise expert. You MUST respond with EXACTLY 3 bullet points. "
+                "Each bullet: max 1 sentence. NO exceptions. NO intro/outro text. Only bullets."
             )
             user_prompt = f"""Q: {question}
 
-Answer with 3-4 bullet points ONLY. No elaboration."""
+RESPOND WITH EXACTLY 3 BULLETS:
+• Point 1:
+• Point 2:
+• Point 3:"""
             temperature = 0.1
-            max_tokens = 400  # ULTRA-LOW for token efficiency
-            logger.info(f"GraphRAG: No graph context, using ULTRA-CONCISE fallback (400 tokens max)")
+            max_tokens = 250  # ULTRA-LOW: force brevity
+            logger.info(f"🔴 GraphRAG FALLBACK (NO GRAPH): Using ultra-concise bullet format (250 tokens max)")
+            logger.warning(f"DEBUG: FALLBACK TRIGGERED - Reason: has_graph_context={has_graph_context}, num_entities={num_entities}")
 
         # 5. Call Gemini via shared client (accurate token counts)
         result = gemini_generate(

@@ -193,12 +193,15 @@ class TigerGraphClient:
         """Fast check: is the graph empty? Used to skip expensive entity extraction."""
         try:
             if not self.conn:
+                logger.warning(f"is_empty(): conn is None, graph is EMPTY")
                 return True
             # Quick check: get vertex count
             result = self.conn.getVertexCount("Entity")
-            return result == 0
+            is_empty = result == 0
+            logger.info(f"is_empty() check: Entity count = {result}, is_empty = {is_empty}")
+            return is_empty
         except Exception as e:
-            logger.warning(f"is_empty() check failed: {e}, assuming graph is empty")
+            logger.warning(f"is_empty() check failed: {e}, assuming graph is EMPTY")
             return True
 
     def get_entity_subgraph(self, entity_names: list[str], max_hops: int = 2,
