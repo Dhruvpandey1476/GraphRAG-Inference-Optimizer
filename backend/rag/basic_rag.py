@@ -240,7 +240,7 @@ Based on the context above, provide a comprehensive answer with citations:"""
             system_prompt=system_prompt,
             user_prompt=user_prompt,
             temperature=0.1,
-            max_tokens=1500,
+            max_tokens=1000,
         )
 
         latency_ms = (time.time() - t0) * 1000

@@ -169,14 +169,21 @@ class GraphRAG:
 
         # PRE-CHECK: If graph is known to be empty, skip entity extraction overhead
         # This prevents wasting 200-300ms on entity extraction when graph is empty
-        is_graph_empty = self.tg.is_empty() if hasattr(self.tg, 'is_empty') else False
+        is_graph_empty = False
+        try:
+            is_graph_empty = self.tg.is_empty() if hasattr(self.tg, 'is_empty') else False
+        except Exception as e:
+            logger.error(f"is_empty() check failed: {e}, defaulting to False (will try entity extraction)")
+        
+        logger.warning(f"DEBUG: is_graph_empty = {is_graph_empty}")
         
         if is_graph_empty:
             # Skip entity extraction entirely when graph is empty
             entities = []
             subgraph = {"entities": [], "relationships": [], "documents": []}
-            logger.info("FAST PATH: Graph is empty, skipping entity extraction overhead")
+            logger.warning("🟡 FAST PATH: Graph detected as EMPTY, skipping entity extraction")
         else:
+            logger.warning("🟠 FULL PATH: Graph not empty, proceeding with entity extraction")
             # 1. Extract entities from the query (seed for traversal)
             entities = extract_query_entities(question)
             logger.info(f"Query entities: {entities}")
@@ -232,9 +239,9 @@ RESPOND WITH EXACTLY 3 BULLETS:
 • Point 2:
 • Point 3:"""
             temperature = 0.1
-            max_tokens = 250  # ULTRA-LOW: force brevity
-            logger.info(f"🔴 GraphRAG FALLBACK (NO GRAPH): Using ultra-concise bullet format (250 tokens max)")
-            logger.warning(f"DEBUG: FALLBACK TRIGGERED - Reason: has_graph_context={has_graph_context}, num_entities={num_entities}")
+            max_tokens = 150  # ULTRA-AGGRESSIVE: force extreme brevity
+            logger.warning(f"🔴 GraphRAG FALLBACK (NO GRAPH): Using 3-bullet format (150 tokens MAX)")
+            logger.warning(f"DEBUG: FALLBACK TRIGGERED - has_graph_context={has_graph_context}, num_entities={num_entities}")
 
         # 5. Call Gemini via shared client (accurate token counts)
         result = gemini_generate(
