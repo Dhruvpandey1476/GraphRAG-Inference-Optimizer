@@ -1,5 +1,5 @@
 # Stage 1: Build frontend with Node
-# Force rebuild: 2026-06-01 deploy fix commit f4bb14ae
+# Force rebuild: 2026-06-02 graph traversal fix with fuzzy entity matching (commit 4215b931, 8d2485c4)
 FROM node:18-alpine AS frontend-builder
 
 WORKDIR /build/frontend
