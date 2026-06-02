@@ -79,14 +79,31 @@ def gemini_generate(
 
     # Parse JSON response if applicable
     import json
+    import re
     answer = response.text
+    
     if use_json_schema:
+        # Try JSON parsing first
         try:
             data = json.loads(response.text)
-            bullets = data.get("bullets", [])[:3]  # Take only first 3
+            bullets = data.get("bullets", [])[:3]
             answer = '\n'.join([f"• {b}" for b in bullets])
+            logger.info(f"✅ JSON schema parsed: {len(bullets)} bullets")
         except:
-            answer = response.text
+            # Fallback: extract bullet points using regex
+            try:
+                # Look for quoted strings that are likely bullets
+                matches = re.findall(r'"([^"]{20,})"', response.text)
+                if matches:
+                    bullets = matches[:3]
+                    answer = '\n'.join([f"• {b}" for b in bullets])
+                    logger.info(f"✅ Extracted {len(bullets)} bullets from JSON")
+                else:
+                    answer = response.text
+                    logger.warning(f"⚠️ Could not parse JSON schema, using raw: {response.text[:100]}")
+            except:
+                answer = response.text
+                logger.error(f"❌ All parsing failed, raw response: {response.text[:200]}")
 
     return {
         "answer": answer,
