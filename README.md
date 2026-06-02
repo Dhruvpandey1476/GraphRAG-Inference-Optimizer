@@ -418,4 +418,5 @@ EMBEDDING_MODEL=text-embedding-3-small
 MIT — Built for the TigerGraph GraphRAG Inference Hackathon 2026.
 
 #   U p d a t e d :   H F   r e b u i l d   t r i g g e r  
+ #   H F   S p a c e   R e b u i l d   T r i g g e r   -   0 6 / 0 2 / 2 0 2 6   1 7 : 2 0 : 5 4  
  
