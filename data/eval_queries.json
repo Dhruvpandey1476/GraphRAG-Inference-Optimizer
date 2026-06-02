@@ -78,5 +78,125 @@
   {
     "question": "What are the cost implications of token reduction at production scale?",
     "ground_truth": "At production scale, a 70% token reduction translates directly to 70% lower LLM API costs, which for systems processing millions of queries daily can represent savings of tens or hundreds of thousands of dollars monthly. It also reduces latency, improves throughput, and decreases the risk of hitting rate limits."
+  },
+  {
+    "question": "What is positional encoding in transformers and why is it necessary?",
+    "ground_truth": "Positional encoding adds information about token positions to embeddings, enabling transformers to understand word order since self-attention is position-invariant. Common approaches include sinusoidal positional encodings and learned positional embeddings that capture relative and absolute positions in sequences."
+  },
+  {
+    "question": "How does the attention mechanism calculate query, key, and value representations?",
+    "ground_truth": "The attention mechanism projects input embeddings into query (Q), key (K), and value (V) spaces using learned linear transformations. Attention scores are computed as softmax(Q·K^T/√d), then used to weight and aggregate value vectors, creating context-aware representations that focus on relevant tokens."
+  },
+  {
+    "question": "What is the difference between self-attention and cross-attention?",
+    "ground_truth": "Self-attention computes attention over the same sequence (Q, K, V all from the same input), allowing tokens to attend to all positions in the input. Cross-attention computes attention from one sequence to another (Q from decoder, K and V from encoder), enabling information transfer between different inputs."
+  },
+  {
+    "question": "How does layer normalization improve transformer training stability?",
+    "ground_truth": "Layer normalization normalizes activations across feature dimensions to have zero mean and unit variance, reducing internal covariate shift and stabilizing gradient flow during training. It allows higher learning rates, enables training of deeper models, and improves convergence speed compared to batch normalization."
+  },
+  {
+    "question": "What is the role of feed-forward networks in transformer blocks?",
+    "ground_truth": "Feed-forward networks in transformers consist of two dense layers with a non-linearity (usually ReLU or GELU) between them. They expand the hidden dimension, learn non-linear transformations, and introduce model capacity while maintaining the same output dimension for residual connections."
+  },
+  {
+    "question": "How does scaling relate to transformer model performance?",
+    "ground_truth": "Transformer performance scales predictably with model size, dataset size, and compute budget following power laws. Larger models with more parameters trained on larger datasets achieve better performance, but with diminishing returns. Scaling laws guide optimal allocation of compute and parameters for a given budget."
+  },
+  {
+    "question": "What are the differences between encoder-only, decoder-only, and encoder-decoder architectures?",
+    "ground_truth": "Encoder-only models (BERT) use masked language modeling for understanding tasks. Decoder-only models (GPT) use causal masking for generation. Encoder-decoder models (T5) combine both for seq2seq tasks like translation. Each architecture trades off between understanding and generation capabilities."
+  },
+  {
+    "question": "How does instruction tuning improve LLM performance on downstream tasks?",
+    "ground_truth": "Instruction tuning fine-tunes pre-trained LLMs on diverse instruction-following examples where the model learns to generate responses aligned with specific instructions. This improves zero-shot generalization to new tasks, reduces the need for few-shot examples, and makes models more controllable and safer."
+  },
+  {
+    "question": "What is in-context learning and how does it differ from fine-tuning?",
+    "ground_truth": "In-context learning (ICL) is where models learn from examples in the prompt without weight updates, enabling fast task adaptation. Fine-tuning updates model weights on task examples, requiring more data and computational resources but potentially achieving better performance for specialized tasks."
+  },
+  {
+    "question": "How does chain-of-thought prompting improve reasoning in LLMs?",
+    "ground_truth": "Chain-of-thought (CoT) prompting encourages LLMs to generate intermediate reasoning steps before final answers. This improves performance on complex reasoning tasks by decomposing problems into manageable steps, enabling explicit error detection, and allowing the model to correct mistakes during reasoning."
+  },
+  {
+    "question": "What are the main differences between decoding strategies like greedy, beam search, and nucleus sampling?",
+    "ground_truth": "Greedy decoding selects the highest probability token at each step (fast but may miss better sequences). Beam search explores multiple hypotheses maintaining top-k options. Nucleus (top-p) sampling restricts the vocabulary to the smallest set of tokens with cumulative probability p, balancing diversity and quality."
+  },
+  {
+    "question": "How does reinforcement learning from human feedback improve LLM alignment?",
+    "ground_truth": "RLHF trains a reward model on human preference pairs, then uses RL (typically PPO) to fine-tune the LLM to maximize reward. This aligns model outputs with human values, reduces harmful content, and improves following user intentions compared to supervised fine-tuning alone."
+  },
+  {
+    "question": "What is the significance of model scale in achieving emergent capabilities?",
+    "ground_truth": "Emergent capabilities are abilities that appear suddenly as model scale increases but are absent in smaller models. Examples include in-context learning, chain-of-thought reasoning, and instruction following. These emerge due to increased model capacity and diversity of learned representations at larger scales."
+  },
+  {
+    "question": "How do sparse transformers reduce computational complexity?",
+    "ground_truth": "Sparse transformers use structured sparsity patterns (strided, local, or learned patterns) instead of full attention, reducing complexity from O(n²) to O(n·√n) or O(n). This enables processing longer sequences while maintaining expressive power through strategic attention connections."
+  },
+  {
+    "question": "What is the difference between parametric and non-parametric knowledge in LLMs?",
+    "ground_truth": "Parametric knowledge is stored in model weights from training data. Non-parametric knowledge comes from external retrieval sources accessed at inference time. RAG combines both: using parametric knowledge for general understanding and non-parametric knowledge for specific, up-to-date facts."
+  },
+  {
+    "question": "How does dense passage retrieval differ from sparse retrieval methods?",
+    "ground_truth": "Dense retrieval uses learned embeddings for semantic matching, capturing meaning-based similarity. Sparse retrieval uses keyword matching (BM25, TF-IDF), which is more interpretable and efficient but may miss semantic relationships. Modern systems often combine both for complementary strengths."
+  },
+  {
+    "question": "What are hard negatives and why are they important for training dense retrievers?",
+    "ground_truth": "Hard negatives are non-relevant documents that are semantically similar to queries, making them difficult to distinguish from relevant documents. Training with hard negatives improves retriever robustness and ranking quality by pushing the model to learn finer semantic distinctions beyond surface similarity."
+  },
+  {
+    "question": "How do entity disambiguation techniques improve knowledge graph construction?",
+    "ground_truth": "Entity disambiguation links mentions of entities to unique identifiers in knowledge bases, resolving ambiguities when the same name refers to different entities. This improves graph quality by preventing spurious entity merging and enabling accurate relationship extraction across mentions of the same entity."
+  },
+  {
+    "question": "What is the relationship between knowledge graph schema design and query performance?",
+    "ground_truth": "Schema design (entity types, relationship types, properties) affects which queries can be expressed efficiently and how comprehensively. Well-designed schemas enable precise queries through rich type information but require careful balance to avoid over-fragmentation that increases query complexity."
+  },
+  {
+    "question": "How does temporal information in knowledge graphs improve reasoning?",
+    "ground_truth": "Temporal properties (valid-from, valid-to dates) on entities and relationships allow graphs to reason about historical facts, validity periods, and causal relationships. This enables queries like 'who was the CEO in 2020' and improves factual correctness by acknowledging that facts change over time."
+  },
+  {
+    "question": "What are the tradeoffs between breadth-first and depth-first traversal in graph retrieval?",
+    "ground_truth": "Breadth-first traversal explores many neighbors at each hop, capturing diverse perspectives but retrieving many entities. Depth-first follows single paths deeply, finding specific connections but potentially missing relevant parallel information. Hybrid strategies or k-hop limits balance both approaches."
+  },
+  {
+    "question": "How does information bottleneck theory relate to token reduction in LLMs?",
+    "ground_truth": "Information bottleneck theory suggests models learn compressed representations by balancing informativeness and compression. Token reduction achieves compression through graph structure, removing redundant tokens while preserving task-relevant information, improving efficiency without sacrificing quality."
+  },
+  {
+    "question": "What is the role of subgraph summarization in graph-based retrieval?",
+    "ground_truth": "Subgraph summarization condenses retrieved subgraphs into compact natural language or structured text. This reduces tokens in prompts while preserving essential relationships and context, enabling LLMs to process complex multi-hop connections efficiently while maintaining answer quality."
+  },
+  {
+    "question": "How do graph attention networks combine graph structure with neural attention?",
+    "ground_truth": "Graph Attention Networks (GATs) use learned attention weights to determine how much each neighbor influences a node's representation. This learns task-specific importance of edges, capturing that not all connections are equally relevant, and improves expressiveness over fixed aggregation schemes."
+  },
+  {
+    "question": "What metrics best capture retriever-reader efficiency in RAG pipelines?",
+    "ground_truth": "Effective metrics include token count per query, retrieval latency, reader latency, end-to-end latency, cost per query, and quality-adjusted metrics like quality-per-token or quality-per-cost. These capture the full efficiency picture beyond token count alone."
+  },
+  {
+    "question": "How does contrastive learning improve representation quality in dense retrievers?",
+    "ground_truth": "Contrastive learning minimizes distance between query and relevant passages while maximizing distance from irrelevant passages. This teaches the model to group semantically similar items and separate dissimilar ones, learning robust representations that generalize to new domains and queries."
+  },
+  {
+    "question": "What is the significance of semantic textual similarity datasets for evaluating embeddings?",
+    "ground_truth": "STS datasets contain sentence pairs with human-assigned similarity scores. Evaluating embeddings on STS provides direct measurement of whether models capture semantic relationships as humans perceive them. Good STS performance correlates with downstream retrieval and ranking effectiveness."
+  },
+  {
+    "question": "How does active learning reduce annotation requirements for training retrievers?",
+    "ground_truth": "Active learning selects the most informative examples for human annotation rather than random sampling. For retrievers, it identifies hard negatives and ambiguous queries that most improve model performance, reducing annotation cost while maintaining or improving final performance."
+  },
+  {
+    "question": "What are zero-shot and few-shot adaptation techniques for RAG systems?",
+    "ground_truth": "Zero-shot adaptation uses retrievers and readers trained on general tasks without target task data. Few-shot uses a small number of in-domain examples for prompt engineering or parameter-efficient fine-tuning. These enable rapid deployment to new domains with minimal annotation effort."
+  },
+  {
+    "question": "How do curriculum learning strategies improve RAG system development?",
+    "ground_truth": "Curriculum learning trains models on progressively harder tasks, starting with simple queries and gradually increasing complexity. For RAG systems, this improves convergence speed and final performance by teaching the model fundamental retrieval patterns before handling complex multi-hop reasoning and rare edge cases."
   }
 ]
