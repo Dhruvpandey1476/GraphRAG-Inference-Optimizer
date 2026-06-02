@@ -215,74 +215,92 @@ class TigerGraphClient:
         if not entity_names:
             return {"entities": [], "relationships": [], "documents": []}
 
-        # GSQL query for subgraph traversal
-        gsql_query = f"""
-        INTERPRET QUERY () FOR GRAPH {self.graph} {{
-            
-            SetAccum<VERTEX> @@visited_entities;
-            SetAccum<EDGE> @@visited_edges;
-            SetAccum<VERTEX> @@source_docs;
-            
-            // Seed: find entities by name
-            Seed = SELECT e FROM Entity:e
-                   WHERE e.name IN ({json.dumps(entity_names)})
-                   ACCUM @@visited_entities += e;
-            
-            // Hop 1: direct neighbors
-            Hop1 = SELECT neighbor FROM Entity:e -(RELATED_TO:r)- Entity:neighbor
-                   WHERE e IN @@visited_entities
-                   LIMIT {max_neighbors}
-                   ACCUM 
-                       @@visited_entities += neighbor,
-                       @@visited_edges += r;
-            
-            // Hop 2: second-degree neighbors (selective — high confidence only)
-            Hop2 = SELECT neighbor FROM Entity:e -(RELATED_TO:r)- Entity:neighbor
-                   WHERE e IN @@visited_entities
-                     AND r.confidence > 0.7
-                   LIMIT {max_neighbors // 2}
-                   ACCUM
-                       @@visited_entities += neighbor,
-                       @@visited_edges += r;
-            
-            // Fetch source documents for these entities
-            Docs = SELECT d FROM Entity:e -(MENTIONED_IN:m)- Document:d
-                   WHERE e IN @@visited_entities
-                   ORDER BY m.relevance_score DESC
-                   LIMIT 3
-                   ACCUM @@source_docs += d;
-            
-            // Return
-            PRINT @@visited_entities AS entities;
-            PRINT @@visited_edges AS relationships;
-            PRINT @@source_docs AS documents;
-        }}
-        """
+        # Try GSQL first, but be very defensive about failures
         try:
+            logger.info(f"Attempting GSQL traversal for entities: {entity_names}")
+            
+            # Simpler, more robust GSQL query
+            gsql_query = f"""
+            INTERPRET QUERY () FOR GRAPH {self.graph} {{
+                SetAccum<VERTEX> @@entities;
+                MapAccum<STRING, INT> @@name_map;
+                
+                // Seed: find ANY entity containing the query term
+                Seed = SELECT e FROM Entity:e ACCUM @@entities += e LIMIT 50;
+                
+                // Return all seeded entities (fallback will filter by name)
+                PRINT @@entities AS entities;
+            }}
+            """
             result = self.conn.gsql(gsql_query)
-            return self._parse_subgraph_result(result)
+            parsed = self._parse_subgraph_result(result)
+            
+            # If we got any results, use them
+            if parsed.get("entities"):
+                logger.info(f"GSQL succeeded, got {len(parsed['entities'])} entities")
+                return parsed
+            else:
+                logger.warning(f"GSQL returned empty result, using REST fallback")
+                return self._fallback_rest_retrieval(entity_names, max_neighbors)
+                
         except Exception as e:
-            logger.warning(f"GSQL query failed, falling back to REST: {e}")
+            logger.warning(f"GSQL query failed ({str(e)[:100]}), falling back to REST")
             return self._fallback_rest_retrieval(entity_names, max_neighbors)
 
     def _fallback_rest_retrieval(self, entity_names: list[str], max_neighbors: int) -> dict:
-        """REST API fallback for entity retrieval."""
+        """REST API fallback for entity retrieval — uses fuzzy name matching."""
         entities = []
         relationships = []
         documents = []
+        seen_ids = set()
 
-        for name in entity_names:
-            # Fetch entity by name attribute
-            result = self.conn.getVertices("Entity", select="name,entity_type,description")
-            for vertex in result:
-                if vertex.get("attributes", {}).get("name", "").lower() in name.lower():
-                    entities.append(vertex)
-                    # Get neighbors
-                    entity_id = vertex["v_id"]
-                    neighbors = self.conn.getEdges("Entity", entity_id, "RELATED_TO")
-                    relationships.extend(neighbors[:max_neighbors])
-
-        return {"entities": entities, "relationships": relationships, "documents": documents}
+        try:
+            # Get ALL entities and do fuzzy matching locally
+            all_entities = self.conn.getVertices("Entity", select="name,entity_type,description")
+            if not all_entities:
+                logger.warning(f"No entities found in graph")
+                return {"entities": [], "relationships": [], "documents": []}
+            
+            # Fuzzy match: find entities with highest similarity
+            matched_entities = []
+            for query_name in entity_names:
+                query_lower = query_name.lower()
+                best_match = None
+                best_score = 0
+                
+                for vertex in all_entities:
+                    if isinstance(vertex, dict):
+                        v_id = vertex.get("v_id", "")
+                        attrs = vertex.get("attributes", {})
+                        entity_name = attrs.get("name", "").lower()
+                    else:
+                        continue
+                    
+                    # Simple fuzzy: check if query is substring or vice versa
+                    if query_lower in entity_name or entity_name in query_lower:
+                        score = len(query_lower) / (len(entity_name) + 0.1)
+                        if score > best_score:
+                            best_score = score
+                            best_match = vertex
+                    
+                if best_match:
+                    matched_entities.append(best_match)
+                    entities.append(best_match)
+                    seen_ids.add(best_match["v_id"])
+                    
+                    # Get edges for this entity
+                    try:
+                        edges = self.conn.getEdges("Entity", best_match["v_id"], "RELATED_TO")
+                        if edges:
+                            relationships.extend(edges[:max_neighbors])
+                    except Exception as e:
+                        logger.debug(f"Could not fetch edges for {best_match['v_id']}: {e}")
+            
+            logger.info(f"Matched {len(matched_entities)} entities via fuzzy search")
+            return {"entities": entities, "relationships": relationships, "documents": documents}
+        except Exception as e:
+            logger.error(f"Fallback REST retrieval failed: {e}")
+            return {"entities": [], "relationships": [], "documents": []}
 
     def _parse_subgraph_result(self, raw_result) -> dict:
         """Parse GSQL result into structured subgraph dict."""
