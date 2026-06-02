@@ -28,23 +28,6 @@ def _get_client():
     return _client
 
 
-def _make_thinking_config():
-    """Create thinking config to disable thinking, handling SDK version differences."""
-    try:
-        from google.genai import types
-        # Try thinking_budget (newer SDK)
-        return types.ThinkingConfig(thinking_budget=0)
-    except Exception:
-        pass
-    try:
-        from google.genai import types
-        # Try mode-based disable (older SDK)
-        return types.ThinkingConfig(mode="off")
-    except Exception:
-        pass
-    return None
-
-
 def gemini_generate(
     system_prompt: str,
     user_prompt: str,
@@ -55,47 +38,29 @@ def gemini_generate(
     from google.genai import types
 
     client = _get_client()
-    thinking = _make_thinking_config()
 
-    try:
-        config_kwargs = dict(
-            temperature=temperature,
-            max_output_tokens=max_tokens,
-            system_instruction=system_prompt,
-        )
-        if thinking is not None:
-            config_kwargs["thinking_config"] = thinking
+    config = types.GenerateContentConfig(
+        temperature=temperature,
+        max_output_tokens=max_tokens,
+        system_instruction=system_prompt,
+        thinking_config=types.ThinkingConfig(thinking_budget=0),
+    )
 
-        config = types.GenerateContentConfig(**config_kwargs)
-        response = client.models.generate_content(
-            model=GEMINI_MODEL_NAME,
-            contents=user_prompt,
-            config=config,
-        )
-    except Exception as e:
-        # If thinking config fails, retry without it
-        logger.warning(f"Retrying without thinking config: {e}")
-        config = types.GenerateContentConfig(
-            temperature=temperature,
-            max_output_tokens=max_tokens,
-            system_instruction=system_prompt,
-        )
-        response = client.models.generate_content(
-            model=GEMINI_MODEL_NAME,
-            contents=user_prompt,
-            config=config,
-        )
+    response = client.models.generate_content(
+        model=GEMINI_MODEL_NAME,
+        contents=user_prompt,
+        config=config,
+    )
 
     usage = response.usage_metadata
     prompt_tokens = getattr(usage, "prompt_token_count", 0) or 0
     completion_tokens = getattr(usage, "candidates_token_count", 0) or 0
-    total_tokens = prompt_tokens + completion_tokens
 
     return {
         "answer": response.text,
         "prompt_tokens": prompt_tokens,
         "completion_tokens": completion_tokens,
-        "total_tokens": total_tokens,
+        "total_tokens": prompt_tokens + completion_tokens,
     }
 
 

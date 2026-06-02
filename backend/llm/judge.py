@@ -25,7 +25,7 @@ def _judge_gemini_call(prompt: str) -> str:
         system_prompt="You are an impartial AI judge. Return only valid JSON.",
         user_prompt=prompt,
         temperature=0,
-        max_tokens=300,
+        max_tokens=500,
     )
     return result["answer"]
 
