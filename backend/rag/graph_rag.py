@@ -165,11 +165,24 @@ class GraphRAG:
         """
         t0 = time.time()
         
-        # SIMPLIFIED: Skip graph traversal for speed, use LLM-only approach
-        # This ensures latency is <3s to match LLM-only baseline
-        entities = []
-        subgraph = {"entities": [], "relationships": [], "documents": []}
-        graph_traversal_ms = 0
+        # Extract entities from query using regex-based extraction
+        entities = extract_query_entities(question)
+        logger.info(f"Extracted entities from query: {entities}")
+        
+        # Traverse graph if TigerGraph is available
+        t_graph_start = time.time()
+        if self.tg and entities:
+            try:
+                subgraph = self.tg.get_entity_subgraph(entities, max_hops, max_neighbors)
+                logger.info(f"✅ Retrieved subgraph: {len(subgraph.get('entities', []))} entities, {len(subgraph.get('relationships', []))} relationships")
+            except Exception as e:
+                logger.warning(f"⚠️  Graph traversal failed: {e}, falling back to LLM-only")
+                subgraph = {"entities": [], "relationships": [], "documents": []}
+        else:
+            logger.debug(f"Skipping graph traversal: tg_client={bool(self.tg)}, entities={len(entities)}")
+            subgraph = {"entities": [], "relationships": [], "documents": []}
+        
+        graph_traversal_ms = (time.time() - t_graph_start) * 1000
 
         # 3. Serialize subgraph into compact structured context
         context = serialize_subgraph(subgraph)

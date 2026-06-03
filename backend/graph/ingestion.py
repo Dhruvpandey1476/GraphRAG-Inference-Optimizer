@@ -77,37 +77,110 @@ def count_tokens(text: str) -> int:
 
 # ─── Entity Extraction ────────────────────────────────────────────────────────
 
-ENTITY_EXTRACTION_PROMPT = """Extract all named entities and their relationships from the following text.
+ENTITY_EXTRACTION_PROMPT = """Extract ALL key entities and their relationships from this Machine Learning / AI / RAG text.
 
-Return ONLY valid JSON in this exact format:
+FOCUS ON: 
+- ML architectures: Transformer, LSTM, RNN, CNN, Seq2Seq, GRU, Attention, etc.
+- Techniques: Attention Mechanism, Self-Attention, Multi-Head Attention, Embeddings, Pooling, etc.
+- Models: BERT, GPT, GPT-2, GPT-3, GPT-4, Claude, LLaMA, RoBERTa, DistilBERT, ALBERT, T5, etc.
+- Frameworks: RAG, GraphRAG, Knowledge Graphs, TigerGraph, Neo4j, FAISS, Pinecone, etc.
+- Concepts: Token, Embedding, Encoder, Decoder, Context Window, Query, Key, Value, Softmax, etc.
+- People: Vaswani, Devlin, Radford, Hinton, LeCun, Bengio, etc.
+- Organizations: OpenAI, Google, Meta, DeepMind, Hugging Face, etc.
+
+EXCLUDE: Generic words (what, when, where, how, why, which, who, it, is, the, a, provides, etc.)
+
+Return ONLY valid JSON (no markdown, no code blocks):
 {
   "entities": [
-    {"name": "Entity Name", "type": "PERSON|ORG|CONCEPT|LOCATION|PRODUCT|EVENT", "description": "brief description"}
+    {"name": "Specific Entity", "type": "ARCHITECTURE|TECHNIQUE|MODEL|FRAMEWORK|CONCEPT|PERSON|ORGANIZATION", "description": "Concise description of what it is"}
   ],
   "relationships": [
-    {"from": "Entity A", "to": "Entity B", "relation": "relation type", "confidence": 0.9, "context": "short context snippet"}
+    {"from": "Entity A", "to": "Entity B", "relation": "uses|implements|extends|improves_over|enables|related_to|combines|alternative_to|requires|known_for|developed_by", "confidence": 0.9}
   ]
 }
+
+REQUIREMENTS:
+- Extract 15-20 specific entities per chunk (be generous, capture everything relevant)
+- Extract 10-15 relationships showing HOW entities connect
+- Relationship confidence: 1.0 for stated facts, 0.8 for obvious inferences, 0.6 for logical deductions
+- Include BOTH entity-type relationships AND more specific connection types
+- Every entity should appear in at least one relationship
 
 Text:
 """
 
 
+def _filter_generic_entity(name: str) -> bool:
+    """Filter out generic, low-value entities that pollute the graph.
+    More permissive to capture more domain-specific entities."""
+    # Ultra-generic words that are never entities
+    ultra_generic = {
+        "what", "when", "where", "how", "why", "which", "who", "it", "is", "the", "a", "an",
+        "and", "or", "but", "for", "of", "in", "on", "at", "to", "from", "about", "by",
+        "text", "document", "provides", "includes", "using", "used", "used", "various",
+        "multiple", "other", "different", "time", "set", "type", "part", "feature", "method",
+        "way", "example", "shown", "case", "number", "result", "form", "based", "becoming",
+    }
+    
+    name_lower = name.lower().strip()
+    
+    # Reject if it's pure ultra-generic
+    if name_lower in ultra_generic:
+        return False
+    
+    # Reject if very short (< 2 chars)
+    if len(name_lower) < 2:
+        return False
+    
+    # Reject single generic words longer than 2 chars but still generic
+    single_word_reject = {
+        "system", "answer", "explanation", "information", "process", "step", "example",
+        "allows", "enables", "makes", "shows", "learning", "training", "evaluation", "user",
+        "question", "expert", "however", "different", "better", "good", "bad", "right", "wrong",
+    }
+    if name_lower in single_word_reject:
+        return False
+    
+    return True
+
+
 def extract_entities_and_relations(chunk: str) -> dict:
-    """Use LLM to extract structured entities and relationships from a text chunk."""
+    """Use LLM to extract domain-specific entities and relationships from a text chunk."""
     try:
         client = _get_groq_client()
         response = client.chat.completions.create(
             model=LLM_MODEL,
             messages=[
-                {"role": "system", "content": "You are a knowledge graph extraction engine. Output only valid JSON."},
+                {"role": "system", "content": "You are a Machine Learning knowledge graph extraction engine. Extract ONLY domain-specific entities. Output only valid JSON, no markdown, no code blocks."},
                 {"role": "user", "content": ENTITY_EXTRACTION_PROMPT + chunk}
             ],
             temperature=0,
-            max_tokens=1000,
+            max_tokens=3000,
         )
-        raw = response.choices[0].message.content
-        return json.loads(raw)
+        raw = response.choices[0].message.content.strip()
+        
+        # Clean markdown code blocks if present
+        if raw.startswith("```"):
+            raw = raw.split("```")[1]
+            if raw.startswith("json"):
+                raw = raw[4:]
+        raw = raw.strip()
+        
+        result = json.loads(raw)
+        
+        # Filter out generic entities
+        filtered_entities = [e for e in result.get("entities", []) if _filter_generic_entity(e.get("name", ""))]
+        
+        logger.debug(f"Extracted {len(filtered_entities)} quality entities (filtered from {len(result.get('entities', []))})")
+        
+        return {
+            "entities": filtered_entities,
+            "relationships": result.get("relationships", [])
+        }
+    except json.JSONDecodeError as e:
+        logger.warning(f"JSON parsing failed: {e}")
+        return {"entities": [], "relationships": []}
     except Exception as e:
         logger.warning(f"Entity extraction failed: {e}")
         return {"entities": [], "relationships": []}
@@ -209,15 +282,18 @@ class DocumentIngestionPipeline:
             chunk_id = f"{doc_id}_chunk_{i}"
             token_count = count_tokens(chunk)
 
-            # Store document chunk
-            self.tg.upsert_document(
-                doc_id=chunk_id,
-                title=f"{title} [chunk {i}]",
-                content=chunk,
-                chunk_index=i,
-                token_count=token_count,
-                source_url=source_url,
-            )
+            # Try to store document chunk, but don't fail if it doesn't work
+            try:
+                self.tg.upsert_document(
+                    doc_id=chunk_id,
+                    title=f"{title} [chunk {i}]",
+                    content=chunk,
+                    chunk_index=i,
+                    token_count=token_count,
+                    source_url=source_url,
+                )
+            except Exception as e:
+                logger.debug(f"Could not store document chunk (this is OK): {e}")
 
             # Extract entities and relationships
             extracted = extract_entities_and_relations(chunk)
@@ -229,39 +305,55 @@ class DocumentIngestionPipeline:
             # Batch embed entity descriptions
             if entities:
                 descriptions = [e.get("description", e["name"]) for e in entities]
-                embeddings = get_embeddings_batch(descriptions)
+                # Skip embeddings if schema doesn't support them
+                embeddings = None
+                try:
+                    embeddings = get_embeddings_batch(descriptions)
+                except Exception as e:
+                    logger.debug(f"Skipping embeddings (schema may not support): {e}")
 
-                for entity, embedding in zip(entities, embeddings):
+                for entity, embedding in zip(entities, embeddings or [None]*len(entities)):
                     entity_id = self._make_entity_id(entity["name"])
                     all_entity_names.add(entity["name"])
 
-                    self.tg.upsert_entity(
-                        entity_id=entity_id,
-                        name=entity["name"],
-                        entity_type=entity.get("type", "UNKNOWN"),
-                        description=entity.get("description", ""),
-                        embedding=embedding,
-                        doc_source=source_url,
-                    )
-                    self.tg.link_entity_to_document(
-                        entity_id=entity_id,
-                        doc_id=chunk_id,
-                        frequency=1,
-                        relevance_score=0.8,
-                    )
-                    self.stats["entities_extracted"] += 1
+                    try:
+                        self.tg.upsert_entity(
+                            entity_id=entity_id,
+                            name=entity["name"],
+                            entity_type=entity.get("type", "UNKNOWN"),
+                            description=entity.get("description", ""),
+                            embedding=embedding or [],  # Pass empty list if no embeddings
+                            doc_source=source_url,
+                        )
+                        self.stats["entities_extracted"] += 1
+                        
+                        # Try to link to document
+                        try:
+                            self.tg.link_entity_to_document(
+                                entity_id=entity_id,
+                                doc_id=chunk_id,
+                                frequency=1,
+                                relevance_score=0.8,
+                            )
+                        except Exception as e:
+                            logger.debug(f"Could not link entity to document: {e}")
+                    except Exception as e:
+                        logger.warning(f"Could not upsert entity '{entity['name']}': {e}")
 
             # Upsert relationships
             for rel in relationships:
                 if rel.get("from") and rel.get("to"):
-                    self.tg.upsert_relationship(
-                        from_entity=self._make_entity_id(rel["from"]),
-                        to_entity=self._make_entity_id(rel["to"]),
-                        relation_type=rel.get("relation", "RELATED_TO"),
-                        confidence=float(rel.get("confidence", 0.8)),
-                        context=rel.get("context", ""),
-                    )
-                    self.stats["relationships_extracted"] += 1
+                    try:
+                        self.tg.upsert_relationship(
+                            from_entity=self._make_entity_id(rel["from"]),
+                            to_entity=self._make_entity_id(rel["to"]),
+                            relation_type=rel.get("relation", "RELATED_TO"),
+                            confidence=float(rel.get("confidence", 0.8)),
+                            context=rel.get("context", ""),
+                        )
+                        self.stats["relationships_extracted"] += 1
+                    except Exception as e:
+                        logger.debug(f"Could not create relationship: {e}")
 
             self.stats["chunks_created"] += 1
 

@@ -135,16 +135,48 @@ class TigerGraphClient:
     def upsert_entity(self, entity_id: str, name: str, entity_type: str,
                       description: str, embedding: list, doc_source: str):
         """Insert or update an entity vertex."""
-        self.conn.upsertVertex(
-            "Entity", entity_id,
-            attributes={
-                "name": name,
-                "entity_type": entity_type,
-                "description": description,
-                "embedding": embedding,
-                "doc_source": doc_source,
-            }
-        )
+        attributes = {
+            "name": name,
+            "entity_type": entity_type,
+            "description": description,
+        }
+        
+        # Try to add optional fields if schema supports them
+        if embedding:
+            try:
+                attributes["embedding"] = embedding
+            except:
+                pass  # Schema may not support embeddings
+        
+        if doc_source:
+            try:
+                attributes["doc_source"] = doc_source
+            except:
+                pass  # Schema may not support doc_source
+        
+        try:
+            self.conn.upsertVertex(
+                "Entity", entity_id,
+                attributes=attributes
+            )
+        except Exception as e:
+            # Try with fewer attributes if it fails
+            if "Unknown vertex attribute" in str(e):
+                logger.debug(f"Some attributes not in schema, retrying with minimal attributes")
+                minimal_attrs = {
+                    "name": name,
+                    "entity_type": entity_type,
+                }
+                try:
+                    self.conn.upsertVertex(
+                        "Entity", entity_id,
+                        attributes=minimal_attrs
+                    )
+                except Exception as e2:
+                    logger.warning(f"Could not upsert entity even with minimal attributes: {e2}")
+                    raise
+            else:
+                raise
 
     def upsert_document(self, doc_id: str, title: str, content: str,
                         chunk_index: int, token_count: int, source_url: str = ""):
@@ -215,34 +247,13 @@ class TigerGraphClient:
         if not entity_names:
             return {"entities": [], "relationships": [], "documents": []}
 
-        # Try GSQL first, but be very defensive about failures
+        logger.info(f"Searching for entities: {entity_names}")
+        
+        # Use fuzzy matching to find relevant entities
         try:
-            # Simpler, more robust GSQL query
-            gsql_query = f"""
-            INTERPRET QUERY () FOR GRAPH {self.graph} {{
-                SetAccum<VERTEX> @@entities;
-                MapAccum<STRING, INT> @@name_map;
-                
-                // Seed: find ANY entity containing the query term
-                Seed = SELECT e FROM Entity:e ACCUM @@entities += e LIMIT 50;
-                
-                // Return all seeded entities (fallback will filter by name)
-                PRINT @@entities AS entities;
-            }}
-            """
-            result = self.conn.gsql(gsql_query)
-            parsed = self._parse_subgraph_result(result)
-            
-            # If we got any results, use them
-            if parsed.get("entities"):
-                return parsed
-            else:
-                # Graph exists but no match - return empty (use LLM-only)
-                return {"entities": [], "relationships": [], "documents": []}
-                
+            return self._fallback_rest_retrieval(entity_names, max_neighbors)
         except Exception as e:
-            # GSQL failed or graph unavailable - return empty, don't try expensive fallback
-            logger.debug(f"Graph unavailable, using LLM-only fallback")
+            logger.warning(f"Entity retrieval failed: {e}, returning empty subgraph")
             return {"entities": [], "relationships": [], "documents": []}
 
     def _fallback_rest_retrieval(self, entity_names: list[str], max_neighbors: int) -> dict:
@@ -259,45 +270,74 @@ class TigerGraphClient:
                 logger.warning(f"No entities found in graph")
                 return {"entities": [], "relationships": [], "documents": []}
             
-            # Fuzzy match: find entities with highest similarity
+            logger.info(f"Total entities in graph: {len(all_entities)}")
+            
+            # Build a map of entity names for faster lookup
+            entity_map = {}
+            for vertex in all_entities:
+                if isinstance(vertex, dict):
+                    v_id = vertex.get("v_id", "")
+                    attrs = vertex.get("attributes", {})
+                    entity_name = attrs.get("name", "").lower() if attrs.get("name") else ""
+                    if entity_name:
+                        entity_map[entity_name] = vertex
+            
+            logger.info(f"Indexed {len(entity_map)} unique entity names")
+            
+            # Match query entities to graph entities
             matched_entities = []
             for query_name in entity_names:
-                query_lower = query_name.lower()
+                query_lower = query_name.lower().strip()
                 best_match = None
                 best_score = 0
                 
-                for vertex in all_entities:
-                    if isinstance(vertex, dict):
-                        v_id = vertex.get("v_id", "")
-                        attrs = vertex.get("attributes", {})
-                        entity_name = attrs.get("name", "").lower()
-                    else:
-                        continue
+                for graph_entity_name, vertex in entity_map.items():
+                    # Score 1: Exact match
+                    if query_lower == graph_entity_name:
+                        best_score = 1.0
+                        best_match = vertex
+                        break
                     
-                    # Simple fuzzy: check if query is substring or vice versa
-                    if query_lower in entity_name or entity_name in query_lower:
-                        score = len(query_lower) / (len(entity_name) + 0.1)
-                        if score > best_score:
-                            best_score = score
+                    # Score 2: Substring match (either direction)
+                    if query_lower in graph_entity_name or graph_entity_name in query_lower:
+                        # Give higher score to longer substring match
+                        overlap = max(len(query_lower), len(graph_entity_name)) / (len(query_lower) + len(graph_entity_name))
+                        if overlap > best_score:
+                            best_score = overlap
                             best_match = vertex
                     
-                if best_match:
-                    matched_entities.append(best_match)
-                    entities.append(best_match)
-                    seen_ids.add(best_match["v_id"])
-                    
-                    # Get edges for this entity
-                    try:
-                        edges = self.conn.getEdges("Entity", best_match["v_id"], "RELATED_TO")
-                        if edges:
-                            relationships.extend(edges[:max_neighbors])
-                    except Exception as e:
-                        logger.debug(f"Could not fetch edges for {best_match['v_id']}: {e}")
+                    # Score 3: Common prefix (at least 3 chars)
+                    if len(query_lower) >= 3 and len(graph_entity_name) >= 3:
+                        for i in range(min(len(query_lower), len(graph_entity_name))):
+                            if query_lower[i] != graph_entity_name[i]:
+                                prefix_match = i / max(len(query_lower), len(graph_entity_name))
+                                if prefix_match > 0.3 and prefix_match > best_score:
+                                    best_score = prefix_match
+                                    best_match = vertex
+                                break
+                
+                if best_match and best_score > 0.3:  # Lower threshold to be more inclusive
+                    if best_match["v_id"] not in seen_ids:
+                        matched_entities.append(best_match)
+                        entities.append(best_match)
+                        seen_ids.add(best_match["v_id"])
+                        logger.info(f"  ✓ Matched query '{query_name}' → '{best_match['attributes']['name']}' (score: {best_score:.2f})")
+                        
+                        # Get relationships for this entity
+                        try:
+                            edges = self.conn.getEdges("Entity", best_match["v_id"], "RELATED_TO")
+                            if edges:
+                                relationships.extend(edges[:max_neighbors])
+                                logger.debug(f"    Found {len(edges[:max_neighbors])} relationships")
+                        except Exception as e:
+                            logger.debug(f"Could not fetch edges for {best_match['v_id']}: {e}")
+                else:
+                    logger.debug(f"  ✗ No match found for '{query_name}' (best score: {best_score:.2f})")
             
-            logger.info(f"Matched {len(matched_entities)} entities via fuzzy search")
+            logger.info(f"✅ Matched {len(matched_entities)} entities via fuzzy search")
             return {"entities": entities, "relationships": relationships, "documents": documents}
         except Exception as e:
-            logger.error(f"Fallback REST retrieval failed: {e}")
+            logger.error(f"Fallback REST retrieval failed: {e}", exc_info=True)
             return {"entities": [], "relationships": [], "documents": []}
 
     def _parse_subgraph_result(self, raw_result) -> dict:
