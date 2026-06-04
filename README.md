@@ -13,8 +13,8 @@
 | **Judge Score** | 7.02/10 | 8.24/10 | **8.08/10** | Fair (Δ0.16) |
 | **Cost/1k** | $0.172 | $0.448 | **$0.075** | **80.2% ↓** |
 | **Latency** | 2,757ms | 4,777ms | **3,103ms** | **35% faster** |
-| **Pass Rate ≥7/10** | — | — | **90%** | Production ✅ |
-| **BERTScore F1** | — | -0.0144 | **0.2493** | **2.4x better** |
+| **Pass Rate ≥7/10** | 65 | **92%** | **90%** | Production ✅ |
+| **BERTScore F1** | — | 0.0144 | **0.2493** | **2.4x better** |
 
 **Status:** Production-ready. Fair baseline ensures credibility. Annual savings: **$136,145 @ 1M queries/day**
 
