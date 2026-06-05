@@ -102,17 +102,20 @@ graphrag-hackathon/
 │   ├── metrics.py                    # Token/cost/quality metrics
 │   └── report_generator.py           # HTML report generation
 │
-├── frontend/                          # React dashboard
-│   └── src/App.jsx                   # Live query interface
-│
+├── frontend/                             # React + Vite dashboard
+│   |── src/App.jsx                    # Live 3-pipeline comparison UI
+│   ├── package.json
+|   └── vite.config.js
+|
 ├── scripts/                           # Setup utilities
 │   ├── setup_tigergraph.py           # Initialize schema
 │   └── ingest_documents.py           # Load documents
-│
+│   └── reingest_enhanced.py          # Re-ingest with improved entity extraction
+| 
 ├── docs/                              # Documentation
 │   ├── architecture.md               # System design
 │   ├── blog_post.md                  # Technical blog
-│   
+│   └── ARCHITECTURE_DIAGRAM.svg      # System diagram
 │
 ├── data/
 │   ├── eval_queries_16.json          # 16 test queries
