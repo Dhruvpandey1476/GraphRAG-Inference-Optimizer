@@ -13,8 +13,8 @@
 | **Judge Score** | 7.02/10 | 8.24/10 | **8.08/10** | Fair (Δ0.16) |
 | **Cost/1k** | $0.172 | $0.448 | **$0.075** | **80.2% ↓** |
 | **Latency** | 2,757ms | 4,777ms | **3,103ms** | **35% faster** |
-| **Pass Rate ≥7/10** | 65 | **92%** | **90%** | Production ✅ |
-| **BERTScore F1** | — | 0.0144 | **0.2493** | **2.4x better** |
+| **Pass Rate ≥7/10** | 65% | **92%** | **90%** | Production ✅ |
+| **BERTScore F1** | — | 0.8288 | **0.8733** | **better** |
 
 **Status:** Production-ready. Fair baseline ensures credibility. Annual savings: **$136,145 @ 1M queries/day**
 
@@ -213,23 +213,6 @@ MAX_NEIGHBORS=10
 - User prompt: Explicit 3-bullet format with context
 - Temperature: 0.1 (deterministic output)
 - Result: **Consistent 9.0/10** quality scores
-
----
-
-## 📊 Benchmark Results
-
-**Test Suite:** 5 diverse queries (transformers, BERT, attention, relationships, pre-training)
-
-| Query | LLM Tokens | RAG Tokens | GraphRAG Tokens | Judge Score |
-|-------|-----------|-----------|----------------|------------|
-| Q1 | 339 | 1,821 | **165** | 9 |
-| Q2 | 339 | 1,332 | **165** | 9 |
-| Q3 | 335 | 1,632 | **160** | 9 |
-| Q4 | 342 | 1,737 | **167** | 9 |
-| Q5 | 342 | 1,810 | **166** | 9 |
-| **AVG** | **339** | **1,666** | **165** | **9.0** |
-
-**Efficiency:** GraphRAG uses **90.7% fewer tokens** than BasicRAG while achieving **4.2% better quality**.
 
 ---
 
