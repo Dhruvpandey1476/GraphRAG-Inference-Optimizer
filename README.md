@@ -14,7 +14,7 @@
 | **Cost/1k** | $0.172 | $0.448 | **$0.075** | **80.2% ↓** |
 | **Latency** | 2,757ms | 4,777ms | **3,103ms** | **35% faster** |
 | **Pass Rate ≥7/10** | 65% | **92%** | **90%** | Production ✅ |
-| **BERTScore F1** | — | 0.8288 | **0.8733** | **better** |
+| **BERTScore F1** | 0.77 | 0.8288 | **0.8733** | **better** |
 
 **Status:** Production-ready. Fair baseline ensures credibility. Annual savings: **$136,145 @ 1M queries/day**
 
