@@ -233,7 +233,7 @@ python -m evaluation.benchmark --queries data/eval_queries.json
 ## 🎯 Why GraphRAG Wins
 
 1. **Radical Token Efficiency** — Graph-native retrieval vs vector brute-force
-2. **Consistent Quality** — 9.0/10 judge scores across all test queries  
+2. **Consistent Quality** — 9.0/10 judge scores on an average across all test queries  
 3. **Engineering Excellence** — Clean modular code, live dashboard, reproducible benchmarks
 4. **Cost-Effective** — 83% cheaper than BasicRAG on cloud APIs
 
