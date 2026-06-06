@@ -121,7 +121,11 @@ graphrag-hackathon/
 │   ├── eval_queries_16.json          # 16 test queries
 │   ├── eval_queries.json             # 50+ benchmark queries
 │   └── sample_docs/ai_knowledge_base.md
-│
+|
+├── results/                           # Evaluation Results
+│   ├── benchmark_20260606_141633.json # 50-query benchmark (84.1% token reduction)
+│   └── BENCHMARK_REPORT_VISUAL.html   [HTML reports generated from benchmar]
+|
 ├── Dockerfile                         # Docker container config
 ├── requirements.txt                   # Python dependencies
 ├── README.md                          # This file
