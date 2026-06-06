@@ -62,21 +62,9 @@ print(f"Judge Score: {result['judge_score']}")  # Expected: ~9.0
 
 ## 🏗️ Architecture
 
-```
-User Query
-    │
-    ▼
-┌─────────────────────────────────────┐
-│   GraphRAG Inference Pipeline       │
-├─────────────────────────────────────┤
-│ 1. Entity Extraction (Gemini)       │
-│ 2. TigerGraph 2-hop Traversal       │
-│ 3. Subgraph Serialization           │
-│ 4. Prompt Assembly                  │
-│ 5. LLM with JSON Schema (3 bullets) │
-│ 6. Answer Generation                │
-└─────────────────────────────────────┘
-```
+**Visual Architecture Diagram:**
+
+<img src="docs/ARCHITECTURE_DIAGRAM.svg" alt="Architecture Diagram" width="900"/>
 
 ---
 
@@ -87,7 +75,7 @@ graphrag-hackathon/
 ├── backend/                           # Core inference engine
 │   ├── api/server.py                  # FastAPI server (port 7860/8000)
 │   ├── rag/
-│   │   ├── graph_rag.py              # Main GraphRAG pipeline ⭐
+│   │   ├── graph_rag.py              # Main GraphRAG pipeline
 │   │   ├── basic_rag.py              # FAISS baseline
 │   │   └── llm_only.py               # No-retrieval baseline
 │   ├── graph/
@@ -123,7 +111,7 @@ graphrag-hackathon/
 │   └── sample_docs/ai_knowledge_base.md
 |
 ├── results/                           # Evaluation Results
-│   ├── benchmark_20260606_141633.json # 50-query benchmark (84.1% token reduction)
+│   ├── benchmark.json # 50-query benchmark (84.1% token reduction)
 │   └── BENCHMARK_REPORT_VISUAL.html   [HTML reports generated from benchmar]
 |
 ├── Dockerfile                         # Docker container config
