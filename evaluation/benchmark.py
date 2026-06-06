@@ -61,6 +61,9 @@ class SingleQueryResult:
     llm_latency_ms: float
     llm_cost: float
     llm_judge_score: float
+    llm_judge_pass: bool  # True if score >= 7
+    llm_bert_f1: float
+    llm_bert_f1_raw: float
 
     # Pipeline 2
     basic_answer: str
@@ -68,6 +71,9 @@ class SingleQueryResult:
     basic_latency_ms: float
     basic_cost: float
     basic_judge_score: float
+    basic_judge_pass: bool  # True if score >= 7
+    basic_bert_f1: float
+    basic_bert_f1_raw: float
 
     # Pipeline 3
     graph_answer: str
@@ -75,6 +81,9 @@ class SingleQueryResult:
     graph_latency_ms: float
     graph_cost: float
     graph_judge_score: float
+    graph_judge_pass: bool  # True if score >= 7
+    graph_bert_f1: float
+    graph_bert_f1_raw: float
 
     # Comparisons
     token_reduction_pct: float
@@ -108,13 +117,17 @@ class BenchmarkSummary:
     avg_judge_score_basic: float
     avg_judge_score_graph: float
 
+    bert_score_llm_f1: float
+    bert_score_llm_f1_raw: float
     bert_score_basic_f1: float
-    bert_score_graph_f1: float
     bert_score_basic_f1_raw: float
+    bert_score_graph_f1: float
     bert_score_graph_f1_raw: float
 
     graph_wins_pct: float
-    llm_judge_pass_rate_graph: float  # pct of queries where score >= 7
+    llm_judge_pass_rate_llm: float  # % of queries where LLM score >= 7
+    llm_judge_pass_rate_basic: float  # % of queries where Basic score >= 7
+    llm_judge_pass_rate_graph: float  # % of queries where GraphRAG score >= 7
 
 
 # ─── Main Benchmark Runner ────────────────────────────────────────────────────
@@ -214,16 +227,25 @@ class BenchmarkRunner:
                 llm_latency_ms=round(llm_lat, 1),
                 llm_cost=round(llm_cost_val, 6),
                 llm_judge_score=llm_score,
+                llm_judge_pass=llm_score >= 7,
+                llm_bert_f1=0.0,  # Will be filled after BERTScore computation
+                llm_bert_f1_raw=0.0,
                 basic_answer=basic_ans,
                 basic_tokens=basic_tokens,
                 basic_latency_ms=round(basic_lat, 1),
                 basic_cost=round(basic_cost_val, 6),
                 basic_judge_score=basic_score,
+                basic_judge_pass=basic_score >= 7,
+                basic_bert_f1=0.0,  # Will be filled after BERTScore computation
+                basic_bert_f1_raw=0.0,
                 graph_answer=graph_ans,
                 graph_tokens=graph_tokens,
                 graph_latency_ms=round(graph_lat, 1),
                 graph_cost=round(graph_cost_val, 6),
                 graph_judge_score=graph_score,
+                graph_judge_pass=graph_score >= 7,
+                graph_bert_f1=0.0,  # Will be filled after BERTScore computation
+                graph_bert_f1_raw=0.0,
                 token_reduction_pct=round(token_red, 1),
                 cost_reduction_pct=round(cost_red, 1),
                 latency_reduction_pct=round(lat_red, 1),
@@ -235,17 +257,33 @@ class BenchmarkRunner:
                 f"({token_red:.1f}% ↓) | judge {basic_score:.1f}→{graph_score:.1f}"
             )
 
-        # BERTScore
+        # BERTScore for all 3 pipelines
         ground_truths = [r.ground_truth for r in results if r.ground_truth]
+        llm_answers_for_bert = [r.llm_answer for r in results if r.ground_truth]
         basic_answers_for_bert = [r.basic_answer for r in results if r.ground_truth]
         graph_answers_for_bert = [r.graph_answer for r in results if r.ground_truth]
 
-        bert_basic = {"f1": 0.0}
-        bert_graph = {"f1": 0.0}
+        bert_llm = {"f1": 0.0, "f1_raw": 0.0}
+        bert_basic = {"f1": 0.0, "f1_raw": 0.0}
+        bert_graph = {"f1": 0.0, "f1_raw": 0.0}
+        
         if ground_truths:
-            logger.info("Computing BERTScore...")
+            logger.info("Computing BERTScore for all 3 pipelines...")
+            bert_llm = compute_bert_score(llm_answers_for_bert, ground_truths)
             bert_basic = compute_bert_score(basic_answers_for_bert, ground_truths)
             bert_graph = compute_bert_score(graph_answers_for_bert, ground_truths)
+            
+            # Update individual query results with BERTScore
+            for i, r in enumerate(results):
+                if i < len(llm_answers_for_bert):
+                    r.llm_bert_f1 = round(bert_llm.get("f1", 0.0), 4)
+                    r.llm_bert_f1_raw = round(bert_llm.get("f1_raw", 0.0), 4)
+                if i < len(basic_answers_for_bert):
+                    r.basic_bert_f1 = round(bert_basic.get("f1", 0.0), 4)
+                    r.basic_bert_f1_raw = round(bert_basic.get("f1_raw", 0.0), 4)
+                if i < len(graph_answers_for_bert):
+                    r.graph_bert_f1 = round(bert_graph.get("f1", 0.0), 4)
+                    r.graph_bert_f1_raw = round(bert_graph.get("f1_raw", 0.0), 4)
 
         n = len(results)
         summary = BenchmarkSummary(
@@ -267,13 +305,17 @@ class BenchmarkRunner:
             avg_judge_score_llm=round(sum(r.llm_judge_score for r in results) / n, 2),
             avg_judge_score_basic=round(sum(r.basic_judge_score for r in results) / n, 2),
             avg_judge_score_graph=round(sum(r.graph_judge_score for r in results) / n, 2),
-            bert_score_basic_f1=round(bert_basic["f1"], 4),
-            bert_score_graph_f1=round(bert_graph["f1"], 4),
-            bert_score_basic_f1_raw=round(bert_basic.get("f1_raw", bert_basic["f1"]), 4),
-            bert_score_graph_f1_raw=round(bert_graph.get("f1_raw", bert_graph["f1"]), 4),
+            bert_score_llm_f1=round(bert_llm.get("f1", 0.0), 4),
+            bert_score_llm_f1_raw=round(bert_llm.get("f1_raw", 0.0), 4),
+            bert_score_basic_f1=round(bert_basic.get("f1", 0.0), 4),
+            bert_score_basic_f1_raw=round(bert_basic.get("f1_raw", 0.0), 4),
+            bert_score_graph_f1=round(bert_graph.get("f1", 0.0), 4),
+            bert_score_graph_f1_raw=round(bert_graph.get("f1_raw", 0.0), 4),
             graph_wins_pct=round(sum(1 for r in results if r.graph_wins_judge) / n * 100, 1),
+            llm_judge_pass_rate_llm=round(sum(1 for r in results if r.llm_judge_pass) / n * 100, 1),
+            llm_judge_pass_rate_basic=round(sum(1 for r in results if r.basic_judge_pass) / n * 100, 1),
             llm_judge_pass_rate_graph=round(
-                sum(1 for r in results if r.graph_judge_score >= 7) / n * 100, 1
+                sum(1 for r in results if r.graph_judge_pass) / n * 100, 1
             ),
         )
 

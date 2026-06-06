@@ -192,34 +192,28 @@ class GraphRAG:
         num_entities = len(subgraph.get("entities", []))
 
         if has_graph_context and num_entities > 0:
-            # We have graph data — provide quality context-grounded answer
-            system_prompt = """You are an expert assistant using knowledge graphs. 
-Provide 3 key insights that directly answer the question using the provided context.
-Focus on relevance and clarity over brevity."""
+            # We have graph data — provide comprehensive context-grounded answer
+            system_prompt = """You are an expert assistant with deep knowledge in machine learning and AI. 
+Answer the question comprehensively and clearly using the provided context.
+Provide a detailed, well-reasoned response that directly addresses all aspects of the question."""
             user_prompt = f"""Question: {question}
 
 Knowledge Graph Context:
 {context}
 
-Provide 3 key bullet points that answer this question based on the context:
-•
-•
-•"""
-            temperature = 0.1
-            max_tokens = 120
+Provide a comprehensive answer to this question based on the context:"""
+            temperature = 0.3
+            max_tokens = 300
         else:
             # No graph data found — use quality fallback
-            system_prompt = """You are an expert assistant. 
-Provide 3 key insights that directly answer the question.
-Focus on accuracy and relevance."""
+            system_prompt = """You are an expert assistant with deep knowledge in machine learning and AI. 
+Answer the question comprehensively and clearly.
+Provide a detailed, well-reasoned response that directly addresses all aspects of the question."""
             user_prompt = f"""Question: {question}
 
-Provide 3 key bullet points that answer this question:
-•
-•
-•"""
-            temperature = 0.1
-            max_tokens = 120
+Provide a comprehensive answer to this question:"""
+            temperature = 0.3
+            max_tokens = 300
 
         # 5. Call Gemini via shared client (accurate token counts)
         # Use JSON schema to force 3-bullet format
@@ -231,20 +225,8 @@ Provide 3 key bullet points that answer this question:
             use_json_schema=True,
         )
 
-        # 6. CRITICAL: Post-process to enforce 3-bullet format
-        # max_tokens parameter is not reliably respected by Gemini, so we truncate manually
+        # 6. Clean up answer (no post-processing constraints needed)
         answer = result["answer"].strip()
-        
-        # Extract only first 3 bullet points
-        lines = [l.strip() for l in answer.split('\n') if l.strip()]
-        bullet_lines = [l for l in lines if l.startswith('•')]
-        
-        if len(bullet_lines) > 3:
-            # Keep only first 3 bullets
-            answer = '\n'.join(bullet_lines[:3])
-        elif len(bullet_lines) < 3 and len(lines) > 0:
-            # If no bullets found, try to create bullets from first 3 lines
-            answer = '\n'.join(['• ' + l if not l.startswith('•') else l for l in lines[:3]])
 
         latency_ms = (time.time() - t0) * 1000
 
