@@ -213,8 +213,6 @@ MAX_NEIGHBORS=10
 ## 🧪 Run Benchmark
 
 ```bash
-# Quick validation (5 queries, ~3 min)
-python -m evaluation.benchmark --queries data/eval_queries_16.json
 
 # Full benchmark (50+ queries, ~15 min)
 python -m evaluation.benchmark --queries data/eval_queries.json
