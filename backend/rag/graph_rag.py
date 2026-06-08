@@ -30,6 +30,7 @@ from dotenv import load_dotenv
 
 from ..graph.tigergraph_client import TigerGraphClient
 from ..llm.gemini_client import gemini_generate
+from .llm_only import LLMOnly
 
 load_dotenv(Path(__file__).parent.parent.parent / ".env", override=True)
 logger = logging.getLogger(__name__)
@@ -236,10 +237,13 @@ class GraphRAG:
         """
         GraphRAG pipeline: query → entities → subgraph → answer
         
+        With proper fallback to LLM-only when TigerGraph is unavailable.
+        
         Guarantees:
+        - Always returns an answer (GraphRAG or LLM fallback)
         - Returns exactly 3 bullet-point answer (JSON schema enforced)
-        - Maintains consistent token efficiency (~200 tokens total)
-        - Uses TigerGraph for grounded context when available
+        - Maintains consistent token efficiency when graph is available
+        - Gracefully degrades to LLM-only when TigerGraph fails
         
         Args:
             question: User query
@@ -248,6 +252,7 @@ class GraphRAG:
         
         Returns:
             GraphRAGResult with answer, subgraph, and token accounting
+            method field indicates "graph_rag" or "graph_rag_fallback_llm"
         """
         t0 = time.time()
         
@@ -255,19 +260,23 @@ class GraphRAG:
         entities = extract_query_entities(question)
         logger.info(f"Extracted {len(entities)} entities: {entities}")
         
-        # 2. Retrieve subgraph from TigerGraph
+        # 2. Try to retrieve subgraph from TigerGraph
         t_graph = time.time()
         subgraph = {"entities": [], "relationships": [], "documents": []}
+        tigergraph_available = False
         
         if self.tg and entities:
             try:
                 subgraph = self.tg.get_entity_subgraph(entities, max_hops, max_neighbors)
                 entity_count = len(subgraph.get("entities", []))
                 rel_count = len(subgraph.get("relationships", []))
-                logger.info(f"Retrieved {entity_count} entities, {rel_count} relationships from TigerGraph")
+                logger.info(f"✅ Retrieved {entity_count} entities, {rel_count} relationships from TigerGraph")
+                tigergraph_available = True
             except Exception as e:
-                logger.error(f"TigerGraph retrieval failed: {e}")
+                logger.error(f"❌ TigerGraph retrieval failed: {e}")
+                logger.warning(f"⚠️ TigerGraph unavailable or out of credits. Falling back to LLM-only mode.")
                 subgraph = {"entities": [], "relationships": [], "documents": []}
+                tigergraph_available = False
         
         graph_traversal_ms = (time.time() - t_graph) * 1000
 
@@ -275,24 +284,39 @@ class GraphRAG:
         context = serialize_subgraph(subgraph)
         has_context = bool(context.strip())
 
-        # 4. Build prompt with locked parameters
+        # IF NO CONTEXT: Fall back to LLM-only
+        if not has_context:
+            logger.warning(f"⚠️ No TigerGraph context available. Using LLM-only fallback.")
+            llm_only = LLMOnly()
+            llm_result = llm_only.query(question)
+            
+            # Convert LLMOnlyResult to GraphRAGResult for consistent interface
+            latency_ms = (time.time() - t0) * 1000
+            return GraphRAGResult(
+                answer=llm_result.answer,
+                subgraph={},  # No graph context
+                entities_found=[],  # No entities used
+                prompt_tokens=llm_result.prompt_tokens,
+                completion_tokens=llm_result.completion_tokens,
+                total_tokens=llm_result.total_tokens,
+                latency_ms=latency_ms,
+                graph_traversal_ms=0,  # No graph traversal
+                method="graph_rag_fallback_llm",  # Flag that we fell back
+            )
+
+        # 4. Build prompt with locked parameters (with graph context)
         system_prompt = """You are an AI assistant with deep expertise in machine learning and artificial intelligence.
 Answer questions clearly and precisely based on provided context.
 Always respond with exactly 3 bullet points."""
 
-        if has_context:
-            user_prompt = f"""Question: {question}
+        user_prompt = f"""Question: {question}
 
 Knowledge Graph Context:
 {context}
 
 Answer with exactly 3 bullet points:"""
-        else:
-            user_prompt = f"""Question: {question}
 
-Answer with exactly 3 bullet points:"""
-
-        # 5. Generate answer using LLM
+        # 5. Generate answer using LLM (with graph context)
         # LOCKED PARAMETERS for consistency:
         temperature = 0.1  # Low temperature for factual, consistent answers
         max_tokens = 120   # Fixed max to ensure 3-bullet format
