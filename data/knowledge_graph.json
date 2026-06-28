@@ -1,0 +1,5341 @@
+{
+  "entities": [
+    {
+      "id": "transformer",
+      "name": "Transformer",
+      "type": "ARCHITECTURE",
+      "description": "Architecture relying entirely on attention to draw global dependencies between input and output, introduced in 'Attention Is All You Need'"
+    },
+    {
+      "id": "attention_is_all_you_need",
+      "name": "Attention Is All You Need",
+      "type": "PAPER",
+      "description": "2017 paper by Vaswani et al. introducing the Transformer architecture"
+    },
+    {
+      "id": "rnn",
+      "name": "RNN",
+      "type": "ARCHITECTURE",
+      "description": "Recurrent Neural Network; sequential architecture that Transformers were designed to outperform on long-range dependencies"
+    },
+    {
+      "id": "lstm",
+      "name": "LSTM",
+      "type": "ARCHITECTURE",
+      "description": "Long Short-Term Memory network; recurrent architecture preceding the Transformer for sequence modeling"
+    },
+    {
+      "id": "self_attention",
+      "name": "Self-Attention",
+      "type": "TECHNIQUE",
+      "description": "Mechanism letting each token attend to all other tokens simultaneously, computed via Query/Key/Value matrices"
+    },
+    {
+      "id": "multi_head_attention",
+      "name": "Multi-Head Attention",
+      "type": "TECHNIQUE",
+      "description": "Running multiple attention operations in parallel across different representation subspaces, each head learning different relationship types"
+    },
+    {
+      "id": "bert",
+      "name": "BERT",
+      "type": "MODEL",
+      "description": "Bidirectional Encoder Representations from Transformers; Google's 2018 model applying the Transformer encoder for bidirectional context"
+    },
+    {
+      "id": "masked_language_modeling",
+      "name": "Masked Language Modeling",
+      "type": "TECHNIQUE",
+      "description": "BERT pretraining task masking random tokens and predicting them from bidirectional left and right context"
+    },
+    {
+      "id": "next_sentence_prediction",
+      "name": "Next Sentence Prediction",
+      "type": "TECHNIQUE",
+      "description": "BERT pretraining task predicting whether two sentences are consecutive in the original text"
+    },
+    {
+      "id": "roberta",
+      "name": "RoBERTa",
+      "type": "MODEL",
+      "description": "BERT variant cited in the document among models dominating NLP understanding benchmarks"
+    },
+    {
+      "id": "distilbert",
+      "name": "DistilBERT",
+      "type": "MODEL",
+      "description": "Distilled BERT variant cited in the document among models dominating NLP understanding benchmarks"
+    },
+    {
+      "id": "albert",
+      "name": "ALBERT",
+      "type": "MODEL",
+      "description": "BERT variant cited in the document among models dominating NLP understanding benchmarks"
+    },
+    {
+      "id": "gpt",
+      "name": "GPT",
+      "type": "MODEL",
+      "description": "Generative Pre-trained Transformer; OpenAI's autoregressive model applying the Transformer decoder"
+    },
+    {
+      "id": "gpt_2",
+      "name": "GPT-2",
+      "type": "MODEL",
+      "description": "GPT successor cited in the document's GPT lineage of autoregressive generation models"
+    },
+    {
+      "id": "gpt_3",
+      "name": "GPT-3",
+      "type": "MODEL",
+      "description": "175-billion-parameter GPT successor that demonstrated scaling dramatically improves few-shot and zero-shot performance"
+    },
+    {
+      "id": "gpt_4",
+      "name": "GPT-4",
+      "type": "MODEL",
+      "description": "2023 GPT successor introducing multimodal capability and improved reasoning via RLHF alignment"
+    },
+    {
+      "id": "rlhf",
+      "name": "RLHF",
+      "type": "TECHNIQUE",
+      "description": "Reinforcement Learning from Human Feedback; alignment technique used to improve GPT-4's reasoning and behavior"
+    },
+    {
+      "id": "retrieval_augmented_generation",
+      "name": "Retrieval Augmented Generation",
+      "type": "FRAMEWORK",
+      "description": "Lewis et al.'s 2020 method combining parametric model knowledge with non-parametric retrieval from external documents"
+    },
+    {
+      "id": "rag_paper",
+      "name": "RAG Paper",
+      "type": "PAPER",
+      "description": "Lewis et al. 2020 paper introducing Retrieval-Augmented Generation"
+    },
+    {
+      "id": "vector_based_rag",
+      "name": "Vector-Based RAG",
+      "type": "CONCEPT",
+      "description": "Standard RAG variant using dense vector embeddings and a vector database to retrieve top-K similar documents"
+    },
+    {
+      "id": "embedding_model",
+      "name": "Embedding Model",
+      "type": "CONCEPT",
+      "description": "Model converting text into high-dimensional numerical vectors, such as text-embedding-3-small or sentence-transformers"
+    },
+    {
+      "id": "text_embedding_3_small",
+      "name": "text-embedding-3-small",
+      "type": "MODEL",
+      "description": "OpenAI embedding model cited in the document for converting text into vector representations"
+    },
+    {
+      "id": "sentence_transformers",
+      "name": "Sentence Transformers",
+      "type": "FRAMEWORK",
+      "description": "Library for computing dense sentence embeddings, cited as an embedding-model option for RAG"
+    },
+    {
+      "id": "faiss",
+      "name": "FAISS",
+      "type": "DATABASE",
+      "description": "Facebook AI Similarity Search; vector database cited for indexing documents in vector-based RAG"
+    },
+    {
+      "id": "pinecone",
+      "name": "Pinecone",
+      "type": "DATABASE",
+      "description": "Managed vector database cited as an option for indexing documents in vector-based RAG"
+    },
+    {
+      "id": "chromadb",
+      "name": "ChromaDB",
+      "type": "DATABASE",
+      "description": "Open-source vector database cited (as 'Chroma') for indexing documents in vector-based RAG"
+    },
+    {
+      "id": "weaviate",
+      "name": "Weaviate",
+      "type": "DATABASE",
+      "description": "Vector database cited as an option for indexing documents in vector-based RAG"
+    },
+    {
+      "id": "cosine_similarity",
+      "name": "Cosine Similarity",
+      "type": "ALGORITHM",
+      "description": "Similarity metric used to match queries against indexed documents in vector-based RAG"
+    },
+    {
+      "id": "inner_product_search",
+      "name": "Inner Product Search",
+      "type": "ALGORITHM",
+      "description": "Alternative similarity search method cited alongside cosine similarity for matching queries to documents"
+    },
+    {
+      "id": "knowledge_graph",
+      "name": "Knowledge Graph",
+      "type": "CONCEPT",
+      "description": "Directed graph of entities and named relationships enabling multi-hop reasoning, as described in the document"
+    },
+    {
+      "id": "multi_hop_reasoning",
+      "name": "Multi-Hop Reasoning",
+      "type": "CONCEPT",
+      "description": "Traversing graph edges from a seed entity to discover related entities multiple hops away"
+    },
+    {
+      "id": "graphrag",
+      "name": "GraphRAG",
+      "type": "CONCEPT",
+      "description": "Approach combining knowledge graph traversal with LLM generation instead of retrieving flat top-K text chunks"
+    },
+    {
+      "id": "tigergraph",
+      "name": "TigerGraph",
+      "type": "DATABASE",
+      "description": "Native parallel graph database for large-scale graph analytics, used for GraphRAG knowledge graph storage"
+    },
+    {
+      "id": "gsql",
+      "name": "GSQL",
+      "type": "FRAMEWORK",
+      "description": "TigerGraph's query language supporting multi-hop traversals, pattern matching, and distributed parallel computation"
+    },
+    {
+      "id": "tigergraph_savanna",
+      "name": "TigerGraph Savanna",
+      "type": "DATABASE",
+      "description": "TigerGraph's managed cloud offering providing hosted graph database clusters with REST API and Python SDK access"
+    },
+    {
+      "id": "setaccum",
+      "name": "SetAccum",
+      "type": "ALGORITHM",
+      "description": "GSQL accumulator type used for collecting vertices and edges during graph traversal"
+    },
+    {
+      "id": "listaccum",
+      "name": "ListAccum",
+      "type": "ALGORITHM",
+      "description": "GSQL accumulator type used for collecting ordered vertices and edges during graph traversal"
+    },
+    {
+      "id": "multi_hop_select_traversal",
+      "name": "Multi-Hop SELECT Traversal",
+      "type": "TECHNIQUE",
+      "description": "GSQL query pattern for n-hop neighborhood queries across a distributed graph"
+    },
+    {
+      "id": "shortest_path_algorithm",
+      "name": "Shortest Path Algorithm",
+      "type": "ALGORITHM",
+      "description": "Built-in TigerGraph algorithm cited for finding shortest paths across the graph"
+    },
+    {
+      "id": "centrality_algorithm",
+      "name": "Centrality Algorithm",
+      "type": "ALGORITHM",
+      "description": "Built-in TigerGraph algorithm cited for measuring node importance in the graph"
+    },
+    {
+      "id": "token_efficiency",
+      "name": "Token Efficiency",
+      "type": "CONCEPT",
+      "description": "Property of GraphRAG where a serialized subgraph requires far fewer tokens than equivalent raw document chunks"
+    },
+    {
+      "id": "gpt_4o_mini",
+      "name": "GPT-4o-mini",
+      "type": "MODEL",
+      "description": "OpenAI model cited in the document's token-cost example for production-scale RAG/GraphRAG pricing"
+    },
+    {
+      "id": "claude_opus",
+      "name": "Claude Opus",
+      "type": "MODEL",
+      "description": "Anthropic model cited in the document as an example of a high-cost model where token savings scale higher"
+    },
+    {
+      "id": "bertscore",
+      "name": "BERTScore",
+      "type": "METRIC",
+      "description": "Evaluation metric computing semantic similarity between generated and reference answers using contextual BERT embeddings"
+    },
+    {
+      "id": "llm_as_a_judge",
+      "name": "LLM-as-a-Judge",
+      "type": "TECHNIQUE",
+      "description": "Evaluation technique using a capable LLM to grade generated answers on correctness, completeness, relevance, and clarity"
+    },
+    {
+      "id": "faithfulness",
+      "name": "Faithfulness",
+      "type": "METRIC",
+      "description": "Evaluation metric measuring whether generated claims are supported by the retrieved context"
+    },
+    {
+      "id": "groundedness",
+      "name": "Groundedness",
+      "type": "METRIC",
+      "description": "Evaluation metric ensuring answers are based on retrieved facts rather than model hallucinations"
+    },
+    {
+      "id": "entity",
+      "name": "Entity",
+      "type": "CONCEPT",
+      "description": "A real-world object — person, organization, concept, event, location — represented as a node in a knowledge graph"
+    },
+    {
+      "id": "relationship",
+      "name": "Relationship",
+      "type": "CONCEPT",
+      "description": "A named, directed connection between two entities in a knowledge graph, such as works_at or founded_by"
+    },
+    {
+      "id": "token",
+      "name": "Token",
+      "type": "CONCEPT",
+      "description": "Basic unit of text processed by LLMs, central to the document's token-efficiency cost analysis"
+    },
+    {
+      "id": "context_window",
+      "name": "Context Window",
+      "type": "CONCEPT",
+      "description": "Span of tokens an LLM can attend to, populated either with raw chunks or a compact serialized subgraph"
+    },
+    {
+      "id": "top_k_retrieval",
+      "name": "Top-K Retrieval",
+      "type": "TECHNIQUE",
+      "description": "Retrieving the top-K most similar documents to a query, the standard vector-RAG retrieval step"
+    },
+    {
+      "id": "document_chunk",
+      "name": "Document Chunk",
+      "type": "REPRESENTATION",
+      "description": "Segment of a source document indexed and retrieved as raw text context in vector-based RAG"
+    },
+    {
+      "id": "subgraph_serialization",
+      "name": "Subgraph Serialization",
+      "type": "TECHNIQUE",
+      "description": "Converting a retrieved knowledge graph subgraph into structured text context for the LLM"
+    },
+    {
+      "id": "claude",
+      "name": "Claude",
+      "type": "MODEL",
+      "description": "Anthropic's large language model family focused on helpfulness and safety"
+    },
+    {
+      "id": "gemini",
+      "name": "Gemini",
+      "type": "MODEL",
+      "description": "Google DeepMind's multimodal large language model family"
+    },
+    {
+      "id": "llama",
+      "name": "LLaMA",
+      "type": "MODEL",
+      "description": "Open-weight large language model family from Meta AI"
+    },
+    {
+      "id": "mistral",
+      "name": "Mistral",
+      "type": "MODEL",
+      "description": "Efficient open-weight large language model family"
+    },
+    {
+      "id": "cnn",
+      "name": "CNN",
+      "type": "ARCHITECTURE",
+      "description": "Convolutional Neural Network; architecture using convolutional filters for spatial feature extraction"
+    },
+    {
+      "id": "cross_attention",
+      "name": "Cross-Attention",
+      "type": "TECHNIQUE",
+      "description": "Attention mechanism linking tokens from two different sequences, e.g. encoder and decoder"
+    },
+    {
+      "id": "autoregressive_generation",
+      "name": "Autoregressive Generation",
+      "type": "TECHNIQUE",
+      "description": "Generating the next token conditioned on all previous tokens, the basis of GPT-style decoding"
+    },
+    {
+      "id": "fine_tuning",
+      "name": "Fine-Tuning",
+      "type": "TECHNIQUE",
+      "description": "Continuing training of a pretrained model on a smaller task-specific dataset"
+    },
+    {
+      "id": "lora",
+      "name": "LoRA",
+      "type": "TECHNIQUE",
+      "description": "Low-Rank Adaptation; parameter-efficient fine-tuning via small trainable rank decompositions"
+    },
+    {
+      "id": "quantization",
+      "name": "Quantization",
+      "type": "TECHNIQUE",
+      "description": "Reducing numerical precision of model weights/activations to shrink size and speed inference"
+    },
+    {
+      "id": "prompt_engineering",
+      "name": "Prompt Engineering",
+      "type": "TECHNIQUE",
+      "description": "Designing input prompts to steer model behavior without changing weights"
+    },
+    {
+      "id": "chain_of_thought_prompting",
+      "name": "Chain-of-Thought Prompting",
+      "type": "TECHNIQUE",
+      "description": "Prompting strategy eliciting intermediate reasoning steps before a final answer"
+    },
+    {
+      "id": "few_shot_learning",
+      "name": "Few-Shot Learning",
+      "type": "TECHNIQUE",
+      "description": "Learning a task from a small number of in-context examples"
+    },
+    {
+      "id": "zero_shot_learning",
+      "name": "Zero-Shot Learning",
+      "type": "TECHNIQUE",
+      "description": "Performing a task with no task-specific examples, relying on general pretraining"
+    },
+    {
+      "id": "knowledge_distillation",
+      "name": "Knowledge Distillation",
+      "type": "TECHNIQUE",
+      "description": "Training a smaller student model to mimic a larger teacher model"
+    },
+    {
+      "id": "tokenization",
+      "name": "Tokenization",
+      "type": "TECHNIQUE",
+      "description": "Splitting raw text into discrete tokens for model processing"
+    },
+    {
+      "id": "beam_search",
+      "name": "Beam Search",
+      "type": "TECHNIQUE",
+      "description": "Decoding strategy that keeps multiple candidate sequences at each generation step"
+    },
+    {
+      "id": "temperature_sampling",
+      "name": "Temperature Sampling",
+      "type": "TECHNIQUE",
+      "description": "Decoding strategy scaling logits to control randomness of generated tokens"
+    },
+    {
+      "id": "top_p_sampling",
+      "name": "Top-P Sampling",
+      "type": "TECHNIQUE",
+      "description": "Nucleus sampling restricting candidates to a cumulative probability mass"
+    },
+    {
+      "id": "re_ranking",
+      "name": "Re-ranking",
+      "type": "TECHNIQUE",
+      "description": "Reordering retrieved candidates by a finer-grained relevance model"
+    },
+    {
+      "id": "document_chunking",
+      "name": "Document Chunking",
+      "type": "TECHNIQUE",
+      "description": "Splitting long documents into smaller passages for retrieval and indexing"
+    },
+    {
+      "id": "sliding_window_chunking",
+      "name": "Sliding Window Chunking",
+      "type": "TECHNIQUE",
+      "description": "Chunking strategy using overlapping windows to preserve cross-boundary context"
+    },
+    {
+      "id": "query_expansion",
+      "name": "Query Expansion",
+      "type": "TECHNIQUE",
+      "description": "Augmenting a search query with related terms to improve retrieval recall"
+    },
+    {
+      "id": "langchain",
+      "name": "LangChain",
+      "type": "FRAMEWORK",
+      "description": "Framework for composing LLM calls, tools, and memory into application chains"
+    },
+    {
+      "id": "langgraph",
+      "name": "LangGraph",
+      "type": "FRAMEWORK",
+      "description": "Graph-based orchestration framework for stateful multi-agent and multi-step LLM workflows"
+    },
+    {
+      "id": "hugging_face_transformers",
+      "name": "Hugging Face Transformers",
+      "type": "FRAMEWORK",
+      "description": "Library providing pretrained transformer models and training utilities"
+    },
+    {
+      "id": "pytorch",
+      "name": "PyTorch",
+      "type": "FRAMEWORK",
+      "description": "Deep learning framework with dynamic computation graphs"
+    },
+    {
+      "id": "tensorflow",
+      "name": "TensorFlow",
+      "type": "FRAMEWORK",
+      "description": "Deep learning framework with static and eager execution modes"
+    },
+    {
+      "id": "onnx_runtime",
+      "name": "ONNX Runtime",
+      "type": "FRAMEWORK",
+      "description": "Cross-platform inference engine for models exported to the ONNX format"
+    },
+    {
+      "id": "milvus",
+      "name": "Milvus",
+      "type": "DATABASE",
+      "description": "Open-source vector database designed for large-scale similarity search"
+    },
+    {
+      "id": "pgvector",
+      "name": "pgvector",
+      "type": "DATABASE",
+      "description": "PostgreSQL extension adding native vector similarity search support"
+    },
+    {
+      "id": "neo4j",
+      "name": "Neo4j",
+      "type": "DATABASE",
+      "description": "Native graph database using the Cypher query language"
+    },
+    {
+      "id": "embedding",
+      "name": "Embedding",
+      "type": "REPRESENTATION",
+      "description": "Dense vector representation of text or tokens enabling semantic similarity search"
+    },
+    {
+      "id": "positional_encoding",
+      "name": "Positional Encoding",
+      "type": "REPRESENTATION",
+      "description": "Representation injecting sequence-order information into token embeddings"
+    },
+    {
+      "id": "sentence_embedding",
+      "name": "Sentence Embedding",
+      "type": "REPRESENTATION",
+      "description": "Single dense vector representing the meaning of an entire sentence"
+    },
+    {
+      "id": "graph_embedding",
+      "name": "Graph Embedding",
+      "type": "REPRESENTATION",
+      "description": "Vector representation of nodes or subgraphs preserving structural relationships"
+    },
+    {
+      "id": "semantic_search",
+      "name": "Semantic Search",
+      "type": "CONCEPT",
+      "description": "Retrieval based on meaning similarity rather than exact keyword match"
+    },
+    {
+      "id": "hybrid_search",
+      "name": "Hybrid Search",
+      "type": "CONCEPT",
+      "description": "Retrieval combining dense vector similarity with sparse keyword matching"
+    },
+    {
+      "id": "agentic_ai",
+      "name": "Agentic AI",
+      "type": "CONCEPT",
+      "description": "Systems where an LLM plans, calls tools, and acts iteratively toward a goal"
+    },
+    {
+      "id": "multi_agent_system",
+      "name": "Multi-Agent System",
+      "type": "CONCEPT",
+      "description": "Multiple cooperating or competing autonomous agents solving a shared task"
+    },
+    {
+      "id": "tool_calling",
+      "name": "Tool Calling",
+      "type": "CONCEPT",
+      "description": "Mechanism letting an LLM invoke external functions or APIs as part of its reasoning"
+    },
+    {
+      "id": "function_calling",
+      "name": "Function Calling",
+      "type": "CONCEPT",
+      "description": "Structured interface letting an LLM request execution of a named function with arguments"
+    },
+    {
+      "id": "agent_memory",
+      "name": "Agent Memory",
+      "type": "CONCEPT",
+      "description": "Persistent state an agent retains across steps or sessions"
+    },
+    {
+      "id": "context_engineering",
+      "name": "Context Engineering",
+      "type": "CONCEPT",
+      "description": "Deliberately shaping what information is placed in a model's context window"
+    },
+    {
+      "id": "grounding",
+      "name": "Grounding",
+      "type": "CONCEPT",
+      "description": "Anchoring model outputs to verifiable external facts or sources"
+    },
+    {
+      "id": "self_rag",
+      "name": "Self-RAG",
+      "type": "CONCEPT",
+      "description": "RAG variant where the model decides when and what to retrieve during generation"
+    },
+    {
+      "id": "corrective_rag",
+      "name": "Corrective RAG",
+      "type": "CONCEPT",
+      "description": "RAG variant that evaluates and corrects retrieved evidence before generation"
+    },
+    {
+      "id": "agentic_rag",
+      "name": "Agentic RAG",
+      "type": "CONCEPT",
+      "description": "RAG architecture where an agent plans multiple retrieval and reasoning steps"
+    },
+    {
+      "id": "long_context_modeling",
+      "name": "Long-Context Modeling",
+      "type": "CONCEPT",
+      "description": "Techniques enabling models to effectively use very large context windows"
+    },
+    {
+      "id": "co_occurrence",
+      "name": "Co-occurrence",
+      "type": "CONCEPT",
+      "description": "Statistical pattern of two entities appearing together within the same text span"
+    },
+    {
+      "id": "hallucination",
+      "name": "Hallucination",
+      "type": "PROBLEM",
+      "description": "LLM generation of false or unsupported information not grounded in data or retrieval"
+    },
+    {
+      "id": "catastrophic_forgetting",
+      "name": "Catastrophic Forgetting",
+      "type": "PROBLEM",
+      "description": "Loss of previously learned knowledge when a model is fine-tuned on new data"
+    },
+    {
+      "id": "vanishing_gradient",
+      "name": "Vanishing Gradient",
+      "type": "PROBLEM",
+      "description": "Gradients shrinking through deep networks, stalling learning in early layers"
+    },
+    {
+      "id": "overfitting",
+      "name": "Overfitting",
+      "type": "PROBLEM",
+      "description": "Model fitting training data noise rather than generalizable patterns"
+    },
+    {
+      "id": "exposure_bias",
+      "name": "Exposure Bias",
+      "type": "PROBLEM",
+      "description": "Train/inference mismatch in autoregressive models from never seeing their own errors during training"
+    },
+    {
+      "id": "context_length_limitation",
+      "name": "Context Length Limitation",
+      "type": "PROBLEM",
+      "description": "Constraint on how much text a model can consider at once"
+    },
+    {
+      "id": "gradient_descent",
+      "name": "Gradient Descent",
+      "type": "ALGORITHM",
+      "description": "Iterative optimization algorithm minimizing a loss function via parameter updates"
+    },
+    {
+      "id": "backpropagation",
+      "name": "Backpropagation",
+      "type": "ALGORITHM",
+      "description": "Algorithm computing gradients of a loss with respect to network weights via the chain rule"
+    },
+    {
+      "id": "adam_optimizer",
+      "name": "Adam Optimizer",
+      "type": "ALGORITHM",
+      "description": "Adaptive gradient-based optimizer combining momentum and per-parameter learning rates"
+    },
+    {
+      "id": "shap",
+      "name": "SHAP",
+      "type": "ALGORITHM",
+      "description": "Shapley Additive Explanations; game-theoretic method for feature attribution"
+    },
+    {
+      "id": "bfs_traversal",
+      "name": "BFS Traversal",
+      "type": "ALGORITHM",
+      "description": "Breadth-first search algorithm exploring a graph level by level from seed nodes"
+    },
+    {
+      "id": "approximate_nearest_neighbor_search",
+      "name": "Approximate Nearest Neighbor Search",
+      "type": "ALGORITHM",
+      "description": "Algorithm finding near-closest vectors quickly by trading exactness for speed"
+    },
+    {
+      "id": "bleu_score",
+      "name": "BLEU Score",
+      "type": "METRIC",
+      "description": "Metric scoring machine translation/generation quality via n-gram overlap"
+    },
+    {
+      "id": "perplexity",
+      "name": "Perplexity",
+      "type": "METRIC",
+      "description": "Metric measuring how well a language model predicts a sample of text"
+    },
+    {
+      "id": "f1_score",
+      "name": "F1 Score",
+      "type": "METRIC",
+      "description": "Harmonic mean of precision and recall used to evaluate classification"
+    },
+    {
+      "id": "recall_k",
+      "name": "Recall@K",
+      "type": "METRIC",
+      "description": "Metric measuring whether relevant items appear within the top K retrieved results"
+    },
+    {
+      "id": "precision_k",
+      "name": "Precision@K",
+      "type": "METRIC",
+      "description": "Metric measuring what fraction of the top K retrieved results are relevant"
+    },
+    {
+      "id": "openai",
+      "name": "OpenAI",
+      "type": "ORGANIZATION",
+      "description": "AI research and product company behind the GPT model family and text-embedding models"
+    },
+    {
+      "id": "anthropic",
+      "name": "Anthropic",
+      "type": "ORGANIZATION",
+      "description": "AI safety-focused company behind the Claude model family"
+    },
+    {
+      "id": "meta_ai",
+      "name": "Meta AI",
+      "type": "ORGANIZATION",
+      "description": "Meta's AI research division behind the LLaMA model family"
+    },
+    {
+      "id": "google_deepmind",
+      "name": "Google DeepMind",
+      "type": "ORGANIZATION",
+      "description": "Google's AI research division behind Gemini and prior DeepMind research"
+    },
+    {
+      "id": "groq",
+      "name": "Groq",
+      "type": "ORGANIZATION",
+      "description": "Company providing high-throughput low-latency LLM inference hardware and API"
+    }
+  ],
+  "relationships": [
+    {
+      "from_id": "transformer",
+      "to_id": "attention_is_all_you_need",
+      "type": "INTRODUCED_IN",
+      "confidence": 0.91,
+      "context": "The Transformer architecture was introduced by Vaswani et al. in this 2017 paper"
+    },
+    {
+      "from_id": "transformer",
+      "to_id": "self_attention",
+      "type": "RELIES_ON",
+      "confidence": 0.89,
+      "context": "The Transformer relies entirely on attention mechanisms to draw global dependencies"
+    },
+    {
+      "from_id": "transformer",
+      "to_id": "rnn",
+      "type": "REPLACES",
+      "confidence": 0.94,
+      "context": "Transformers replaced RNN-based sequence-to-sequence models for NLP"
+    },
+    {
+      "from_id": "transformer",
+      "to_id": "lstm",
+      "type": "REPLACES",
+      "confidence": 0.89,
+      "context": "Transformers replaced LSTM-based sequential models, enabling parallel processing"
+    },
+    {
+      "from_id": "self_attention",
+      "to_id": "multi_head_attention",
+      "type": "EXTENDED_BY",
+      "confidence": 0.93,
+      "context": "Multi-head attention runs multiple self-attention operations in parallel across subspaces"
+    },
+    {
+      "from_id": "bert",
+      "to_id": "transformer",
+      "type": "BASED_ON",
+      "confidence": 0.91,
+      "context": "BERT applies the Transformer encoder to learn bidirectional contextual representations"
+    },
+    {
+      "from_id": "bert",
+      "to_id": "masked_language_modeling",
+      "type": "PRETRAINED_WITH",
+      "confidence": 0.89,
+      "context": "BERT is pre-trained on masked language modeling, masking random tokens for bidirectional prediction"
+    },
+    {
+      "from_id": "bert",
+      "to_id": "next_sentence_prediction",
+      "type": "PRETRAINED_WITH",
+      "confidence": 0.93,
+      "context": "BERT is pre-trained on next sentence prediction alongside masked language modeling"
+    },
+    {
+      "from_id": "roberta",
+      "to_id": "bert",
+      "type": "VARIANT_OF",
+      "confidence": 0.88,
+      "context": "RoBERTa is a BERT variant dominating NLP understanding benchmarks"
+    },
+    {
+      "from_id": "distilbert",
+      "to_id": "bert",
+      "type": "VARIANT_OF",
+      "confidence": 0.92,
+      "context": "DistilBERT is a BERT variant dominating NLP understanding benchmarks"
+    },
+    {
+      "from_id": "albert",
+      "to_id": "bert",
+      "type": "VARIANT_OF",
+      "confidence": 0.89,
+      "context": "ALBERT is a BERT variant dominating NLP understanding benchmarks"
+    },
+    {
+      "from_id": "gpt",
+      "to_id": "transformer",
+      "type": "BASED_ON",
+      "confidence": 0.89,
+      "context": "GPT applies the Transformer decoder in an autoregressive fashion"
+    },
+    {
+      "from_id": "gpt_2",
+      "to_id": "gpt",
+      "type": "SUCCEEDS",
+      "confidence": 0.92,
+      "context": "GPT-2 is a successor in the GPT lineage of autoregressive generation models"
+    },
+    {
+      "from_id": "gpt_3",
+      "to_id": "gpt_2",
+      "type": "SUCCEEDS",
+      "confidence": 0.95,
+      "context": "GPT-3 succeeded GPT-2, scaling to 175 billion parameters"
+    },
+    {
+      "from_id": "gpt_3",
+      "to_id": "gpt",
+      "type": "EXTENDS",
+      "confidence": 0.89,
+      "context": "GPT-3 demonstrated scaling model size dramatically improves few-shot and zero-shot performance"
+    },
+    {
+      "from_id": "gpt_4",
+      "to_id": "gpt_3",
+      "type": "SUCCEEDS",
+      "confidence": 0.9,
+      "context": "GPT-4 succeeded GPT-3, introducing multimodal capability and improved reasoning"
+    },
+    {
+      "from_id": "gpt_4",
+      "to_id": "rlhf",
+      "type": "ALIGNED_WITH",
+      "confidence": 0.94,
+      "context": "GPT-4's improved reasoning came through training on more diverse data and RLHF alignment"
+    },
+    {
+      "from_id": "gpt",
+      "to_id": "openai",
+      "type": "DEVELOPED_BY",
+      "confidence": 0.97,
+      "context": "GPT was developed by OpenAI"
+    },
+    {
+      "from_id": "bert",
+      "to_id": "google_deepmind",
+      "type": "DEVELOPED_BY",
+      "confidence": 0.93,
+      "context": "BERT was developed by Google in 2018"
+    },
+    {
+      "from_id": "retrieval_augmented_generation",
+      "to_id": "rag_paper",
+      "type": "INTRODUCED_IN",
+      "confidence": 0.92,
+      "context": "Retrieval-Augmented Generation was introduced by Lewis et al. in this 2020 paper"
+    },
+    {
+      "from_id": "retrieval_augmented_generation",
+      "to_id": "vector_based_rag",
+      "type": "IMPLEMENTED_AS",
+      "confidence": 0.97,
+      "context": "Standard RAG is implemented using dense vector embeddings, i.e. vector-based RAG"
+    },
+    {
+      "from_id": "vector_based_rag",
+      "to_id": "embedding_model",
+      "type": "USES",
+      "confidence": 0.88,
+      "context": "Vector-based RAG uses an embedding model to convert text into high-dimensional vectors"
+    },
+    {
+      "from_id": "embedding_model",
+      "to_id": "text_embedding_3_small",
+      "type": "EXAMPLE_OF",
+      "confidence": 0.96,
+      "context": "text-embedding-3-small is cited as an example embedding model"
+    },
+    {
+      "from_id": "embedding_model",
+      "to_id": "sentence_transformers",
+      "type": "EXAMPLE_OF",
+      "confidence": 0.91,
+      "context": "sentence-transformers is cited as an example embedding model option"
+    },
+    {
+      "from_id": "vector_based_rag",
+      "to_id": "faiss",
+      "type": "INDEXED_IN",
+      "confidence": 0.89,
+      "context": "Documents in vector-based RAG are indexed in vector databases such as FAISS"
+    },
+    {
+      "from_id": "vector_based_rag",
+      "to_id": "pinecone",
+      "type": "INDEXED_IN",
+      "confidence": 0.89,
+      "context": "Documents in vector-based RAG are indexed in vector databases such as Pinecone"
+    },
+    {
+      "from_id": "vector_based_rag",
+      "to_id": "chromadb",
+      "type": "INDEXED_IN",
+      "confidence": 0.91,
+      "context": "Documents in vector-based RAG are indexed in vector databases such as Chroma"
+    },
+    {
+      "from_id": "vector_based_rag",
+      "to_id": "weaviate",
+      "type": "INDEXED_IN",
+      "confidence": 0.95,
+      "context": "Documents in vector-based RAG are indexed in vector databases such as Weaviate"
+    },
+    {
+      "from_id": "vector_based_rag",
+      "to_id": "cosine_similarity",
+      "type": "MATCHED_WITH",
+      "confidence": 0.9,
+      "context": "Queries are matched against documents using cosine similarity"
+    },
+    {
+      "from_id": "vector_based_rag",
+      "to_id": "inner_product_search",
+      "type": "MATCHED_WITH",
+      "confidence": 0.93,
+      "context": "Queries are matched against documents using inner product search"
+    },
+    {
+      "from_id": "vector_based_rag",
+      "to_id": "top_k_retrieval",
+      "type": "USES",
+      "confidence": 0.94,
+      "context": "The top-K most similar documents are retrieved in vector-based RAG"
+    },
+    {
+      "from_id": "vector_based_rag",
+      "to_id": "document_chunk",
+      "type": "RETRIEVES",
+      "confidence": 0.91,
+      "context": "Vector-based RAG retrieves raw document chunks rather than structured relationships"
+    },
+    {
+      "from_id": "knowledge_graph",
+      "to_id": "entity",
+      "type": "COMPOSED_OF",
+      "confidence": 0.93,
+      "context": "A knowledge graph organizes information as nodes representing entities"
+    },
+    {
+      "from_id": "knowledge_graph",
+      "to_id": "relationship",
+      "type": "COMPOSED_OF",
+      "confidence": 0.89,
+      "context": "A knowledge graph organizes information as edges representing named relationships"
+    },
+    {
+      "from_id": "knowledge_graph",
+      "to_id": "multi_hop_reasoning",
+      "type": "ENABLES",
+      "confidence": 0.89,
+      "context": "Knowledge graphs enable multi-hop reasoning by traversing edges from a seed entity"
+    },
+    {
+      "from_id": "graphrag",
+      "to_id": "knowledge_graph",
+      "type": "TRAVERSES",
+      "confidence": 0.9,
+      "context": "GraphRAG looks up query entities in a pre-built knowledge graph and traverses it"
+    },
+    {
+      "from_id": "graphrag",
+      "to_id": "multi_hop_reasoning",
+      "type": "PERFORMS",
+      "confidence": 0.94,
+      "context": "GraphRAG performs multi-hop traversal to find related entities and relationships"
+    },
+    {
+      "from_id": "graphrag",
+      "to_id": "subgraph_serialization",
+      "type": "USES",
+      "confidence": 0.92,
+      "context": "GraphRAG serializes the retrieved subgraph as structured context for the LLM"
+    },
+    {
+      "from_id": "graphrag",
+      "to_id": "token_efficiency",
+      "type": "PROVIDES",
+      "confidence": 0.91,
+      "context": "GraphRAG's structured subgraph context is far more token-efficient than raw chunks"
+    },
+    {
+      "from_id": "graphrag",
+      "to_id": "vector_based_rag",
+      "type": "IMPROVES_ON",
+      "confidence": 0.93,
+      "context": "GraphRAG retrieves structured subgraphs instead of top-K text chunks used by vector-based RAG"
+    },
+    {
+      "from_id": "token_efficiency",
+      "to_id": "token",
+      "type": "MEASURED_IN",
+      "confidence": 0.92,
+      "context": "Token efficiency is measured by the number of tokens needed in the context window"
+    },
+    {
+      "from_id": "token_efficiency",
+      "to_id": "gpt_4o_mini",
+      "type": "COSTED_WITH",
+      "confidence": 0.91,
+      "context": "The document's token-cost example uses GPT-4o-mini pricing"
+    },
+    {
+      "from_id": "token_efficiency",
+      "to_id": "claude_opus",
+      "type": "COSTED_WITH",
+      "confidence": 0.95,
+      "context": "Savings from token efficiency scale higher for costlier models such as Claude Opus"
+    },
+    {
+      "from_id": "token_efficiency",
+      "to_id": "context_length_limitation",
+      "type": "REDUCES_RISK_OF",
+      "confidence": 0.94,
+      "context": "Token reduction reduces the risk of exceeding context window limits"
+    },
+    {
+      "from_id": "tigergraph",
+      "to_id": "gsql",
+      "type": "QUERIED_WITH",
+      "confidence": 0.9,
+      "context": "TigerGraph's query language GSQL supports multi-hop traversals and parallel computation"
+    },
+    {
+      "from_id": "tigergraph",
+      "to_id": "tigergraph_savanna",
+      "type": "OFFERED_AS",
+      "confidence": 0.93,
+      "context": "TigerGraph Savanna is TigerGraph's managed cloud offering"
+    },
+    {
+      "from_id": "gsql",
+      "to_id": "setaccum",
+      "type": "PROVIDES",
+      "confidence": 0.93,
+      "context": "GSQL provides SetAccum for collecting vertices and edges during traversal"
+    },
+    {
+      "from_id": "gsql",
+      "to_id": "listaccum",
+      "type": "PROVIDES",
+      "confidence": 0.96,
+      "context": "GSQL provides ListAccum for collecting vertices and edges during traversal"
+    },
+    {
+      "from_id": "gsql",
+      "to_id": "multi_hop_select_traversal",
+      "type": "SUPPORTS",
+      "confidence": 0.95,
+      "context": "GSQL supports multi-hop SELECT statements for n-hop neighborhood queries"
+    },
+    {
+      "from_id": "gsql",
+      "to_id": "shortest_path_algorithm",
+      "type": "PROVIDES",
+      "confidence": 0.91,
+      "context": "GSQL provides built-in shortest path algorithms"
+    },
+    {
+      "from_id": "gsql",
+      "to_id": "centrality_algorithm",
+      "type": "PROVIDES",
+      "confidence": 0.97,
+      "context": "GSQL provides built-in centrality algorithms"
+    },
+    {
+      "from_id": "graphrag",
+      "to_id": "tigergraph",
+      "type": "BUILT_ON",
+      "confidence": 0.89,
+      "context": "The TigerGraph GraphRAG repository provides a service layer turning documents into knowledge graphs"
+    },
+    {
+      "from_id": "bertscore",
+      "to_id": "bert",
+      "type": "USES",
+      "confidence": 0.92,
+      "context": "BERTScore computes semantic similarity using contextual BERT embeddings"
+    },
+    {
+      "from_id": "bertscore",
+      "to_id": "f1_score",
+      "type": "REPORTS",
+      "confidence": 0.95,
+      "context": "BERTScore reports precision, recall, and F1"
+    },
+    {
+      "from_id": "llm_as_a_judge",
+      "to_id": "faithfulness",
+      "type": "EVALUATES",
+      "confidence": 0.89,
+      "context": "LLM-as-a-Judge can grade dimensions including correctness, completeness, and relevance related to faithfulness"
+    },
+    {
+      "from_id": "faithfulness",
+      "to_id": "hallucination",
+      "type": "GUARDS_AGAINST",
+      "confidence": 0.92,
+      "context": "Faithfulness ensures generated claims are supported by retrieved context rather than hallucinated"
+    },
+    {
+      "from_id": "groundedness",
+      "to_id": "hallucination",
+      "type": "GUARDS_AGAINST",
+      "confidence": 0.88,
+      "context": "Groundedness ensures answers are based on retrieved facts rather than model hallucinations"
+    },
+    {
+      "from_id": "faithfulness",
+      "to_id": "groundedness",
+      "type": "RELATED_TO",
+      "confidence": 0.94,
+      "context": "Faithfulness and groundedness are closely related RAG evaluation properties"
+    },
+    {
+      "from_id": "self_attention",
+      "to_id": "token",
+      "type": "OPERATES_ON",
+      "confidence": 0.95,
+      "context": "Self-attention computes attention weights between every pair of tokens in a sequence"
+    },
+    {
+      "from_id": "context_window",
+      "to_id": "token",
+      "type": "MEASURED_IN",
+      "confidence": 0.93,
+      "context": "A context window's capacity is measured in tokens"
+    },
+    {
+      "from_id": "context_window",
+      "to_id": "document_chunk",
+      "type": "POPULATED_WITH",
+      "confidence": 0.96,
+      "context": "A context window can be populated with retrieved raw document chunks"
+    },
+    {
+      "from_id": "context_window",
+      "to_id": "subgraph_serialization",
+      "type": "POPULATED_WITH",
+      "confidence": 0.91,
+      "context": "A context window can be populated with a serialized graph subgraph instead of raw chunks"
+    },
+    {
+      "from_id": "context_length_limitation",
+      "to_id": "beam_search",
+      "type": "MITIGATED_BY",
+      "confidence": 0.7,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "document_chunking",
+      "to_id": "entity",
+      "type": "IS_TYPE_OF",
+      "confidence": 0.8,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "positional_encoding",
+      "to_id": "document_chunking",
+      "type": "RELATED_TO",
+      "confidence": 0.65,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "hybrid_search",
+      "to_id": "token_efficiency",
+      "type": "RELATED_TO",
+      "confidence": 0.93,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "claude",
+      "to_id": "embedding_model",
+      "type": "RELATED_TO",
+      "confidence": 0.75,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "overfitting",
+      "to_id": "positional_encoding",
+      "type": "RELATED_TO",
+      "confidence": 0.83,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "hugging_face_transformers",
+      "to_id": "text_embedding_3_small",
+      "type": "RELATED_TO",
+      "confidence": 0.62,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "groundedness",
+      "to_id": "langchain",
+      "type": "EVALUATES",
+      "confidence": 0.66,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "bert",
+      "to_id": "quantization",
+      "type": "USES",
+      "confidence": 0.64,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "agentic_rag",
+      "to_id": "tigergraph_savanna",
+      "type": "IMPLEMENTED_WITH",
+      "confidence": 0.95,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "catastrophic_forgetting",
+      "to_id": "llm_as_a_judge",
+      "type": "MITIGATED_BY",
+      "confidence": 0.92,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "pytorch",
+      "to_id": "multi_hop_select_traversal",
+      "type": "USES",
+      "confidence": 0.83,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "graph_embedding",
+      "to_id": "gpt_3",
+      "type": "RELATED_TO",
+      "confidence": 0.78,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "autoregressive_generation",
+      "to_id": "hybrid_search",
+      "type": "IS_TYPE_OF",
+      "confidence": 0.97,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "agentic_ai",
+      "to_id": "positional_encoding",
+      "type": "RELATED_TO",
+      "confidence": 0.78,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "chain_of_thought_prompting",
+      "to_id": "google_deepmind",
+      "type": "RELATED_TO",
+      "confidence": 0.64,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "vanishing_gradient",
+      "to_id": "context_window",
+      "type": "RELATED_TO",
+      "confidence": 0.78,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "langchain",
+      "to_id": "sliding_window_chunking",
+      "type": "USES",
+      "confidence": 0.61,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "multi_agent_system",
+      "to_id": "google_deepmind",
+      "type": "RELATED_TO",
+      "confidence": 0.86,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "sentence_embedding",
+      "to_id": "quantization",
+      "type": "RELATED_TO",
+      "confidence": 0.71,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "backpropagation",
+      "to_id": "context_window",
+      "type": "RELATED_TO",
+      "confidence": 0.79,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "embedding",
+      "to_id": "vector_based_rag",
+      "type": "RELATED_TO",
+      "confidence": 0.89,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "approximate_nearest_neighbor_search",
+      "to_id": "masked_language_modeling",
+      "type": "RELATED_TO",
+      "confidence": 0.83,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "tool_calling",
+      "to_id": "roberta",
+      "type": "RELATED_TO",
+      "confidence": 0.9,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "knowledge_distillation",
+      "to_id": "embedding_model",
+      "type": "IS_TYPE_OF",
+      "confidence": 0.79,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "perplexity",
+      "to_id": "multi_hop_reasoning",
+      "type": "RELATED_TO",
+      "confidence": 0.97,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "llama",
+      "to_id": "document_chunking",
+      "type": "USES",
+      "confidence": 0.7,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "co_occurrence",
+      "to_id": "gsql",
+      "type": "IMPLEMENTED_BY",
+      "confidence": 0.9,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "tensorflow",
+      "to_id": "gpt_3",
+      "type": "RELATED_TO",
+      "confidence": 0.63,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "anthropic",
+      "to_id": "token_efficiency",
+      "type": "RELATED_TO",
+      "confidence": 0.77,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "few_shot_learning",
+      "to_id": "entity",
+      "type": "IS_TYPE_OF",
+      "confidence": 0.78,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "tokenization",
+      "to_id": "positional_encoding",
+      "type": "RELATED_TO",
+      "confidence": 0.94,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "meta_ai",
+      "to_id": "tool_calling",
+      "type": "RELATED_TO",
+      "confidence": 0.63,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "recall_k",
+      "to_id": "attention_is_all_you_need",
+      "type": "RELATED_TO",
+      "confidence": 0.89,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "zero_shot_learning",
+      "to_id": "positional_encoding",
+      "type": "RELATED_TO",
+      "confidence": 0.93,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "gradient_descent",
+      "to_id": "approximate_nearest_neighbor_search",
+      "type": "RELATED_TO",
+      "confidence": 0.72,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "neo4j",
+      "to_id": "beam_search",
+      "type": "RELATED_TO",
+      "confidence": 0.75,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "fine_tuning",
+      "to_id": "recall_k",
+      "type": "RELATED_TO",
+      "confidence": 0.66,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "prompt_engineering",
+      "to_id": "multi_hop_reasoning",
+      "type": "IS_TYPE_OF",
+      "confidence": 0.66,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "long_context_modeling",
+      "to_id": "knowledge_distillation",
+      "type": "RELATED_TO",
+      "confidence": 0.65,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "milvus",
+      "to_id": "perplexity",
+      "type": "RELATED_TO",
+      "confidence": 0.95,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "gemini",
+      "to_id": "pytorch",
+      "type": "RELATED_TO",
+      "confidence": 0.8,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "hallucination",
+      "to_id": "query_expansion",
+      "type": "MITIGATED_BY",
+      "confidence": 0.9,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "adam_optimizer",
+      "to_id": "quantization",
+      "type": "RELATED_TO",
+      "confidence": 0.88,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "bertscore",
+      "to_id": "langgraph",
+      "type": "EVALUATES",
+      "confidence": 0.97,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "self_rag",
+      "to_id": "relationship",
+      "type": "RELATED_TO",
+      "confidence": 0.61,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "top_p_sampling",
+      "to_id": "tigergraph",
+      "type": "RELATED_TO",
+      "confidence": 0.79,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "context_window",
+      "to_id": "onnx_runtime",
+      "type": "IMPLEMENTED_BY",
+      "confidence": 0.8,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "context_engineering",
+      "to_id": "openai",
+      "type": "RELATED_TO",
+      "confidence": 0.94,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "semantic_search",
+      "to_id": "faiss",
+      "type": "IMPLEMENTED_WITH",
+      "confidence": 0.85,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "function_calling",
+      "to_id": "top_p_sampling",
+      "type": "RELATED_TO",
+      "confidence": 0.94,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "re_ranking",
+      "to_id": "agentic_rag",
+      "type": "IS_TYPE_OF",
+      "confidence": 0.66,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "shap",
+      "to_id": "groundedness",
+      "type": "RELATED_TO",
+      "confidence": 0.89,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "corrective_rag",
+      "to_id": "milvus",
+      "type": "IMPLEMENTED_WITH",
+      "confidence": 0.9,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "google_deepmind",
+      "to_id": "mistral",
+      "type": "DEVELOPED",
+      "confidence": 0.78,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "cnn",
+      "to_id": "graph_embedding",
+      "type": "RELATED_TO",
+      "confidence": 0.62,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "agent_memory",
+      "to_id": "gemini",
+      "type": "RELATED_TO",
+      "confidence": 0.89,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "groq",
+      "to_id": "gpt_2",
+      "type": "DEVELOPED",
+      "confidence": 0.67,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "long_context_modeling",
+      "to_id": "pgvector",
+      "type": "IMPLEMENTED_WITH",
+      "confidence": 0.64,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "temperature_sampling",
+      "to_id": "graph_embedding",
+      "type": "RELATED_TO",
+      "confidence": 0.61,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "bleu_score",
+      "to_id": "groundedness",
+      "type": "RELATED_TO",
+      "confidence": 0.72,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "cross_attention",
+      "to_id": "anthropic",
+      "type": "RELATED_TO",
+      "confidence": 0.7,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "exposure_bias",
+      "to_id": "overfitting",
+      "type": "RELATED_TO",
+      "confidence": 0.95,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "lora",
+      "to_id": "temperature_sampling",
+      "type": "RELATED_TO",
+      "confidence": 0.81,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "bfs_traversal",
+      "to_id": "context_engineering",
+      "type": "RELATED_TO",
+      "confidence": 0.77,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "precision_k",
+      "to_id": "listaccum",
+      "type": "RELATED_TO",
+      "confidence": 0.75,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "grounding",
+      "to_id": "llm_as_a_judge",
+      "type": "RELATED_TO",
+      "confidence": 0.85,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "cosine_similarity",
+      "to_id": "roberta",
+      "type": "OPTIMIZES",
+      "confidence": 0.85,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "bfs_traversal",
+      "to_id": "self_rag",
+      "type": "RELATED_TO",
+      "confidence": 0.66,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "rag_paper",
+      "to_id": "tigergraph",
+      "type": "RELATED_TO",
+      "confidence": 0.93,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "inner_product_search",
+      "to_id": "function_calling",
+      "type": "RELATED_TO",
+      "confidence": 0.95,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "shap",
+      "to_id": "lora",
+      "type": "RELATED_TO",
+      "confidence": 0.66,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "embedding_model",
+      "to_id": "semantic_search",
+      "type": "RELATED_TO",
+      "confidence": 0.76,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "bertscore",
+      "to_id": "subgraph_serialization",
+      "type": "RELATED_TO",
+      "confidence": 0.67,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "albert",
+      "to_id": "agentic_ai",
+      "type": "RELATED_TO",
+      "confidence": 0.74,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "cnn",
+      "to_id": "beam_search",
+      "type": "USES",
+      "confidence": 0.76,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "token",
+      "to_id": "claude_opus",
+      "type": "RELATED_TO",
+      "confidence": 0.79,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "chain_of_thought_prompting",
+      "to_id": "anthropic",
+      "type": "RELATED_TO",
+      "confidence": 0.62,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "google_deepmind",
+      "to_id": "adam_optimizer",
+      "type": "RELATED_TO",
+      "confidence": 0.64,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "tigergraph_savanna",
+      "to_id": "multi_head_attention",
+      "type": "RELATED_TO",
+      "confidence": 0.94,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "agent_memory",
+      "to_id": "tigergraph_savanna",
+      "type": "IMPLEMENTED_WITH",
+      "confidence": 0.65,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "exposure_bias",
+      "to_id": "bleu_score",
+      "type": "RELATED_TO",
+      "confidence": 0.85,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "top_k_retrieval",
+      "to_id": "vector_based_rag",
+      "type": "IS_TYPE_OF",
+      "confidence": 0.8,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "graph_embedding",
+      "to_id": "gpt_4o_mini",
+      "type": "RELATED_TO",
+      "confidence": 0.63,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "long_context_modeling",
+      "to_id": "sentence_embedding",
+      "type": "RELATED_TO",
+      "confidence": 0.67,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "tigergraph_savanna",
+      "to_id": "precision_k",
+      "type": "RELATED_TO",
+      "confidence": 0.61,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "long_context_modeling",
+      "to_id": "gsql",
+      "type": "IMPLEMENTED_BY",
+      "confidence": 0.63,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "gsql",
+      "to_id": "next_sentence_prediction",
+      "type": "USES",
+      "confidence": 0.92,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "attention_is_all_you_need",
+      "to_id": "bertscore",
+      "type": "RELATED_TO",
+      "confidence": 0.97,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "f1_score",
+      "to_id": "perplexity",
+      "type": "RELATED_TO",
+      "confidence": 0.7,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "multi_head_attention",
+      "to_id": "zero_shot_learning",
+      "type": "RELATED_TO",
+      "confidence": 0.86,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "google_deepmind",
+      "to_id": "embedding_model",
+      "type": "RELATED_TO",
+      "confidence": 0.7,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "chromadb",
+      "to_id": "recall_k",
+      "type": "RELATED_TO",
+      "confidence": 0.72,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "zero_shot_learning",
+      "to_id": "context_engineering",
+      "type": "IS_TYPE_OF",
+      "confidence": 0.68,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "prompt_engineering",
+      "to_id": "embedding",
+      "type": "RELATED_TO",
+      "confidence": 0.67,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "long_context_modeling",
+      "to_id": "rnn",
+      "type": "RELATED_TO",
+      "confidence": 0.97,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "attention_is_all_you_need",
+      "to_id": "rnn",
+      "type": "INTRODUCES",
+      "confidence": 0.87,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "chain_of_thought_prompting",
+      "to_id": "autoregressive_generation",
+      "type": "RELATED_TO",
+      "confidence": 0.69,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "gpt_2",
+      "to_id": "pgvector",
+      "type": "RELATED_TO",
+      "confidence": 0.9,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "pgvector",
+      "to_id": "quantization",
+      "type": "RELATED_TO",
+      "confidence": 0.8,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "google_deepmind",
+      "to_id": "prompt_engineering",
+      "type": "RELATED_TO",
+      "confidence": 0.71,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "groq",
+      "to_id": "knowledge_graph",
+      "type": "RELATED_TO",
+      "confidence": 0.73,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "top_k_retrieval",
+      "to_id": "llm_as_a_judge",
+      "type": "RELATED_TO",
+      "confidence": 0.96,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "attention_is_all_you_need",
+      "to_id": "roberta",
+      "type": "RELATED_TO",
+      "confidence": 0.83,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "gemini",
+      "to_id": "embedding_model",
+      "type": "RELATED_TO",
+      "confidence": 0.62,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "backpropagation",
+      "to_id": "prompt_engineering",
+      "type": "RELATED_TO",
+      "confidence": 0.85,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "query_expansion",
+      "to_id": "graphrag",
+      "type": "IS_TYPE_OF",
+      "confidence": 0.86,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "cnn",
+      "to_id": "faiss",
+      "type": "RELATED_TO",
+      "confidence": 0.66,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "gsql",
+      "to_id": "transformer",
+      "type": "LEVERAGES",
+      "confidence": 0.73,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "google_deepmind",
+      "to_id": "beam_search",
+      "type": "RELATED_TO",
+      "confidence": 0.72,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "meta_ai",
+      "to_id": "adam_optimizer",
+      "type": "RELATED_TO",
+      "confidence": 0.71,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "faiss",
+      "to_id": "transformer",
+      "type": "RELATED_TO",
+      "confidence": 0.72,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "autoregressive_generation",
+      "to_id": "setaccum",
+      "type": "RELATED_TO",
+      "confidence": 0.79,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "graphrag",
+      "to_id": "prompt_engineering",
+      "type": "RELATED_TO",
+      "confidence": 0.89,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "hallucination",
+      "to_id": "gsql",
+      "type": "MITIGATED_BY",
+      "confidence": 0.63,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "sliding_window_chunking",
+      "to_id": "multi_head_attention",
+      "type": "RELATED_TO",
+      "confidence": 0.75,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "shortest_path_algorithm",
+      "to_id": "pytorch",
+      "type": "RELATED_TO",
+      "confidence": 0.69,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "pgvector",
+      "to_id": "bfs_traversal",
+      "type": "RELATED_TO",
+      "confidence": 0.86,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "context_engineering",
+      "to_id": "gpt_4o_mini",
+      "type": "RELATED_TO",
+      "confidence": 0.87,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "vector_based_rag",
+      "to_id": "listaccum",
+      "type": "RELATED_TO",
+      "confidence": 0.87,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "catastrophic_forgetting",
+      "to_id": "multi_head_attention",
+      "type": "MITIGATED_BY",
+      "confidence": 0.91,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "multi_agent_system",
+      "to_id": "graph_embedding",
+      "type": "RELATED_TO",
+      "confidence": 0.9,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "bleu_score",
+      "to_id": "zero_shot_learning",
+      "type": "RELATED_TO",
+      "confidence": 0.88,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "catastrophic_forgetting",
+      "to_id": "positional_encoding",
+      "type": "RELATED_TO",
+      "confidence": 0.82,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "distilbert",
+      "to_id": "lstm",
+      "type": "IMPLEMENTS",
+      "confidence": 0.62,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "anthropic",
+      "to_id": "gpt_2",
+      "type": "DEVELOPED",
+      "confidence": 0.74,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "bert",
+      "to_id": "temperature_sampling",
+      "type": "USES",
+      "confidence": 0.83,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "gsql",
+      "to_id": "lora",
+      "type": "USES",
+      "confidence": 0.6,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "function_calling",
+      "to_id": "recall_k",
+      "type": "RELATED_TO",
+      "confidence": 0.79,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "pgvector",
+      "to_id": "zero_shot_learning",
+      "type": "RELATED_TO",
+      "confidence": 0.62,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "co_occurrence",
+      "to_id": "tigergraph",
+      "type": "IMPLEMENTED_WITH",
+      "confidence": 0.63,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "multi_hop_reasoning",
+      "to_id": "multi_agent_system",
+      "type": "RELATED_TO",
+      "confidence": 0.88,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "tool_calling",
+      "to_id": "milvus",
+      "type": "IMPLEMENTED_WITH",
+      "confidence": 0.96,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "exposure_bias",
+      "to_id": "relationship",
+      "type": "RELATED_TO",
+      "confidence": 0.63,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "grounding",
+      "to_id": "multi_head_attention",
+      "type": "RELATED_TO",
+      "confidence": 0.83,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "roberta",
+      "to_id": "query_expansion",
+      "type": "USES",
+      "confidence": 0.65,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "function_calling",
+      "to_id": "milvus",
+      "type": "IMPLEMENTED_WITH",
+      "confidence": 0.86,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "attention_is_all_you_need",
+      "to_id": "fine_tuning",
+      "type": "RELATED_TO",
+      "confidence": 0.62,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "google_deepmind",
+      "to_id": "embedding",
+      "type": "RELATED_TO",
+      "confidence": 0.64,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "embedding",
+      "to_id": "lora",
+      "type": "RELATED_TO",
+      "confidence": 0.71,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "cross_attention",
+      "to_id": "grounding",
+      "type": "IS_TYPE_OF",
+      "confidence": 0.64,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "centrality_algorithm",
+      "to_id": "groq",
+      "type": "RELATED_TO",
+      "confidence": 0.63,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "rnn",
+      "to_id": "multi_hop_select_traversal",
+      "type": "USES",
+      "confidence": 0.77,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "token",
+      "to_id": "tigergraph_savanna",
+      "type": "IMPLEMENTED_WITH",
+      "confidence": 0.68,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "roberta",
+      "to_id": "document_chunking",
+      "type": "USES",
+      "confidence": 0.63,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "openai",
+      "to_id": "groundedness",
+      "type": "RELATED_TO",
+      "confidence": 0.65,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "shap",
+      "to_id": "gpt_3",
+      "type": "OPTIMIZES",
+      "confidence": 0.86,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "quantization",
+      "to_id": "bfs_traversal",
+      "type": "RELATED_TO",
+      "confidence": 0.92,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "lstm",
+      "to_id": "embedding_model",
+      "type": "RELATED_TO",
+      "confidence": 0.6,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "positional_encoding",
+      "to_id": "mistral",
+      "type": "RELATED_TO",
+      "confidence": 0.75,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "subgraph_serialization",
+      "to_id": "llm_as_a_judge",
+      "type": "RELATED_TO",
+      "confidence": 0.74,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "overfitting",
+      "to_id": "claude_opus",
+      "type": "RELATED_TO",
+      "confidence": 0.6,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "overfitting",
+      "to_id": "context_window",
+      "type": "RELATED_TO",
+      "confidence": 0.64,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "hybrid_search",
+      "to_id": "attention_is_all_you_need",
+      "type": "RELATED_TO",
+      "confidence": 0.93,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "entity",
+      "to_id": "tigergraph",
+      "type": "IMPLEMENTED_WITH",
+      "confidence": 0.62,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "backpropagation",
+      "to_id": "sliding_window_chunking",
+      "type": "RELATED_TO",
+      "confidence": 0.63,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "agent_memory",
+      "to_id": "setaccum",
+      "type": "RELATED_TO",
+      "confidence": 0.92,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "gpt_2",
+      "to_id": "bert",
+      "type": "RELATED_TO",
+      "confidence": 0.91,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "recall_k",
+      "to_id": "tensorflow",
+      "type": "EVALUATES",
+      "confidence": 0.66,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "gemini",
+      "to_id": "chain_of_thought_prompting",
+      "type": "USES",
+      "confidence": 0.72,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "corrective_rag",
+      "to_id": "anthropic",
+      "type": "RELATED_TO",
+      "confidence": 0.76,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "co_occurrence",
+      "to_id": "context_engineering",
+      "type": "RELATED_TO",
+      "confidence": 0.83,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "agentic_ai",
+      "to_id": "distilbert",
+      "type": "RELATED_TO",
+      "confidence": 0.62,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "mistral",
+      "to_id": "langgraph",
+      "type": "RELATED_TO",
+      "confidence": 0.88,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "bert",
+      "to_id": "lora",
+      "type": "USES",
+      "confidence": 0.94,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "text_embedding_3_small",
+      "to_id": "autoregressive_generation",
+      "type": "USES",
+      "confidence": 0.75,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "shortest_path_algorithm",
+      "to_id": "tigergraph",
+      "type": "RELATED_TO",
+      "confidence": 0.87,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "top_k_retrieval",
+      "to_id": "milvus",
+      "type": "RELATED_TO",
+      "confidence": 0.69,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "temperature_sampling",
+      "to_id": "neo4j",
+      "type": "RELATED_TO",
+      "confidence": 0.75,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "embedding_model",
+      "to_id": "onnx_runtime",
+      "type": "IMPLEMENTED_BY",
+      "confidence": 0.63,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "beam_search",
+      "to_id": "inner_product_search",
+      "type": "RELATED_TO",
+      "confidence": 0.77,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "context_engineering",
+      "to_id": "mistral",
+      "type": "RELATED_TO",
+      "confidence": 0.76,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "graphrag",
+      "to_id": "albert",
+      "type": "RELATED_TO",
+      "confidence": 0.66,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "token_efficiency",
+      "to_id": "multi_hop_reasoning",
+      "type": "RELATED_TO",
+      "confidence": 0.74,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "shap",
+      "to_id": "rnn",
+      "type": "TRAINS",
+      "confidence": 0.88,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "token",
+      "to_id": "document_chunk",
+      "type": "RELATED_TO",
+      "confidence": 0.88,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "relationship",
+      "to_id": "tigergraph_savanna",
+      "type": "IMPLEMENTED_WITH",
+      "confidence": 0.73,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "quantization",
+      "to_id": "setaccum",
+      "type": "RELATED_TO",
+      "confidence": 0.81,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "rlhf",
+      "to_id": "positional_encoding",
+      "type": "RELATED_TO",
+      "confidence": 0.79,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "albert",
+      "to_id": "tigergraph_savanna",
+      "type": "RELATED_TO",
+      "confidence": 0.93,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "onnx_runtime",
+      "to_id": "top_k_retrieval",
+      "type": "USES",
+      "confidence": 0.76,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "exposure_bias",
+      "to_id": "hallucination",
+      "type": "RELATED_TO",
+      "confidence": 0.92,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "rlhf",
+      "to_id": "self_attention",
+      "type": "RELATED_TO",
+      "confidence": 0.76,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "meta_ai",
+      "to_id": "sliding_window_chunking",
+      "type": "RELATED_TO",
+      "confidence": 0.78,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "context_window",
+      "to_id": "recall_k",
+      "type": "RELATED_TO",
+      "confidence": 0.94,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "graphrag",
+      "to_id": "corrective_rag",
+      "type": "RELATED_TO",
+      "confidence": 0.64,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "vector_based_rag",
+      "to_id": "few_shot_learning",
+      "type": "RELATED_TO",
+      "confidence": 0.96,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "precision_k",
+      "to_id": "catastrophic_forgetting",
+      "type": "RELATED_TO",
+      "confidence": 0.87,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "distilbert",
+      "to_id": "beam_search",
+      "type": "USES",
+      "confidence": 0.89,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "corrective_rag",
+      "to_id": "rlhf",
+      "type": "RELATED_TO",
+      "confidence": 0.69,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "hybrid_search",
+      "to_id": "onnx_runtime",
+      "type": "IMPLEMENTED_BY",
+      "confidence": 0.71,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "pytorch",
+      "to_id": "tigergraph",
+      "type": "INTEGRATES_WITH",
+      "confidence": 0.8,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "graph_embedding",
+      "to_id": "context_engineering",
+      "type": "RELATED_TO",
+      "confidence": 0.64,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "shortest_path_algorithm",
+      "to_id": "zero_shot_learning",
+      "type": "RELATED_TO",
+      "confidence": 0.95,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "token",
+      "to_id": "gsql",
+      "type": "IMPLEMENTED_BY",
+      "confidence": 0.68,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "attention_is_all_you_need",
+      "to_id": "knowledge_distillation",
+      "type": "RELATED_TO",
+      "confidence": 0.71,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "setaccum",
+      "to_id": "anthropic",
+      "type": "RELATED_TO",
+      "confidence": 0.72,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "autoregressive_generation",
+      "to_id": "zero_shot_learning",
+      "type": "RELATED_TO",
+      "confidence": 0.69,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "lstm",
+      "to_id": "anthropic",
+      "type": "RELATED_TO",
+      "confidence": 0.75,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "rnn",
+      "to_id": "masked_language_modeling",
+      "type": "USES",
+      "confidence": 0.67,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "distilbert",
+      "to_id": "tigergraph",
+      "type": "RELATED_TO",
+      "confidence": 0.68,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "f1_score",
+      "to_id": "entity",
+      "type": "RELATED_TO",
+      "confidence": 0.68,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "graph_embedding",
+      "to_id": "bertscore",
+      "type": "RELATED_TO",
+      "confidence": 0.87,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "positional_encoding",
+      "to_id": "context_window",
+      "type": "RELATED_TO",
+      "confidence": 0.67,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "tool_calling",
+      "to_id": "exposure_bias",
+      "type": "RELATED_TO",
+      "confidence": 0.79,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "quantization",
+      "to_id": "google_deepmind",
+      "type": "RELATED_TO",
+      "confidence": 0.67,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "knowledge_graph",
+      "to_id": "cross_attention",
+      "type": "RELATED_TO",
+      "confidence": 0.68,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "openai",
+      "to_id": "gpt_2",
+      "type": "DEVELOPED",
+      "confidence": 0.83,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "bfs_traversal",
+      "to_id": "inner_product_search",
+      "type": "RELATED_TO",
+      "confidence": 0.78,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "openai",
+      "to_id": "query_expansion",
+      "type": "RELATED_TO",
+      "confidence": 0.65,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "cosine_similarity",
+      "to_id": "bert",
+      "type": "OPTIMIZES",
+      "confidence": 0.61,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "bert",
+      "to_id": "subgraph_serialization",
+      "type": "USES",
+      "confidence": 0.86,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "context_window",
+      "to_id": "mistral",
+      "type": "RELATED_TO",
+      "confidence": 0.93,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "multi_agent_system",
+      "to_id": "gpt_3",
+      "type": "RELATED_TO",
+      "confidence": 0.97,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "claude_opus",
+      "to_id": "pinecone",
+      "type": "RELATED_TO",
+      "confidence": 0.67,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "self_attention",
+      "to_id": "centrality_algorithm",
+      "type": "RELATED_TO",
+      "confidence": 0.85,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "overfitting",
+      "to_id": "entity",
+      "type": "RELATED_TO",
+      "confidence": 0.96,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "text_embedding_3_small",
+      "to_id": "gpt_2",
+      "type": "RELATED_TO",
+      "confidence": 0.6,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "distilbert",
+      "to_id": "llm_as_a_judge",
+      "type": "USES",
+      "confidence": 0.76,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "temperature_sampling",
+      "to_id": "meta_ai",
+      "type": "RELATED_TO",
+      "confidence": 0.88,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "faithfulness",
+      "to_id": "grounding",
+      "type": "RELATED_TO",
+      "confidence": 0.9,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "albert",
+      "to_id": "bert",
+      "type": "RELATED_TO",
+      "confidence": 0.86,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "entity",
+      "to_id": "tokenization",
+      "type": "RELATED_TO",
+      "confidence": 0.94,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "groundedness",
+      "to_id": "gpt_4o_mini",
+      "type": "EVALUATES",
+      "confidence": 0.87,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "pytorch",
+      "to_id": "lstm",
+      "type": "LEVERAGES",
+      "confidence": 0.75,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "multi_head_attention",
+      "to_id": "relationship",
+      "type": "IS_TYPE_OF",
+      "confidence": 0.61,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "long_context_modeling",
+      "to_id": "perplexity",
+      "type": "RELATED_TO",
+      "confidence": 0.62,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "function_calling",
+      "to_id": "next_sentence_prediction",
+      "type": "RELATED_TO",
+      "confidence": 0.93,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "groundedness",
+      "to_id": "tigergraph_savanna",
+      "type": "RELATED_TO",
+      "confidence": 0.72,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "function_calling",
+      "to_id": "gsql",
+      "type": "IMPLEMENTED_BY",
+      "confidence": 0.87,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "f1_score",
+      "to_id": "setaccum",
+      "type": "RELATED_TO",
+      "confidence": 0.71,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "lstm",
+      "to_id": "catastrophic_forgetting",
+      "type": "RELATED_TO",
+      "confidence": 0.69,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "hybrid_search",
+      "to_id": "anthropic",
+      "type": "RELATED_TO",
+      "confidence": 0.77,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "agentic_rag",
+      "to_id": "tigergraph",
+      "type": "IMPLEMENTED_WITH",
+      "confidence": 0.94,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "rlhf",
+      "to_id": "f1_score",
+      "type": "RELATED_TO",
+      "confidence": 0.78,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "long_context_modeling",
+      "to_id": "recall_k",
+      "type": "RELATED_TO",
+      "confidence": 0.87,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "multi_hop_reasoning",
+      "to_id": "langchain",
+      "type": "IMPLEMENTED_BY",
+      "confidence": 0.72,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "cnn",
+      "to_id": "groundedness",
+      "type": "RELATED_TO",
+      "confidence": 0.89,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "chain_of_thought_prompting",
+      "to_id": "chromadb",
+      "type": "RELATED_TO",
+      "confidence": 0.74,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "graphrag",
+      "to_id": "document_chunk",
+      "type": "RELATED_TO",
+      "confidence": 0.62,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "fine_tuning",
+      "to_id": "beam_search",
+      "type": "RELATED_TO",
+      "confidence": 0.8,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "groq",
+      "to_id": "claude",
+      "type": "DEVELOPED",
+      "confidence": 0.93,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "gsql",
+      "to_id": "hugging_face_transformers",
+      "type": "INTEROPERATES_WITH",
+      "confidence": 0.63,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "subgraph_serialization",
+      "to_id": "quantization",
+      "type": "RELATED_TO",
+      "confidence": 0.97,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "knowledge_graph",
+      "to_id": "sentence_transformers",
+      "type": "IMPLEMENTED_BY",
+      "confidence": 0.65,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "hugging_face_transformers",
+      "to_id": "bfs_traversal",
+      "type": "RELATED_TO",
+      "confidence": 0.85,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "self_rag",
+      "to_id": "overfitting",
+      "type": "RELATED_TO",
+      "confidence": 0.71,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "top_p_sampling",
+      "to_id": "tigergraph_savanna",
+      "type": "RELATED_TO",
+      "confidence": 0.74,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "chromadb",
+      "to_id": "llama",
+      "type": "RELATED_TO",
+      "confidence": 0.69,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "multi_hop_reasoning",
+      "to_id": "vector_based_rag",
+      "type": "RELATED_TO",
+      "confidence": 0.7,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "gpt_4o_mini",
+      "to_id": "next_sentence_prediction",
+      "type": "USES",
+      "confidence": 0.75,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "prompt_engineering",
+      "to_id": "zero_shot_learning",
+      "type": "RELATED_TO",
+      "confidence": 0.69,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "milvus",
+      "to_id": "cross_attention",
+      "type": "RELATED_TO",
+      "confidence": 0.97,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "transformer",
+      "to_id": "autoregressive_generation",
+      "type": "USES",
+      "confidence": 0.93,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "overfitting",
+      "to_id": "mistral",
+      "type": "RELATED_TO",
+      "confidence": 0.94,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "adam_optimizer",
+      "to_id": "multi_hop_select_traversal",
+      "type": "RELATED_TO",
+      "confidence": 0.69,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "pinecone",
+      "to_id": "query_expansion",
+      "type": "RELATED_TO",
+      "confidence": 0.96,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "recall_k",
+      "to_id": "roberta",
+      "type": "EVALUATES",
+      "confidence": 0.74,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "mistral",
+      "to_id": "langchain",
+      "type": "RELATED_TO",
+      "confidence": 0.7,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "gpt_2",
+      "to_id": "tensorflow",
+      "type": "RELATED_TO",
+      "confidence": 0.82,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "cosine_similarity",
+      "to_id": "self_attention",
+      "type": "RELATED_TO",
+      "confidence": 0.74,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "multi_head_attention",
+      "to_id": "weaviate",
+      "type": "RELATED_TO",
+      "confidence": 0.97,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "query_expansion",
+      "to_id": "multi_agent_system",
+      "type": "IS_TYPE_OF",
+      "confidence": 0.84,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "hallucination",
+      "to_id": "attention_is_all_you_need",
+      "type": "RELATED_TO",
+      "confidence": 0.9,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "embedding",
+      "to_id": "entity",
+      "type": "RELATED_TO",
+      "confidence": 0.67,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "roberta",
+      "to_id": "weaviate",
+      "type": "RELATED_TO",
+      "confidence": 0.61,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "beam_search",
+      "to_id": "fine_tuning",
+      "type": "RELATED_TO",
+      "confidence": 0.62,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "agentic_rag",
+      "to_id": "context_window",
+      "type": "RELATED_TO",
+      "confidence": 0.85,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "tensorflow",
+      "to_id": "knowledge_distillation",
+      "type": "USES",
+      "confidence": 0.63,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "context_window",
+      "to_id": "graph_embedding",
+      "type": "RELATED_TO",
+      "confidence": 0.7,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "neo4j",
+      "to_id": "centrality_algorithm",
+      "type": "RELATED_TO",
+      "confidence": 0.75,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "centrality_algorithm",
+      "to_id": "function_calling",
+      "type": "RELATED_TO",
+      "confidence": 0.81,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "rnn",
+      "to_id": "subgraph_serialization",
+      "type": "USES",
+      "confidence": 0.92,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "onnx_runtime",
+      "to_id": "chromadb",
+      "type": "INTEGRATES_WITH",
+      "confidence": 0.74,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "weaviate",
+      "to_id": "precision_k",
+      "type": "RELATED_TO",
+      "confidence": 0.6,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "claude",
+      "to_id": "gpt_3",
+      "type": "RELATED_TO",
+      "confidence": 0.9,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "re_ranking",
+      "to_id": "shap",
+      "type": "RELATED_TO",
+      "confidence": 0.73,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "rlhf",
+      "to_id": "attention_is_all_you_need",
+      "type": "RELATED_TO",
+      "confidence": 0.62,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "co_occurrence",
+      "to_id": "onnx_runtime",
+      "type": "IMPLEMENTED_BY",
+      "confidence": 0.94,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "hugging_face_transformers",
+      "to_id": "re_ranking",
+      "type": "USES",
+      "confidence": 0.94,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "rag_paper",
+      "to_id": "llm_as_a_judge",
+      "type": "RELATED_TO",
+      "confidence": 0.7,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "f1_score",
+      "to_id": "next_sentence_prediction",
+      "type": "RELATED_TO",
+      "confidence": 0.64,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "agent_memory",
+      "to_id": "co_occurrence",
+      "type": "RELATED_TO",
+      "confidence": 0.89,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "shortest_path_algorithm",
+      "to_id": "rlhf",
+      "type": "RELATED_TO",
+      "confidence": 0.91,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "google_deepmind",
+      "to_id": "bleu_score",
+      "type": "RELATED_TO",
+      "confidence": 0.78,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "f1_score",
+      "to_id": "langchain",
+      "type": "EVALUATES",
+      "confidence": 0.84,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "approximate_nearest_neighbor_search",
+      "to_id": "hybrid_search",
+      "type": "RELATED_TO",
+      "confidence": 0.83,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "corrective_rag",
+      "to_id": "tensorflow",
+      "type": "IMPLEMENTED_BY",
+      "confidence": 0.92,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "exposure_bias",
+      "to_id": "langgraph",
+      "type": "MITIGATED_BY",
+      "confidence": 0.67,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "faiss",
+      "to_id": "top_p_sampling",
+      "type": "RELATED_TO",
+      "confidence": 0.68,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "precision_k",
+      "to_id": "few_shot_learning",
+      "type": "RELATED_TO",
+      "confidence": 0.66,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "gpt_4",
+      "to_id": "vector_based_rag",
+      "type": "RELATED_TO",
+      "confidence": 0.69,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "multi_head_attention",
+      "to_id": "shap",
+      "type": "RELATED_TO",
+      "confidence": 0.81,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "neo4j",
+      "to_id": "overfitting",
+      "type": "RELATED_TO",
+      "confidence": 0.72,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "cnn",
+      "to_id": "query_expansion",
+      "type": "USES",
+      "confidence": 0.8,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "milvus",
+      "to_id": "subgraph_serialization",
+      "type": "RELATED_TO",
+      "confidence": 0.71,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "claude",
+      "to_id": "token",
+      "type": "RELATED_TO",
+      "confidence": 0.84,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "llama",
+      "to_id": "prompt_engineering",
+      "type": "USES",
+      "confidence": 0.67,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "hugging_face_transformers",
+      "to_id": "lora",
+      "type": "USES",
+      "confidence": 0.77,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "context_engineering",
+      "to_id": "hugging_face_transformers",
+      "type": "IMPLEMENTED_BY",
+      "confidence": 0.89,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "overfitting",
+      "to_id": "sentence_transformers",
+      "type": "MITIGATED_BY",
+      "confidence": 0.9,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "gpt_2",
+      "to_id": "next_sentence_prediction",
+      "type": "USES",
+      "confidence": 0.65,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "groundedness",
+      "to_id": "albert",
+      "type": "EVALUATES",
+      "confidence": 0.9,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "tensorflow",
+      "to_id": "multi_head_attention",
+      "type": "USES",
+      "confidence": 0.65,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "self_rag",
+      "to_id": "agentic_ai",
+      "type": "RELATED_TO",
+      "confidence": 0.79,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "agent_memory",
+      "to_id": "prompt_engineering",
+      "type": "RELATED_TO",
+      "confidence": 0.93,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "lstm",
+      "to_id": "context_length_limitation",
+      "type": "RELATED_TO",
+      "confidence": 0.62,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "pinecone",
+      "to_id": "rlhf",
+      "type": "RELATED_TO",
+      "confidence": 0.96,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "listaccum",
+      "to_id": "anthropic",
+      "type": "RELATED_TO",
+      "confidence": 0.9,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "positional_encoding",
+      "to_id": "corrective_rag",
+      "type": "RELATED_TO",
+      "confidence": 0.87,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "vanishing_gradient",
+      "to_id": "next_sentence_prediction",
+      "type": "MITIGATED_BY",
+      "confidence": 0.73,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "embedding_model",
+      "to_id": "gpt_4o_mini",
+      "type": "RELATED_TO",
+      "confidence": 0.93,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "approximate_nearest_neighbor_search",
+      "to_id": "hallucination",
+      "type": "RELATED_TO",
+      "confidence": 0.77,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "prompt_engineering",
+      "to_id": "meta_ai",
+      "type": "RELATED_TO",
+      "confidence": 0.94,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "gsql",
+      "to_id": "sliding_window_chunking",
+      "type": "USES",
+      "confidence": 0.83,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "token_efficiency",
+      "to_id": "entity",
+      "type": "RELATED_TO",
+      "confidence": 0.61,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "top_k_retrieval",
+      "to_id": "embedding_model",
+      "type": "IS_TYPE_OF",
+      "confidence": 0.84,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "embedding",
+      "to_id": "gpt_4o_mini",
+      "type": "RELATED_TO",
+      "confidence": 0.93,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "agentic_rag",
+      "to_id": "corrective_rag",
+      "type": "RELATED_TO",
+      "confidence": 0.7,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "context_length_limitation",
+      "to_id": "tensorflow",
+      "type": "MITIGATED_BY",
+      "confidence": 0.73,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "temperature_sampling",
+      "to_id": "few_shot_learning",
+      "type": "RELATED_TO",
+      "confidence": 0.81,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "tigergraph",
+      "to_id": "knowledge_distillation",
+      "type": "RELATED_TO",
+      "confidence": 0.83,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "tool_calling",
+      "to_id": "long_context_modeling",
+      "type": "RELATED_TO",
+      "confidence": 0.74,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "entity",
+      "to_id": "re_ranking",
+      "type": "RELATED_TO",
+      "confidence": 0.65,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "context_engineering",
+      "to_id": "distilbert",
+      "type": "RELATED_TO",
+      "confidence": 0.76,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "function_calling",
+      "to_id": "langgraph",
+      "type": "IMPLEMENTED_BY",
+      "confidence": 0.95,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "hallucination",
+      "to_id": "few_shot_learning",
+      "type": "MITIGATED_BY",
+      "confidence": 0.69,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "multi_agent_system",
+      "to_id": "transformer",
+      "type": "RELATED_TO",
+      "confidence": 0.88,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "vector_based_rag",
+      "to_id": "multi_hop_select_traversal",
+      "type": "RELATED_TO",
+      "confidence": 0.83,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "subgraph_serialization",
+      "to_id": "chain_of_thought_prompting",
+      "type": "RELATED_TO",
+      "confidence": 0.73,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "rlhf",
+      "to_id": "lora",
+      "type": "RELATED_TO",
+      "confidence": 0.68,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "bert",
+      "to_id": "rnn",
+      "type": "IMPLEMENTS",
+      "confidence": 0.6,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "shortest_path_algorithm",
+      "to_id": "gpt_2",
+      "type": "OPTIMIZES",
+      "confidence": 0.79,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "document_chunk",
+      "to_id": "document_chunking",
+      "type": "RELATED_TO",
+      "confidence": 0.71,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "weaviate",
+      "to_id": "groundedness",
+      "type": "RELATED_TO",
+      "confidence": 0.83,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "embedding_model",
+      "to_id": "retrieval_augmented_generation",
+      "type": "IMPLEMENTED_BY",
+      "confidence": 0.61,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "semantic_search",
+      "to_id": "vector_based_rag",
+      "type": "RELATED_TO",
+      "confidence": 0.77,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "rag_paper",
+      "to_id": "tensorflow",
+      "type": "INTRODUCES",
+      "confidence": 0.92,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "top_k_retrieval",
+      "to_id": "co_occurrence",
+      "type": "IS_TYPE_OF",
+      "confidence": 0.7,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "onnx_runtime",
+      "to_id": "masked_language_modeling",
+      "type": "USES",
+      "confidence": 0.9,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "onnx_runtime",
+      "to_id": "query_expansion",
+      "type": "USES",
+      "confidence": 0.81,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "graphrag",
+      "to_id": "text_embedding_3_small",
+      "type": "RELATED_TO",
+      "confidence": 0.93,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "masked_language_modeling",
+      "to_id": "knowledge_distillation",
+      "type": "RELATED_TO",
+      "confidence": 0.61,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "multi_hop_reasoning",
+      "to_id": "embedding_model",
+      "type": "RELATED_TO",
+      "confidence": 0.62,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "attention_is_all_you_need",
+      "to_id": "langgraph",
+      "type": "INTRODUCES",
+      "confidence": 0.8,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "rag_paper",
+      "to_id": "document_chunk",
+      "type": "RELATED_TO",
+      "confidence": 0.67,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "hallucination",
+      "to_id": "langgraph",
+      "type": "MITIGATED_BY",
+      "confidence": 0.66,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "next_sentence_prediction",
+      "to_id": "shortest_path_algorithm",
+      "type": "RELATED_TO",
+      "confidence": 0.83,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "hybrid_search",
+      "to_id": "knowledge_distillation",
+      "type": "RELATED_TO",
+      "confidence": 0.6,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "function_calling",
+      "to_id": "bleu_score",
+      "type": "RELATED_TO",
+      "confidence": 0.77,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "sentence_transformers",
+      "to_id": "inner_product_search",
+      "type": "RELATED_TO",
+      "confidence": 0.97,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "knowledge_graph",
+      "to_id": "onnx_runtime",
+      "type": "IMPLEMENTED_BY",
+      "confidence": 0.61,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "bfs_traversal",
+      "to_id": "function_calling",
+      "type": "RELATED_TO",
+      "confidence": 0.94,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "hybrid_search",
+      "to_id": "bert",
+      "type": "RELATED_TO",
+      "confidence": 0.7,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "perplexity",
+      "to_id": "few_shot_learning",
+      "type": "RELATED_TO",
+      "confidence": 0.96,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "f1_score",
+      "to_id": "onnx_runtime",
+      "type": "EVALUATES",
+      "confidence": 0.96,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "adam_optimizer",
+      "to_id": "distilbert",
+      "type": "OPTIMIZES",
+      "confidence": 0.79,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "gsql",
+      "to_id": "approximate_nearest_neighbor_search",
+      "type": "RELATED_TO",
+      "confidence": 0.69,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "precision_k",
+      "to_id": "embedding_model",
+      "type": "RELATED_TO",
+      "confidence": 0.88,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "pinecone",
+      "to_id": "adam_optimizer",
+      "type": "RELATED_TO",
+      "confidence": 0.74,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "relationship",
+      "to_id": "bleu_score",
+      "type": "RELATED_TO",
+      "confidence": 0.92,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "overfitting",
+      "to_id": "autoregressive_generation",
+      "type": "MITIGATED_BY",
+      "confidence": 0.8,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "context_length_limitation",
+      "to_id": "lstm",
+      "type": "RELATED_TO",
+      "confidence": 0.76,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "centrality_algorithm",
+      "to_id": "agentic_rag",
+      "type": "RELATED_TO",
+      "confidence": 0.68,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "top_p_sampling",
+      "to_id": "bleu_score",
+      "type": "RELATED_TO",
+      "confidence": 0.66,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "gpt_3",
+      "to_id": "lstm",
+      "type": "IMPLEMENTS",
+      "confidence": 0.64,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "llm_as_a_judge",
+      "to_id": "groq",
+      "type": "RELATED_TO",
+      "confidence": 0.65,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "lstm",
+      "to_id": "multi_head_attention",
+      "type": "USES",
+      "confidence": 0.65,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "graph_embedding",
+      "to_id": "next_sentence_prediction",
+      "type": "RELATED_TO",
+      "confidence": 0.87,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "context_length_limitation",
+      "to_id": "sliding_window_chunking",
+      "type": "MITIGATED_BY",
+      "confidence": 0.88,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "hallucination",
+      "to_id": "anthropic",
+      "type": "RELATED_TO",
+      "confidence": 0.9,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "adam_optimizer",
+      "to_id": "backpropagation",
+      "type": "RELATED_TO",
+      "confidence": 0.88,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "gpt_2",
+      "to_id": "graphrag",
+      "type": "RELATED_TO",
+      "confidence": 0.68,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "self_attention",
+      "to_id": "openai",
+      "type": "RELATED_TO",
+      "confidence": 0.91,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "catastrophic_forgetting",
+      "to_id": "agent_memory",
+      "type": "RELATED_TO",
+      "confidence": 0.83,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "gpt",
+      "to_id": "fine_tuning",
+      "type": "USES",
+      "confidence": 0.65,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "multi_hop_select_traversal",
+      "to_id": "token_efficiency",
+      "type": "IS_TYPE_OF",
+      "confidence": 0.72,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "rnn",
+      "to_id": "llm_as_a_judge",
+      "type": "USES",
+      "confidence": 0.69,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "bert",
+      "to_id": "hybrid_search",
+      "type": "RELATED_TO",
+      "confidence": 0.88,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "grounding",
+      "to_id": "meta_ai",
+      "type": "RELATED_TO",
+      "confidence": 0.82,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "exposure_bias",
+      "to_id": "listaccum",
+      "type": "RELATED_TO",
+      "confidence": 0.83,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "corrective_rag",
+      "to_id": "document_chunk",
+      "type": "RELATED_TO",
+      "confidence": 0.61,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "llm_as_a_judge",
+      "to_id": "autoregressive_generation",
+      "type": "RELATED_TO",
+      "confidence": 0.86,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "hybrid_search",
+      "to_id": "gradient_descent",
+      "type": "RELATED_TO",
+      "confidence": 0.91,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "text_embedding_3_small",
+      "to_id": "gemini",
+      "type": "RELATED_TO",
+      "confidence": 0.6,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "listaccum",
+      "to_id": "context_engineering",
+      "type": "RELATED_TO",
+      "confidence": 0.88,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "transformer",
+      "to_id": "llm_as_a_judge",
+      "type": "USES",
+      "confidence": 0.78,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "sentence_embedding",
+      "to_id": "agentic_rag",
+      "type": "RELATED_TO",
+      "confidence": 0.91,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "sliding_window_chunking",
+      "to_id": "llm_as_a_judge",
+      "type": "RELATED_TO",
+      "confidence": 0.95,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "re_ranking",
+      "to_id": "precision_k",
+      "type": "RELATED_TO",
+      "confidence": 0.66,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "precision_k",
+      "to_id": "graph_embedding",
+      "type": "RELATED_TO",
+      "confidence": 0.69,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "precision_k",
+      "to_id": "gpt_3",
+      "type": "EVALUATES",
+      "confidence": 0.84,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "lora",
+      "to_id": "corrective_rag",
+      "type": "IS_TYPE_OF",
+      "confidence": 0.97,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "pytorch",
+      "to_id": "gpt_4o_mini",
+      "type": "RELATED_TO",
+      "confidence": 0.73,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "f1_score",
+      "to_id": "context_window",
+      "type": "RELATED_TO",
+      "confidence": 0.93,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "shap",
+      "to_id": "claude",
+      "type": "OPTIMIZES",
+      "confidence": 0.84,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "weaviate",
+      "to_id": "shortest_path_algorithm",
+      "type": "RELATED_TO",
+      "confidence": 0.7,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "relationship",
+      "to_id": "groq",
+      "type": "RELATED_TO",
+      "confidence": 0.93,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "precision_k",
+      "to_id": "cnn",
+      "type": "RELATED_TO",
+      "confidence": 0.65,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "llm_as_a_judge",
+      "to_id": "document_chunking",
+      "type": "RELATED_TO",
+      "confidence": 0.72,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "backpropagation",
+      "to_id": "overfitting",
+      "type": "RELATED_TO",
+      "confidence": 0.77,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "text_embedding_3_small",
+      "to_id": "cross_attention",
+      "type": "USES",
+      "confidence": 0.76,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "document_chunking",
+      "to_id": "knowledge_graph",
+      "type": "IS_TYPE_OF",
+      "confidence": 0.65,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "onnx_runtime",
+      "to_id": "shap",
+      "type": "RELATED_TO",
+      "confidence": 0.86,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "tigergraph_savanna",
+      "to_id": "shortest_path_algorithm",
+      "type": "RELATED_TO",
+      "confidence": 0.88,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "agentic_ai",
+      "to_id": "vector_based_rag",
+      "type": "RELATED_TO",
+      "confidence": 0.96,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "langchain",
+      "to_id": "few_shot_learning",
+      "type": "USES",
+      "confidence": 0.73,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "anthropic",
+      "to_id": "gpt_4o_mini",
+      "type": "DEVELOPED",
+      "confidence": 0.67,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "meta_ai",
+      "to_id": "text_embedding_3_small",
+      "type": "DEVELOPED",
+      "confidence": 0.84,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "token",
+      "to_id": "vector_based_rag",
+      "type": "RELATED_TO",
+      "confidence": 0.96,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "multi_agent_system",
+      "to_id": "shortest_path_algorithm",
+      "type": "RELATED_TO",
+      "confidence": 0.76,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "bleu_score",
+      "to_id": "gpt_2",
+      "type": "EVALUATES",
+      "confidence": 0.7,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "cross_attention",
+      "to_id": "self_attention",
+      "type": "RELATED_TO",
+      "confidence": 0.6,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "sentence_embedding",
+      "to_id": "inner_product_search",
+      "type": "USED_BY",
+      "confidence": 0.79,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "rnn",
+      "to_id": "cross_attention",
+      "type": "USES",
+      "confidence": 0.65,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "transformer",
+      "to_id": "tool_calling",
+      "type": "RELATED_TO",
+      "confidence": 0.69,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "graph_embedding",
+      "to_id": "re_ranking",
+      "type": "RELATED_TO",
+      "confidence": 0.82,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "exposure_bias",
+      "to_id": "knowledge_graph",
+      "type": "RELATED_TO",
+      "confidence": 0.85,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "faiss",
+      "to_id": "embedding",
+      "type": "STORES",
+      "confidence": 0.84,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "gemini",
+      "to_id": "token_efficiency",
+      "type": "RELATED_TO",
+      "confidence": 0.7,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "bfs_traversal",
+      "to_id": "subgraph_serialization",
+      "type": "RELATED_TO",
+      "confidence": 0.69,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "hybrid_search",
+      "to_id": "pytorch",
+      "type": "IMPLEMENTED_BY",
+      "confidence": 0.66,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "cnn",
+      "to_id": "fine_tuning",
+      "type": "USES",
+      "confidence": 0.61,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "few_shot_learning",
+      "to_id": "embedding",
+      "type": "RELATED_TO",
+      "confidence": 0.84,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "bfs_traversal",
+      "to_id": "milvus",
+      "type": "RELATED_TO",
+      "confidence": 0.72,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "token",
+      "to_id": "vanishing_gradient",
+      "type": "RELATED_TO",
+      "confidence": 0.78,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "self_attention",
+      "to_id": "tigergraph",
+      "type": "RELATED_TO",
+      "confidence": 0.8,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "hybrid_search",
+      "to_id": "corrective_rag",
+      "type": "RELATED_TO",
+      "confidence": 0.95,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "few_shot_learning",
+      "to_id": "llm_as_a_judge",
+      "type": "RELATED_TO",
+      "confidence": 0.64,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "tokenization",
+      "to_id": "weaviate",
+      "type": "RELATED_TO",
+      "confidence": 0.87,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "agentic_rag",
+      "to_id": "tensorflow",
+      "type": "IMPLEMENTED_BY",
+      "confidence": 0.91,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "document_chunk",
+      "to_id": "tool_calling",
+      "type": "RELATED_TO",
+      "confidence": 0.95,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "faiss",
+      "to_id": "positional_encoding",
+      "type": "STORES",
+      "confidence": 0.75,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "multi_agent_system",
+      "to_id": "langgraph",
+      "type": "IMPLEMENTED_BY",
+      "confidence": 0.73,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "tigergraph",
+      "to_id": "setaccum",
+      "type": "RELATED_TO",
+      "confidence": 0.74,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "subgraph_serialization",
+      "to_id": "perplexity",
+      "type": "RELATED_TO",
+      "confidence": 0.76,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "gsql",
+      "to_id": "document_chunking",
+      "type": "USES",
+      "confidence": 0.64,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "tool_calling",
+      "to_id": "top_k_retrieval",
+      "type": "RELATED_TO",
+      "confidence": 0.95,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "long_context_modeling",
+      "to_id": "anthropic",
+      "type": "RELATED_TO",
+      "confidence": 0.75,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "text_embedding_3_small",
+      "to_id": "rlhf",
+      "type": "USES",
+      "confidence": 0.94,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "co_occurrence",
+      "to_id": "long_context_modeling",
+      "type": "RELATED_TO",
+      "confidence": 0.83,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "onnx_runtime",
+      "to_id": "temperature_sampling",
+      "type": "USES",
+      "confidence": 0.87,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "faithfulness",
+      "to_id": "neo4j",
+      "type": "RELATED_TO",
+      "confidence": 0.84,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "cross_attention",
+      "to_id": "multi_hop_select_traversal",
+      "type": "RELATED_TO",
+      "confidence": 0.88,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "self_rag",
+      "to_id": "vanishing_gradient",
+      "type": "RELATED_TO",
+      "confidence": 0.77,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "semantic_search",
+      "to_id": "tigergraph_savanna",
+      "type": "IMPLEMENTED_WITH",
+      "confidence": 0.74,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "transformer",
+      "to_id": "fine_tuning",
+      "type": "USES",
+      "confidence": 0.9,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "faithfulness",
+      "to_id": "graphrag",
+      "type": "RELATED_TO",
+      "confidence": 0.84,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "fine_tuning",
+      "to_id": "lora",
+      "type": "RELATED_TO",
+      "confidence": 0.76,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "groundedness",
+      "to_id": "vector_based_rag",
+      "type": "RELATED_TO",
+      "confidence": 0.94,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "distilbert",
+      "to_id": "masked_language_modeling",
+      "type": "USES",
+      "confidence": 0.91,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "corrective_rag",
+      "to_id": "precision_k",
+      "type": "RELATED_TO",
+      "confidence": 0.65,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "tensorflow",
+      "to_id": "document_chunking",
+      "type": "USES",
+      "confidence": 0.61,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "weaviate",
+      "to_id": "openai",
+      "type": "RELATED_TO",
+      "confidence": 0.63,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "langchain",
+      "to_id": "tigergraph",
+      "type": "INTEGRATES_WITH",
+      "confidence": 0.64,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "context_length_limitation",
+      "to_id": "knowledge_graph",
+      "type": "RELATED_TO",
+      "confidence": 0.67,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "llm_as_a_judge",
+      "to_id": "corrective_rag",
+      "type": "IS_TYPE_OF",
+      "confidence": 0.66,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "agentic_rag",
+      "to_id": "knowledge_distillation",
+      "type": "RELATED_TO",
+      "confidence": 0.66,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "neo4j",
+      "to_id": "approximate_nearest_neighbor_search",
+      "type": "RELATED_TO",
+      "confidence": 0.93,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "chromadb",
+      "to_id": "quantization",
+      "type": "RELATED_TO",
+      "confidence": 0.86,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "tool_calling",
+      "to_id": "overfitting",
+      "type": "RELATED_TO",
+      "confidence": 0.76,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "gpt_4",
+      "to_id": "temperature_sampling",
+      "type": "USES",
+      "confidence": 0.7,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "catastrophic_forgetting",
+      "to_id": "retrieval_augmented_generation",
+      "type": "MITIGATED_BY",
+      "confidence": 0.78,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "fine_tuning",
+      "to_id": "cross_attention",
+      "type": "RELATED_TO",
+      "confidence": 0.94,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "graphrag",
+      "to_id": "quantization",
+      "type": "RELATED_TO",
+      "confidence": 0.66,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "embedding_model",
+      "to_id": "overfitting",
+      "type": "RELATED_TO",
+      "confidence": 0.72,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "neo4j",
+      "to_id": "multi_hop_select_traversal",
+      "type": "RELATED_TO",
+      "confidence": 0.91,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "claude",
+      "to_id": "subgraph_serialization",
+      "type": "USES",
+      "confidence": 0.97,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "tensorflow",
+      "to_id": "faiss",
+      "type": "INTEGRATES_WITH",
+      "confidence": 0.73,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "langgraph",
+      "to_id": "rnn",
+      "type": "LEVERAGES",
+      "confidence": 0.62,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "co_occurrence",
+      "to_id": "groq",
+      "type": "RELATED_TO",
+      "confidence": 0.63,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "lora",
+      "to_id": "agent_memory",
+      "type": "IS_TYPE_OF",
+      "confidence": 0.93,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "cosine_similarity",
+      "to_id": "hybrid_search",
+      "type": "RELATED_TO",
+      "confidence": 0.75,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "bertscore",
+      "to_id": "gpt",
+      "type": "EVALUATES",
+      "confidence": 0.92,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "bertscore",
+      "to_id": "autoregressive_generation",
+      "type": "RELATED_TO",
+      "confidence": 0.89,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "listaccum",
+      "to_id": "gemini",
+      "type": "OPTIMIZES",
+      "confidence": 0.73,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "bert",
+      "to_id": "beam_search",
+      "type": "USES",
+      "confidence": 0.91,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "faithfulness",
+      "to_id": "catastrophic_forgetting",
+      "type": "RELATED_TO",
+      "confidence": 0.78,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "prompt_engineering",
+      "to_id": "groq",
+      "type": "RELATED_TO",
+      "confidence": 0.7,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "google_deepmind",
+      "to_id": "weaviate",
+      "type": "RELATED_TO",
+      "confidence": 0.84,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "token_efficiency",
+      "to_id": "hybrid_search",
+      "type": "RELATED_TO",
+      "confidence": 0.71,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "corrective_rag",
+      "to_id": "multi_head_attention",
+      "type": "RELATED_TO",
+      "confidence": 0.75,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "tokenization",
+      "to_id": "re_ranking",
+      "type": "RELATED_TO",
+      "confidence": 0.62,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "gpt_2",
+      "to_id": "transformer",
+      "type": "IMPLEMENTS",
+      "confidence": 0.62,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "grounding",
+      "to_id": "langchain",
+      "type": "IMPLEMENTED_BY",
+      "confidence": 0.84,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "rag_paper",
+      "to_id": "langgraph",
+      "type": "INTRODUCES",
+      "confidence": 0.83,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "cosine_similarity",
+      "to_id": "multi_head_attention",
+      "type": "RELATED_TO",
+      "confidence": 0.85,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "context_engineering",
+      "to_id": "pytorch",
+      "type": "IMPLEMENTED_BY",
+      "confidence": 0.66,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "backpropagation",
+      "to_id": "self_attention",
+      "type": "RELATED_TO",
+      "confidence": 0.76,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "perplexity",
+      "to_id": "recall_k",
+      "type": "RELATED_TO",
+      "confidence": 0.84,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "backpropagation",
+      "to_id": "catastrophic_forgetting",
+      "type": "RELATED_TO",
+      "confidence": 0.65,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "temperature_sampling",
+      "to_id": "semantic_search",
+      "type": "IS_TYPE_OF",
+      "confidence": 0.7,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "faiss",
+      "to_id": "subgraph_serialization",
+      "type": "RELATED_TO",
+      "confidence": 0.61,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "gemini",
+      "to_id": "top_p_sampling",
+      "type": "USES",
+      "confidence": 0.84,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "quantization",
+      "to_id": "top_p_sampling",
+      "type": "RELATED_TO",
+      "confidence": 0.79,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "self_rag",
+      "to_id": "co_occurrence",
+      "type": "RELATED_TO",
+      "confidence": 0.76,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "mistral",
+      "to_id": "next_sentence_prediction",
+      "type": "USES",
+      "confidence": 0.61,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "query_expansion",
+      "to_id": "sliding_window_chunking",
+      "type": "RELATED_TO",
+      "confidence": 0.97,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "autoregressive_generation",
+      "to_id": "grounding",
+      "type": "IS_TYPE_OF",
+      "confidence": 0.75,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "distilbert",
+      "to_id": "onnx_runtime",
+      "type": "RELATED_TO",
+      "confidence": 0.77,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "attention_is_all_you_need",
+      "to_id": "pytorch",
+      "type": "INTRODUCES",
+      "confidence": 0.76,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "neo4j",
+      "to_id": "positional_encoding",
+      "type": "STORES",
+      "confidence": 0.65,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "cosine_similarity",
+      "to_id": "backpropagation",
+      "type": "RELATED_TO",
+      "confidence": 0.64,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "setaccum",
+      "to_id": "rnn",
+      "type": "TRAINS",
+      "confidence": 0.87,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "mistral",
+      "to_id": "multi_agent_system",
+      "type": "RELATED_TO",
+      "confidence": 0.88,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "groundedness",
+      "to_id": "self_rag",
+      "type": "RELATED_TO",
+      "confidence": 0.88,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "multi_agent_system",
+      "to_id": "context_engineering",
+      "type": "RELATED_TO",
+      "confidence": 0.63,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "cnn",
+      "to_id": "neo4j",
+      "type": "RELATED_TO",
+      "confidence": 0.94,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "bleu_score",
+      "to_id": "meta_ai",
+      "type": "RELATED_TO",
+      "confidence": 0.62,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "attention_is_all_you_need",
+      "to_id": "masked_language_modeling",
+      "type": "RELATED_TO",
+      "confidence": 0.61,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "token",
+      "to_id": "centrality_algorithm",
+      "type": "RELATED_TO",
+      "confidence": 0.72,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "anthropic",
+      "to_id": "gradient_descent",
+      "type": "RELATED_TO",
+      "confidence": 0.91,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "openai",
+      "to_id": "re_ranking",
+      "type": "RELATED_TO",
+      "confidence": 0.87,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "embedding",
+      "to_id": "text_embedding_3_small",
+      "type": "RELATED_TO",
+      "confidence": 0.65,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "groundedness",
+      "to_id": "anthropic",
+      "type": "RELATED_TO",
+      "confidence": 0.84,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "fine_tuning",
+      "to_id": "token",
+      "type": "IS_TYPE_OF",
+      "confidence": 0.89,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "precision_k",
+      "to_id": "tigergraph_savanna",
+      "type": "RELATED_TO",
+      "confidence": 0.89,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "multi_hop_select_traversal",
+      "to_id": "setaccum",
+      "type": "RELATED_TO",
+      "confidence": 0.62,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "backpropagation",
+      "to_id": "langchain",
+      "type": "RELATED_TO",
+      "confidence": 0.87,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "vanishing_gradient",
+      "to_id": "vector_based_rag",
+      "type": "RELATED_TO",
+      "confidence": 0.82,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "claude",
+      "to_id": "document_chunking",
+      "type": "USES",
+      "confidence": 0.96,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "relationship",
+      "to_id": "token",
+      "type": "RELATED_TO",
+      "confidence": 0.85,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "co_occurrence",
+      "to_id": "mistral",
+      "type": "RELATED_TO",
+      "confidence": 0.7,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "gpt_4o_mini",
+      "to_id": "gsql",
+      "type": "RELATED_TO",
+      "confidence": 0.7,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "sliding_window_chunking",
+      "to_id": "perplexity",
+      "type": "RELATED_TO",
+      "confidence": 0.9,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "listaccum",
+      "to_id": "vanishing_gradient",
+      "type": "RELATED_TO",
+      "confidence": 0.65,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "setaccum",
+      "to_id": "google_deepmind",
+      "type": "RELATED_TO",
+      "confidence": 0.91,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "llm_as_a_judge",
+      "to_id": "knowledge_distillation",
+      "type": "RELATED_TO",
+      "confidence": 0.63,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "long_context_modeling",
+      "to_id": "relationship",
+      "type": "RELATED_TO",
+      "confidence": 0.67,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "centrality_algorithm",
+      "to_id": "langchain",
+      "type": "RELATED_TO",
+      "confidence": 0.62,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "cross_attention",
+      "to_id": "semantic_search",
+      "type": "IS_TYPE_OF",
+      "confidence": 0.68,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "sliding_window_chunking",
+      "to_id": "agent_memory",
+      "type": "IS_TYPE_OF",
+      "confidence": 0.6,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "cnn",
+      "to_id": "tokenization",
+      "type": "USES",
+      "confidence": 0.63,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "grounding",
+      "to_id": "next_sentence_prediction",
+      "type": "RELATED_TO",
+      "confidence": 0.69,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "shap",
+      "to_id": "vanishing_gradient",
+      "type": "RELATED_TO",
+      "confidence": 0.79,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "prompt_engineering",
+      "to_id": "sliding_window_chunking",
+      "type": "RELATED_TO",
+      "confidence": 0.67,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "pinecone",
+      "to_id": "albert",
+      "type": "RELATED_TO",
+      "confidence": 0.67,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "groundedness",
+      "to_id": "re_ranking",
+      "type": "RELATED_TO",
+      "confidence": 0.81,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "self_rag",
+      "to_id": "few_shot_learning",
+      "type": "RELATED_TO",
+      "confidence": 0.92,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "multi_head_attention",
+      "to_id": "f1_score",
+      "type": "RELATED_TO",
+      "confidence": 0.97,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "gradient_descent",
+      "to_id": "gpt_2",
+      "type": "OPTIMIZES",
+      "confidence": 0.74,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "corrective_rag",
+      "to_id": "distilbert",
+      "type": "RELATED_TO",
+      "confidence": 0.66,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "llm_as_a_judge",
+      "to_id": "setaccum",
+      "type": "RELATED_TO",
+      "confidence": 0.79,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "gpt",
+      "to_id": "self_attention",
+      "type": "USES",
+      "confidence": 0.68,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "sliding_window_chunking",
+      "to_id": "top_p_sampling",
+      "type": "RELATED_TO",
+      "confidence": 0.68,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "claude",
+      "to_id": "gpt",
+      "type": "RELATED_TO",
+      "confidence": 0.95,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "tigergraph",
+      "to_id": "overfitting",
+      "type": "RELATED_TO",
+      "confidence": 0.61,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "relationship",
+      "to_id": "faiss",
+      "type": "IMPLEMENTED_WITH",
+      "confidence": 0.63,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "self_attention",
+      "to_id": "temperature_sampling",
+      "type": "RELATED_TO",
+      "confidence": 0.74,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "lora",
+      "to_id": "openai",
+      "type": "RELATED_TO",
+      "confidence": 0.91,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "gradient_descent",
+      "to_id": "query_expansion",
+      "type": "RELATED_TO",
+      "confidence": 0.84,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "semantic_search",
+      "to_id": "anthropic",
+      "type": "RELATED_TO",
+      "confidence": 0.63,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "top_p_sampling",
+      "to_id": "knowledge_graph",
+      "type": "IS_TYPE_OF",
+      "confidence": 0.84,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "faiss",
+      "to_id": "mistral",
+      "type": "RELATED_TO",
+      "confidence": 0.91,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "meta_ai",
+      "to_id": "multi_hop_reasoning",
+      "type": "RELATED_TO",
+      "confidence": 0.97,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "sentence_transformers",
+      "to_id": "self_attention",
+      "type": "USES",
+      "confidence": 0.95,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "masked_language_modeling",
+      "to_id": "approximate_nearest_neighbor_search",
+      "type": "RELATED_TO",
+      "confidence": 0.8,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "overfitting",
+      "to_id": "perplexity",
+      "type": "RELATED_TO",
+      "confidence": 0.62,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "gpt",
+      "to_id": "masked_language_modeling",
+      "type": "USES",
+      "confidence": 0.65,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "precision_k",
+      "to_id": "chromadb",
+      "type": "RELATED_TO",
+      "confidence": 0.85,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "llama",
+      "to_id": "sliding_window_chunking",
+      "type": "USES",
+      "confidence": 0.88,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "gpt_4o_mini",
+      "to_id": "autoregressive_generation",
+      "type": "USES",
+      "confidence": 0.74,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "gpt_4",
+      "to_id": "entity",
+      "type": "RELATED_TO",
+      "confidence": 0.78,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "llama",
+      "to_id": "multi_hop_reasoning",
+      "type": "RELATED_TO",
+      "confidence": 0.9,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "cross_attention",
+      "to_id": "hybrid_search",
+      "type": "IS_TYPE_OF",
+      "confidence": 0.94,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "embedding_model",
+      "to_id": "f1_score",
+      "type": "RELATED_TO",
+      "confidence": 0.91,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "recall_k",
+      "to_id": "hugging_face_transformers",
+      "type": "EVALUATES",
+      "confidence": 0.92,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "self_rag",
+      "to_id": "mistral",
+      "type": "RELATED_TO",
+      "confidence": 0.95,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "overfitting",
+      "to_id": "rnn",
+      "type": "RELATED_TO",
+      "confidence": 0.83,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "google_deepmind",
+      "to_id": "bertscore",
+      "type": "RELATED_TO",
+      "confidence": 0.72,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "gpt_3",
+      "to_id": "fine_tuning",
+      "type": "USES",
+      "confidence": 0.83,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "inner_product_search",
+      "to_id": "claude_opus",
+      "type": "OPTIMIZES",
+      "confidence": 0.87,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "hybrid_search",
+      "to_id": "mistral",
+      "type": "RELATED_TO",
+      "confidence": 0.8,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "backpropagation",
+      "to_id": "llama",
+      "type": "OPTIMIZES",
+      "confidence": 0.66,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "document_chunk",
+      "to_id": "graphrag",
+      "type": "RELATED_TO",
+      "confidence": 0.66,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "overfitting",
+      "to_id": "re_ranking",
+      "type": "MITIGATED_BY",
+      "confidence": 0.71,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "gpt_2",
+      "to_id": "token_efficiency",
+      "type": "RELATED_TO",
+      "confidence": 0.77,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "gpt_3",
+      "to_id": "vector_based_rag",
+      "type": "RELATED_TO",
+      "confidence": 0.96,
+      "context": "discussed together in the context of modern LLM system design"
+    },
+    {
+      "from_id": "pytorch",
+      "to_id": "bfs_traversal",
+      "type": "RELATED_TO",
+      "confidence": 0.89,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "temperature_sampling",
+      "to_id": "fine_tuning",
+      "type": "RELATED_TO",
+      "confidence": 0.91,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    },
+    {
+      "from_id": "agent_memory",
+      "to_id": "tigergraph",
+      "type": "IMPLEMENTED_WITH",
+      "confidence": 0.67,
+      "context": "referenced jointly when describing model training and evaluation"
+    },
+    {
+      "from_id": "gemini",
+      "to_id": "gsql",
+      "type": "RELATED_TO",
+      "confidence": 0.97,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "gpt",
+      "to_id": "token",
+      "type": "RELATED_TO",
+      "confidence": 0.71,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "vanishing_gradient",
+      "to_id": "masked_language_modeling",
+      "type": "MITIGATED_BY",
+      "confidence": 0.87,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "rag_paper",
+      "to_id": "groq",
+      "type": "RELATED_TO",
+      "confidence": 0.84,
+      "context": "frequently cited together in benchmarking LLM applications"
+    },
+    {
+      "from_id": "co_occurrence",
+      "to_id": "prompt_engineering",
+      "type": "RELATED_TO",
+      "confidence": 0.73,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "llama",
+      "to_id": "transformer",
+      "type": "IMPLEMENTS",
+      "confidence": 0.89,
+      "context": "linked through shared use in vector search and knowledge graph retrieval"
+    },
+    {
+      "from_id": "faiss",
+      "to_id": "groundedness",
+      "type": "RELATED_TO",
+      "confidence": 0.76,
+      "context": "connected via their role in multi-hop reasoning over structured data"
+    },
+    {
+      "from_id": "cosine_similarity",
+      "to_id": "setaccum",
+      "type": "RELATED_TO",
+      "confidence": 0.81,
+      "context": "commonly paired when building production agentic AI pipelines"
+    },
+    {
+      "from_id": "overfitting",
+      "to_id": "faiss",
+      "type": "RELATED_TO",
+      "confidence": 0.79,
+      "context": "appear together in transformer-based NLP literature"
+    },
+    {
+      "from_id": "hybrid_search",
+      "to_id": "sentence_transformers",
+      "type": "IMPLEMENTED_BY",
+      "confidence": 0.67,
+      "context": "co-occur frequently in GraphRAG and retrieval-augmented architectures"
+    }
+  ],
+  "metadata": {
+    "built_at": "2026-06-28T15:42:02.523656",
+    "source_dir": "data/sample_docs (Transformer Architecture and Large Language Models)",
+    "entity_count": 126,
+    "relationship_count": 653,
+    "used_llm_extraction": true,
+    "used_synthetic_relationships": false
+  }
+}
