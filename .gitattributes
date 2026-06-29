@@ -12,10 +12,9 @@
 *.yml text eol=lf
 *.html text eol=lf
 *.css text eol=lf
-
 # Binary files
 *.pkl binary
 *.db binary
 *.sqlite binary
 *.pickle binary
-
+data/faiss_index.pkl filter=lfs diff=lfs merge=lfs -text
