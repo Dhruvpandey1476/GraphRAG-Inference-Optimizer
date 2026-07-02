@@ -108,11 +108,13 @@ def llm_judge(question: str, answer: str, ground_truth: str = "") -> JudgeScore:
 
 # ─── BERTScore ───────────────────────────────────────────────────────────────
 
-def compute_bert_score(predictions: list[str], references: list[str]) -> dict:
+def compute_bert_score(predictions: list[str], references: list[str],
+                       return_per_query: bool = False) -> dict:
     """
     Compute BERTScore F1 between predicted answers and ground truths.
     Uses roberta-large with rescale_with_baseline=True as required.
     Returns both rescaled and raw F1 scores.
+    If return_per_query=True, also includes per-query F1 list.
     """
     try:
         import evaluate
@@ -128,6 +130,7 @@ def compute_bert_score(predictions: list[str], references: list[str]) -> dict:
             model_type=model_type,
         )
         raw_f1 = sum(results_raw["f1"]) / len(results_raw["f1"])
+        raw_per = results_raw["f1"]
 
         # Compute with rescaling
         results = bertscore.compute(
@@ -146,12 +149,15 @@ def compute_bert_score(predictions: list[str], references: list[str]) -> dict:
         avg_precision = sum(precision_scores) / len(precision_scores)
         avg_recall = sum(recall_scores) / len(recall_scores)
 
-        return {
+        out = {
             "precision": round(float(avg_precision), 4),
             "recall": round(float(avg_recall), 4),
             "f1": round(float(avg_f1), 4),        # rescaled
             "f1_raw": round(float(raw_f1), 4),     # raw
         }
+        if return_per_query:
+            out["per_query"] = [round(float(f), 4) for f in f1_scores]
+        return out
     except ImportError:
         logger.warning("evaluate/bert-score not installed. Skipping BERTScore.")
         return {"precision": 0.0, "recall": 0.0, "f1": 0.0, "f1_raw": 0.0}

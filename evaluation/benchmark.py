@@ -85,6 +85,12 @@ class SingleQueryResult:
     graph_bert_f1: float
     graph_bert_f1_raw: float
 
+    # GraphRAG provenance — proves the answer came from TigerGraph (not fallback)
+    graph_retrieval_source: str  # "tigergraph" or "llm_fallback"
+    graph_used_tigergraph: bool
+    graph_entities_retrieved: int
+    graph_relationships_retrieved: int
+
     # Comparisons
     token_reduction_pct: float
     cost_reduction_pct: float
@@ -129,6 +135,10 @@ class BenchmarkSummary:
     llm_judge_pass_rate_basic: float  # % of queries where Basic score >= 7
     llm_judge_pass_rate_graph: float  # % of queries where GraphRAG score >= 7
 
+    # Provenance: how many GraphRAG answers actually came from TigerGraph
+    graph_tigergraph_used_count: int  # # queries answered from the TigerGraph subgraph
+    graph_tigergraph_used_pct: float  # % of queries answered from TigerGraph (vs LLM fallback)
+
 
 # ─── Main Benchmark Runner ────────────────────────────────────────────────────
 
@@ -146,11 +156,16 @@ class BenchmarkRunner:
             tg = TigerGraphClient().connect()
             self.pipeline3 = GraphRAG(tg)
             self.tg_available = True
-            logger.info("✅ TigerGraph connected")
+            logger.info("[OK] TigerGraph connected")
         except Exception as e:
-            logger.warning(f"⚠️  TigerGraph unavailable, using mock: {e}")
+            logger.warning(f"[WARN]  TigerGraph unavailable, using mock: {e}")
             self.pipeline3 = None
             self.tg_available = False
+
+        if self.tg_available:
+            print("\n  [ACTIVE] TigerGraph: connected to " + str(tg.host) + "/" + str(tg.graph))
+        else:
+            print("\n  [WARN] TigerGraph: FALLBACK MODE (local graph only) noexcept")
 
     def load_queries(self, path: str) -> list[dict]:
         with open(path, "r") as f:
@@ -192,6 +207,11 @@ class BenchmarkRunner:
                 basic_ans, basic_tokens, basic_lat, basic_cost_val = f"ERROR: {e}", 0, 0, 0
 
             # Pipeline 3
+            # Provenance defaults — assume no TigerGraph until a real run proves it
+            graph_retrieval_source = "llm_fallback"
+            graph_used_tg = False
+            graph_ents_retrieved = 0
+            graph_rels_retrieved = 0
             try:
                 if self.pipeline3:
                     r3 = self.pipeline3.query(question)
@@ -199,15 +219,23 @@ class BenchmarkRunner:
                     graph_tokens = r3.total_tokens
                     graph_lat = r3.latency_ms
                     graph_cost_val = cost(r3.prompt_tokens, r3.completion_tokens)
+                    graph_retrieval_source = r3.retrieval_source
+                    graph_used_tg = r3.used_tigergraph
+                    graph_ents_retrieved = r3.graph_entities_retrieved
+                    graph_rels_retrieved = r3.graph_relationships_retrieved
                 else:
-                    # Demo mode: simulate reduction
-                    graph_ans = basic_ans
-                    graph_tokens = max(80, basic_tokens // 4)
-                    graph_lat = basic_lat * 0.65
-                    graph_cost_val = basic_cost_val * 0.25
+                    # No GraphRAG pipeline (TigerGraph not connected). Do NOT
+                    # fabricate a favorable reduction — record an honest failure
+                    # so it can't bias the averages or the token-reduction claim.
+                    raise RuntimeError("GraphRAG pipeline unavailable (TigerGraph not connected)")
             except Exception as e:
                 logger.error(f"P3 failed on q{i}: {e}")
-                graph_ans, graph_tokens, graph_lat, graph_cost_val = basic_ans, basic_tokens // 4, basic_lat, basic_cost_val * 0.25
+                # Honest failure: real measured numbers only. No copied answer,
+                # no invented token cut. This query's GraphRAG result is an error.
+                graph_ans = f"ERROR: {e}"
+                graph_tokens, graph_lat, graph_cost_val = 0, 0.0, 0.0
+                graph_retrieval_source = "error"
+                graph_used_tg = False
 
             # LLM Judge scores
             llm_score = llm_judge(question, llm_ans, ground_truth).overall
@@ -246,16 +274,23 @@ class BenchmarkRunner:
                 graph_judge_pass=graph_score >= 7,
                 graph_bert_f1=0.0,  # Will be filled after BERTScore computation
                 graph_bert_f1_raw=0.0,
+                graph_retrieval_source=graph_retrieval_source,
+                graph_used_tigergraph=graph_used_tg,
+                graph_entities_retrieved=graph_ents_retrieved,
+                graph_relationships_retrieved=graph_rels_retrieved,
                 token_reduction_pct=round(token_red, 1),
                 cost_reduction_pct=round(cost_red, 1),
                 latency_reduction_pct=round(lat_red, 1),
                 graph_wins_judge=graph_score > basic_score,
             ))
 
-            logger.info(
-                f"  Q{i+1}: tokens {basic_tokens}→{graph_tokens} "
-                f"({token_red:.1f}% ↓) | judge {basic_score:.1f}→{graph_score:.1f}"
-            )
+            print(f"\n  ─── Q{i+1}: {question[:70]}... ───")
+            print(f"  Tokens   | LLM: {llm_tokens:>5} | Basic: {basic_tokens:>5} | Graph: {graph_tokens:>5} | ↓{token_red:.1f}%")
+            print(f"  Judge    | LLM: {llm_score:>4.1f}/10 | Basic: {basic_score:>4.1f}/10 | Graph: {graph_score:>4.1f}/10")
+            if graph_used_tg:
+                print(f"  Source   | GraphRAG → TIGERGRAPH ✓ (entities={graph_ents_retrieved}, relationships={graph_rels_retrieved})")
+            else:
+                print(f"  Source   | GraphRAG → LLM FALLBACK ✗ (no TigerGraph context; entities={graph_ents_retrieved}, relationships={graph_rels_retrieved})")
 
         # BERTScore for all 3 pipelines
         ground_truths = [r.ground_truth for r in results if r.ground_truth]
@@ -263,27 +298,37 @@ class BenchmarkRunner:
         basic_answers_for_bert = [r.basic_answer for r in results if r.ground_truth]
         graph_answers_for_bert = [r.graph_answer for r in results if r.ground_truth]
 
-        bert_llm = {"f1": 0.0, "f1_raw": 0.0}
-        bert_basic = {"f1": 0.0, "f1_raw": 0.0}
-        bert_graph = {"f1": 0.0, "f1_raw": 0.0}
+        bert_llm = {"f1": 0.0, "f1_raw": 0.0, "per_query": []}
+        bert_basic = {"f1": 0.0, "f1_raw": 0.0, "per_query": []}
+        bert_graph = {"f1": 0.0, "f1_raw": 0.0, "per_query": []}
         
         if ground_truths:
             logger.info("Computing BERTScore for all 3 pipelines...")
-            bert_llm = compute_bert_score(llm_answers_for_bert, ground_truths)
-            bert_basic = compute_bert_score(basic_answers_for_bert, ground_truths)
-            bert_graph = compute_bert_score(graph_answers_for_bert, ground_truths)
+            bert_llm_raw = compute_bert_score(llm_answers_for_bert, ground_truths, return_per_query=True)
+            bert_basic_raw = compute_bert_score(basic_answers_for_bert, ground_truths, return_per_query=True)
+            bert_graph_raw = compute_bert_score(graph_answers_for_bert, ground_truths, return_per_query=True)
+            for d in [bert_llm_raw, bert_basic_raw, bert_graph_raw]:
+                d.setdefault("per_query", [])
+            bert_llm = bert_llm_raw
+            bert_basic = bert_basic_raw
+            bert_graph = bert_graph_raw
             
-            # Update individual query results with BERTScore
+            # Update individual query results with per-query BERTScore
             for i, r in enumerate(results):
-                if i < len(llm_answers_for_bert):
-                    r.llm_bert_f1 = round(bert_llm.get("f1", 0.0), 4)
-                    r.llm_bert_f1_raw = round(bert_llm.get("f1_raw", 0.0), 4)
-                if i < len(basic_answers_for_bert):
-                    r.basic_bert_f1 = round(bert_basic.get("f1", 0.0), 4)
-                    r.basic_bert_f1_raw = round(bert_basic.get("f1_raw", 0.0), 4)
-                if i < len(graph_answers_for_bert):
-                    r.graph_bert_f1 = round(bert_graph.get("f1", 0.0), 4)
-                    r.graph_bert_f1_raw = round(bert_graph.get("f1_raw", 0.0), 4)
+                if i < len(bert_llm.get("per_query", [])):
+                    r.llm_bert_f1 = round(bert_llm["per_query"][i], 4)
+                if i < len(bert_basic.get("per_query", [])):
+                    r.basic_bert_f1 = round(bert_basic["per_query"][i], 4)
+                if i < len(bert_graph.get("per_query", [])):
+                    r.graph_bert_f1 = round(bert_graph["per_query"][i], 4)
+
+            # Print per-query BERTScore table
+            print("\n  ─── BERTScore F1 (per query) ───")
+            print(f"  {'Q':>3} | {'LLM':>6} | {'Basic':>6} | {'Graph':>6}")
+            print(f"  {'─'*3}─┼─{'─'*6}─┼─{'─'*6}─┼─{'─'*6}")
+            for i, r in enumerate(results):
+                if r.ground_truth:
+                    print(f"  {i+1:>3} | {r.llm_bert_f1:>6.3f} | {r.basic_bert_f1:>6.3f} | {r.graph_bert_f1:>6.3f}")
 
         n = len(results)
         summary = BenchmarkSummary(
@@ -317,6 +362,10 @@ class BenchmarkRunner:
             llm_judge_pass_rate_graph=round(
                 sum(1 for r in results if r.graph_judge_pass) / n * 100, 1
             ),
+            graph_tigergraph_used_count=sum(1 for r in results if r.graph_used_tigergraph),
+            graph_tigergraph_used_pct=round(
+                sum(1 for r in results if r.graph_used_tigergraph) / n * 100, 1
+            ),
         )
 
         self._save_results(results, summary)
@@ -334,7 +383,7 @@ class BenchmarkRunner:
         json_path = self.output_dir / f"benchmark_{ts}.json"
         with open(json_path, "w") as f:
             json.dump(out, f, indent=2)
-        logger.info(f"📄 Results saved: {json_path}")
+        logger.info(f"[FILE] Results saved: {json_path}")
 
         # Also generate HTML report
         try:
@@ -346,9 +395,15 @@ class BenchmarkRunner:
             logger.warning(f"HTML report generation failed (non-critical): {e}")
 
     def _print_summary(self, s: BenchmarkSummary):
+        import subprocess
+        try:
+            commit = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], text=True).strip()
+        except Exception:
+            commit = "unknown"
         print(f"""
 ╔══════════════════════════════════════════════════════════╗
-║           BENCHMARK RESULTS — GraphRAG vs Basic RAG      ║
+║      GraphRAG BENCHMARK — TokenNinja                    ║
+║      Commit: {commit:<49s}║
 ╠══════════════════════════════════════════════════════════╣
 ║  Queries evaluated: {s.total_queries:<38d}║
 ╠══════════════════════════════════════════════════════════╣
@@ -378,6 +433,10 @@ class BenchmarkRunner:
 ╠══════════════════════════════════════════════════════════╣
 ║  GraphRAG wins (judge):  {s.graph_wins_pct:<33.1f}%║
 ║  Judge pass rate (≥7):   {s.llm_judge_pass_rate_graph:<33.1f}%║
+╠══════════════════════════════════════════════════════════╣
+║  PROVENANCE (did the answer come from TigerGraph?)       ║
+║    Answered via TigerGraph: {s.graph_tigergraph_used_count:>3d}/{s.total_queries:<3d} queries{' ':<15}║
+║    TigerGraph usage rate:  {s.graph_tigergraph_used_pct:<31.1f}%║
 ╚══════════════════════════════════════════════════════════╝
 """)
 

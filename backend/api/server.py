@@ -56,14 +56,14 @@ state = AppState()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Initialize pipelines on-demand (lazy loading for free tier)."""
-    logger.info("🚀 GraphRAG server starting (Free Tier Mode - lazy loading)...")
+    logger.info("[START] GraphRAG server starting (Free Tier Mode - lazy loading)...")
     
     # Don't load models at startup to save memory
     # They'll be loaded on first request
     state.initialized = True
-    logger.info("✅ Ready to serve (models loaded on-demand)")
+    logger.info("[OK] Ready to serve (models loaded on-demand)")
     yield
-    logger.info("👋 Shutting down...")
+    logger.info("[WAVE] Shutting down...")
 
 
 app = FastAPI(
@@ -138,23 +138,23 @@ def init_pipelines_if_needed():
     logger.info("⏳ Initializing pipelines on first request...")
     try:
         state.llm_only = LLMOnly()
-        logger.info("✅ LLM-Only pipeline ready")
+        logger.info("[OK] LLM-Only pipeline ready")
     except Exception as e:
-        logger.warning(f"⚠️  LLM-Only pipeline failed: {e}")
+        logger.warning(f"[WARN]  LLM-Only pipeline failed: {e}")
     
     try:
         state.basic_rag = BasicRAG()
-        logger.info("✅ Basic RAG pipeline ready")
+        logger.info("[OK] Basic RAG pipeline ready")
     except Exception as e:
-        logger.warning(f"⚠️  Basic RAG pipeline failed: {e}")
+        logger.warning(f"[WARN]  Basic RAG pipeline failed: {e}")
     
     try:
         state.tg_client = TigerGraphClient()
         state.tg_client.connect()
         state.graph_rag = GraphRAG(state.tg_client)
-        logger.info("✅ GraphRAG pipeline ready")
+        logger.info("[OK] GraphRAG pipeline ready")
     except Exception as e:
-        logger.warning(f"⚠️  GraphRAG unavailable: {e}")
+        logger.warning(f"[WARN]  GraphRAG unavailable: {e}")
         state.graph_rag = None
 
 
@@ -366,7 +366,7 @@ FRONTEND_ASSETS_PATH = FRONTEND_BUILD_PATH / "assets"
 # Only mount assets if they exist
 if FRONTEND_ASSETS_PATH.exists():
     app.mount("/assets", StaticFiles(directory=FRONTEND_ASSETS_PATH), name="assets")
-    logger.info(f"✅ Mounted assets from {FRONTEND_ASSETS_PATH}")
+    logger.info(f"[OK] Mounted assets from {FRONTEND_ASSETS_PATH}")
 
 if FRONTEND_BUILD_PATH.exists() and (FRONTEND_BUILD_PATH / "index.html").exists():
     @app.get("/")
@@ -381,9 +381,9 @@ if FRONTEND_BUILD_PATH.exists() and (FRONTEND_BUILD_PATH / "index.html").exists(
             raise HTTPException(404)
         return FileResponse(str(FRONTEND_BUILD_PATH / "index.html"))
     
-    logger.info(f"✅ Frontend served from {FRONTEND_BUILD_PATH}")
+    logger.info(f"[OK] Frontend served from {FRONTEND_BUILD_PATH}")
 else:
-    logger.warning(f"⚠️ Frontend build not found at: {FRONTEND_BUILD_PATH}")
+    logger.warning(f"[WARN] Frontend build not found at: {FRONTEND_BUILD_PATH}")
     
     @app.get("/")
     async def root():

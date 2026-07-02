@@ -10,7 +10,7 @@ from pathlib import Path
 from dataclasses import dataclass
 from dotenv import load_dotenv
 
-from ..llm.gemini_client import gemini_generate
+from ..llm.gemini_client import gemini_generate, MAX_OUTPUT_TOKENS, CONCISE_ANSWER_INSTRUCTION
 
 load_dotenv(Path(__file__).parent.parent.parent / ".env", override=True)
 logger = logging.getLogger(__name__)
@@ -23,6 +23,7 @@ class LLMOnlyResult:
     completion_tokens: int
     total_tokens: int
     latency_ms: float
+    context_tokens: int = 0  # no retrieval → zero context
     method: str = "llm_only"
 
 
@@ -41,16 +42,15 @@ class LLMOnly:
         t0 = time.time()
 
         system_prompt = (
-            "You are a knowledgeable assistant. Answer the following question "
-            "as accurately and thoroughly as possible using your training knowledge. "
-            "Provide specific details, examples, and explanations."
+            "You are a knowledgeable assistant. Answer the question using your "
+            "training knowledge. " + CONCISE_ANSWER_INSTRUCTION
         )
 
         result = gemini_generate(
             system_prompt=system_prompt,
             user_prompt=question,
             temperature=0.1,
-            max_tokens=300,
+            max_tokens=MAX_OUTPUT_TOKENS,  # shared cap — equal across all 3 pipelines
         )
 
         latency_ms = (time.time() - t0) * 1000
@@ -61,4 +61,5 @@ class LLMOnly:
             completion_tokens=result["completion_tokens"],
             total_tokens=result["total_tokens"],
             latency_ms=latency_ms,
+            context_tokens=0,  # LLM-only feeds no retrieved context
         )

@@ -7,6 +7,16 @@ Just cosine similarity over document chunks.
 """
 
 import os
+
+# Force HuggingFace transformers to use the PyTorch backend only. Without this,
+# transformers eagerly imports TensorFlow, which fails on this machine with a
+# protobuf mismatch ("cannot import name 'runtime_version'") — breaking
+# sentence-transformers and silently falling back to zero embeddings. Must be
+# set before transformers is imported anywhere.
+os.environ.setdefault("USE_TF", "0")
+os.environ.setdefault("USE_TORCH", "1")
+os.environ.setdefault("TRANSFORMERS_NO_ADVISORY_WARNINGS", "1")
+
 import time
 import logging
 from pathlib import Path
@@ -15,7 +25,12 @@ import numpy as np
 import faiss
 from dotenv import load_dotenv
 
-from ..llm.gemini_client import gemini_generate
+from ..llm.gemini_client import (
+    gemini_generate,
+    MAX_OUTPUT_TOKENS,
+    CONCISE_ANSWER_INSTRUCTION,
+    count_context_tokens,
+)
 
 # Load .env from project root
 load_dotenv(Path(__file__).parent.parent.parent / ".env", override=True)
@@ -28,6 +43,32 @@ EMBEDDING_DIM = 384  # sentence-transformers all-MiniLM-L6-v2
 _sentence_transformer = None
 USE_SENTENCE_TRANSFORMERS = (os.getenv("USE_SENTENCE_TRANSFORMERS", "true") or "true").lower().strip() == "true"
 
+# Corpus directory (relative to project root). Defaults to the full arXiv bulk dataset.
+RAG_DATA_DIR = (os.getenv("RAG_DATA_DIR", "data/arxiv_bulk") or "data/arxiv_bulk").strip()
+
+
+def _assert_real_embeddings(vectors: np.ndarray) -> None:
+    """Abort loudly if embeddings are degenerate (all-zero rows).
+
+    The embedding stack silently falls back to zero vectors when neither OpenAI
+    nor sentence-transformers is usable (e.g. torch fails to import). A FAISS
+    index of zero vectors is useless — every similarity is identical — so we
+    refuse to build/save it rather than waste a long ingest run.
+    """
+    if vectors.size == 0:
+        raise RuntimeError("No embeddings produced — refusing to build an empty index.")
+
+    zero_rows = int(np.count_nonzero(np.abs(vectors).sum(axis=1) == 0))
+    if zero_rows == len(vectors):
+        raise RuntimeError(
+            f"All {len(vectors)} embeddings are zero vectors. The embedding backend "
+            "failed silently (OpenAI key missing AND sentence-transformers/torch not "
+            "importable). Fix the embedder, then re-run — refusing to write a useless "
+            "zero-vector index."
+        )
+    if zero_rows:
+        logger.warning(f"[WARN]  {zero_rows}/{len(vectors)} embeddings are zero vectors (some chunks failed to embed).")
+
 
 # Gemini calls go through shared gemini_client.gemini_generate()
 
@@ -39,9 +80,13 @@ def _get_sentence_transformer():
         try:
             from sentence_transformers import SentenceTransformer
             _sentence_transformer = SentenceTransformer("all-MiniLM-L6-v2")
-            logger.info("✅ Loaded sentence-transformers for local embeddings (384 dims)")
-        except ImportError:
-            logger.warning("sentence-transformers not installed. Install with: pip install sentence-transformers")
+            logger.info("[OK] Loaded sentence-transformers for local embeddings (384 dims)")
+        except ImportError as e:
+            logger.warning(f"sentence-transformers unavailable (import failed): {e}. "
+                           "Install with: pip install sentence-transformers")
+            _sentence_transformer = False
+        except Exception as e:
+            logger.warning(f"sentence-transformers failed to load the model: {e}")
             _sentence_transformer = False
     return _sentence_transformer if _sentence_transformer else None
 
@@ -54,6 +99,7 @@ class RAGResult:
     completion_tokens: int
     total_tokens: int
     latency_ms: float
+    context_tokens: int = 0  # tokens of retrieved chunk context fed to the LLM
     method: str = "basic_rag"
 
 
@@ -69,18 +115,18 @@ class BasicRAG:
     No structural understanding of relationships.
     """
 
-    def __init__(self):
+    def __init__(self, auto_build: bool = True):
         self.index = faiss.IndexFlatIP(EMBEDDING_DIM)  # Inner product = cosine similarity
         self.chunks: list[str] = []
         self.chunk_metadata: list[dict] = []
-        
+
         # Try to load pre-built FAISS index from disk
         # Use absolute path: work up from this file → backend → graphrag-hackathon → data
         faiss_path = Path(__file__).resolve().parent.parent.parent / "data" / "faiss_index.pkl"
-        
+
         logger.info(f"Attempting to load FAISS index from: {faiss_path}")
         logger.info(f"Path exists: {faiss_path.exists()}")
-        
+
         if faiss_path.exists():
             try:
                 import pickle
@@ -89,82 +135,70 @@ class BasicRAG:
                     self.index = data["index"]
                     self.chunks = data["chunks"]
                     self.chunk_metadata = data.get("metadata", [])
-                logger.info(f"✅ Loaded FAISS index from {faiss_path} ({len(self.chunks)} chunks, {self.index.ntotal} vectors)")
+                logger.info(f"[OK] Loaded FAISS index from {faiss_path} ({len(self.chunks)} chunks, {self.index.ntotal} vectors)")
             except Exception as e:
-                logger.error(f"❌ Failed to load FAISS index: {e}", exc_info=True)
-                # Fall through to build from sample docs
-                self._build_index_from_sample_docs()
-        else:
-            logger.warning(f"⚠️  FAISS index not found at {faiss_path}. Building from sample documents...")
+                logger.error(f"[ERR] Failed to load FAISS index: {e}", exc_info=True)
+                # Fall through to build from the corpus
+                if auto_build:
+                    self._build_index_from_sample_docs()
+        elif auto_build:
+            logger.warning(f"[WARN]  FAISS index not found at {faiss_path}. Building from corpus...")
             self._build_index_from_sample_docs()
 
     def _build_index_from_sample_docs(self):
-        """Dynamically build FAISS index from sample documents with semantic chunking"""
-        sample_docs_dir = Path(__file__).resolve().parent.parent.parent / "data" / "sample_docs"
-        
+        """Dynamically build FAISS index from the corpus with token-aware chunking."""
+        # Reuse the same robust, format-agnostic chunker used by the ingestion
+        # pipeline so .txt papers (no markdown headers) chunk correctly.
+        from ..graph.ingestion import chunk_text
+
+        project_root = Path(__file__).resolve().parent.parent.parent
+        sample_docs_dir = project_root / RAG_DATA_DIR
+
         if not sample_docs_dir.exists():
-            logger.warning(f"Sample docs directory not found at {sample_docs_dir}")
+            logger.warning(f"Corpus directory not found at {sample_docs_dir}")
             return
-        
+
         # Load all .md and .txt files
         doc_files = list(sample_docs_dir.glob("*.md")) + list(sample_docs_dir.glob("*.txt"))
         if not doc_files:
             logger.warning(f"No documents found in {sample_docs_dir}")
             return
-        
+
         logger.info(f"Loading {len(doc_files)} documents from {sample_docs_dir}...")
-        
+
         for doc_file in doc_files:
             try:
                 with open(doc_file, "r", encoding="utf-8", errors="ignore") as f:
                     content = f.read()
-                
-                # Semantic chunking: split by sections and paragraphs
-                sections = content.split("##")
-                for section_idx, section in enumerate(sections):
-                    # Split each section into paragraphs
-                    paragraphs = section.split("\n\n")
-                    
-                    # Group smaller paragraphs together, keep larger ones separate
-                    current_chunk = ""
-                    for para in paragraphs:
-                        para = para.strip()
-                        if not para:
-                            continue
-                        
-                        if len(current_chunk) + len(para) < 1000:  # Combine paragraphs up to 1000 chars
-                            if current_chunk:
-                                current_chunk += "\n\n"
-                            current_chunk += para
-                        else:
-                            if current_chunk:
-                                self.chunks.append(current_chunk)
-                                self.chunk_metadata.append({
-                                    "source": doc_file.name,
-                                    "section": section_idx,
-                                })
-                            current_chunk = para
-                    
-                    if current_chunk:
-                        self.chunks.append(current_chunk)
-                        self.chunk_metadata.append({
-                            "source": doc_file.name,
-                            "section": section_idx,
-                        })
-                
-                logger.info(f"  ✅ Loaded {doc_file.name} ({len(content)} chars → {len([c for c in self.chunks if c.split('###')[0].startswith(doc_file.name.split('.')[0][:20])])} semantic chunks)")
+
+                if not content.strip():
+                    continue
+
+                # Token-aware chunking with overlap (works for .md and plain .txt)
+                chunks = [c.strip() for c in chunk_text(content) if c.strip()]
+                for chunk_idx, chunk in enumerate(chunks):
+                    self.chunks.append(chunk)
+                    self.chunk_metadata.append({
+                        "source": doc_file.name,
+                        "chunk": chunk_idx,
+                    })
             except Exception as e:
                 logger.warning(f"Failed to load {doc_file.name}: {e}")
-        
+
+        logger.info(f"[FILE] Chunked {len(doc_files)} documents into {len(self.chunks)} chunks")
+
         # Embed all chunks
         if self.chunks:
             try:
                 logger.info(f"Embedding {len(self.chunks)} chunks...")
                 embeddings = self._embed_batch(self.chunks)
                 vectors = np.array(embeddings, dtype="float32")
+                _assert_real_embeddings(vectors)
                 faiss.normalize_L2(vectors)
                 self.index.add(vectors)
-                logger.info(f"✅ Built FAISS index with {self.index.ntotal} vectors from {len(self.chunks)} chunks")
+                logger.info(f"[OK] Built FAISS index with {self.index.ntotal} vectors from {len(self.chunks)} chunks")
+            except RuntimeError:
+                raise  # zero-vector guard — abort loudly, do not swallow
             except Exception as e:
                 logger.error(f"Failed to embed chunks: {e}")
                 self.chunks = []  # Clear on failure
@@ -178,6 +212,7 @@ class BasicRAG:
         logger.info(f"Embedding {len(chunks)} chunks for FAISS index...")
         embeddings = self._embed_batch(chunks)
         vectors = np.array(embeddings, dtype="float32")
+        _assert_real_embeddings(vectors)
         # Normalize for cosine similarity
         faiss.normalize_L2(vectors)
         self.index.add(vectors)
@@ -209,39 +244,39 @@ class BasicRAG:
             try:
                 distances, indices = self.index.search(query_vec, min(top_k, self.index.ntotal))
                 retrieved = [self.chunks[i] for i in indices[0] if i < len(self.chunks)]
-                logger.info(f"✅ Retrieved {len(retrieved)} chunks from FAISS (ntotal: {self.index.ntotal})")
+                logger.info(f"[OK] Retrieved {len(retrieved)} chunks from FAISS (ntotal: {self.index.ntotal})")
             except Exception as e:
                 logger.error(f"FAISS search failed: {e}. Falling back to first chunks.")
                 retrieved = self.chunks[:top_k]
         elif self.chunks:
             # Fallback: return first K chunks if embedding/search fails
-            logger.warning(f"⚠️ Embedding or index unavailable. Using first {top_k} chunks as fallback.")
+            logger.warning(f"[WARN] Embedding or index unavailable. Using first {top_k} chunks as fallback.")
             retrieved = self.chunks[:top_k]
         else:
             retrieved = ["[No documents available. Please ingest documents first.]"]
 
         # 3. Build context (this is where tokens pile up)
         context = "\n\n---\n\n".join(retrieved)
+        context_tokens = count_context_tokens(context)
 
         # 4. Build prompt
         system_prompt = (
-            "You are an expert assistant. Use the provided context when available. "
-            "If context is insufficient, leverage your knowledge to provide a helpful answer. "
-            "Always prioritize context when it's available."
+            "You are an expert assistant. Use the provided context when available; "
+            "otherwise use your knowledge. " + CONCISE_ANSWER_INSTRUCTION
         )
         user_prompt = f"""Context from documents:
 {context}
 
 Question: {question}
 
-Provide a comprehensive answer using the context if available, or general knowledge:"""
+Answer:"""
 
         # 5. Call Gemini via shared client (accurate token counts)
         result = gemini_generate(
             system_prompt=system_prompt,
             user_prompt=user_prompt,
             temperature=0.1,
-            max_tokens=1000,
+            max_tokens=MAX_OUTPUT_TOKENS,  # shared cap — equal across all 3 pipelines
         )
 
         latency_ms = (time.time() - t0) * 1000
@@ -253,6 +288,7 @@ Provide a comprehensive answer using the context if available, or general knowle
             completion_tokens=result["completion_tokens"],
             total_tokens=result["total_tokens"],
             latency_ms=latency_ms,
+            context_tokens=context_tokens,
             method="basic_rag",
         )
 
@@ -318,8 +354,9 @@ Provide a comprehensive answer using the context if available, or general knowle
         return [[0.0] * 384 for _ in texts]
 
     def count_tokens(self, text: str) -> int:
-        from ..llm.gemini_client import count_tokens_gemini
-        return count_tokens_gemini(text)
+        # Use tiktoken locally (no API call needed)
+        from ..llm.gemini_client import count_context_tokens
+        return count_context_tokens(text)
 
     def get_index_stats(self) -> dict:
         return {
@@ -327,3 +364,4 @@ Provide a comprehensive answer using the context if available, or general knowle
             "index_size": self.index.ntotal,
             "embedding_dim": EMBEDDING_DIM,
         }
+        

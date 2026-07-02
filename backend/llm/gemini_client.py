@@ -14,6 +14,20 @@ logger = logging.getLogger(__name__)
 _client = None
 GEMINI_MODEL_NAME = (os.getenv("GEMINI_MODEL", "gemini-2.5-flash") or "").strip()
 
+# Shared output cap for ALL three pipelines (llm_only, basic_rag, graph_rag).
+# Keeping a single source of truth guarantees the comparison is fair — every
+# pipeline generates under the identical max_output_tokens ceiling.
+MAX_OUTPUT_TOKENS = int((os.getenv("MAX_OUTPUT_TOKENS", "1000") or "1000").strip())
+
+# Shared answer-length policy applied IDENTICALLY to all three pipelines. A
+# uniform conciseness instruction is fair (no pipeline is singled out) and keeps
+# completion tokens small and equal across pipelines — so the headline token
+# reduction reflects the real difference: how much CONTEXT each pipeline feeds
+# the model, not how long its answers are.
+CONCISE_ANSWER_INSTRUCTION = (
+    "Answer concisely in 2-4 sentences. Be direct and factual; do not pad the response."
+)
+
 
 def _get_client():
     """Lazily initialize Genai client."""
@@ -88,7 +102,7 @@ def gemini_generate(
             data = json.loads(response.text)
             bullets = data.get("bullets", [])[:3]
             answer = '\n'.join([f"• {b}" for b in bullets])
-            logger.info(f"✅ JSON schema parsed: {len(bullets)} bullets")
+            logger.info(f"[OK] JSON schema parsed: {len(bullets)} bullets")
         except:
             # Fallback: extract bullet points using regex
             try:
@@ -97,13 +111,13 @@ def gemini_generate(
                 if matches:
                     bullets = matches[:3]
                     answer = '\n'.join([f"• {b}" for b in bullets])
-                    logger.info(f"✅ Extracted {len(bullets)} bullets from JSON")
+                    logger.info(f"[OK] Extracted {len(bullets)} bullets from JSON")
                 else:
                     answer = response.text
-                    logger.warning(f"⚠️ Could not parse JSON schema, using raw: {response.text[:100]}")
+                    logger.warning(f"[WARN] Could not parse JSON schema, using raw: {response.text[:100]}")
             except:
                 answer = response.text
-                logger.error(f"❌ All parsing failed, raw response: {response.text[:200]}")
+                logger.error(f"[ERR] All parsing failed, raw response: {response.text[:200]}")
 
     return {
         "answer": answer,
@@ -118,3 +132,30 @@ def count_tokens_gemini(text: str) -> int:
     client = _get_client()
     result = client.models.count_tokens(model=GEMINI_MODEL_NAME, contents=text)
     return result.total_tokens
+
+
+_context_encoder = None
+
+
+def count_context_tokens(text: str) -> int:
+    """Count the tokens of a retrieved-context string.
+
+    Uses one local tokenizer (tiktoken cl100k_base) applied IDENTICALLY to every
+    pipeline's context, so "context-token reduction" is an apples-to-apples
+    metric — and costs zero API calls. It is an approximation of Gemini's
+    tokenizer, but because the same counter is used everywhere the *relative*
+    reduction across pipelines is valid.
+    """
+    if not text:
+        return 0
+    global _context_encoder
+    if _context_encoder is None:
+        try:
+            import tiktoken
+            _context_encoder = tiktoken.get_encoding("cl100k_base")
+        except Exception:
+            _context_encoder = False
+    if _context_encoder:
+        return len(_context_encoder.encode(text))
+    # crude fallback if tiktoken is unavailable: ~4 chars per token
+    return max(1, len(text) // 4)

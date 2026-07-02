@@ -11,11 +11,11 @@ import logging
 from pathlib import Path
 from typing import Iterator
 import tiktoken
-from groq import Groq
 from tqdm import tqdm
 from dotenv import load_dotenv
 
 from .tigergraph_client import TigerGraphClient
+from ..llm.gemini_client import gemini_generate
 
 # Load .env from project root
 load_dotenv(Path(__file__).parent.parent.parent / ".env", override=True)
@@ -24,22 +24,9 @@ logger = logging.getLogger(__name__)
 CHUNK_SIZE = int(os.getenv("CHUNK_SIZE", 512))
 CHUNK_OVERLAP = int(os.getenv("CHUNK_OVERLAP", 64))
 EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "text-embedding-3-small")
-LLM_MODEL = os.getenv("LLM_MODEL", "llama-3.3-70b-versatile")
 
-_groq_client = None
 _sentence_transformer = None
 encoder = tiktoken.get_encoding("cl100k_base")
-
-
-def _get_groq_client():
-    """Lazily initialize Groq client to ensure .env is loaded."""
-    global _groq_client
-    if _groq_client is None:
-        api_key = os.getenv("GROQ_API_KEY")
-        if not api_key:
-            raise ValueError("GROQ_API_KEY not found in environment. Check your .env file.")
-        _groq_client = Groq(api_key=api_key)
-    return _groq_client
 
 
 def _get_sentence_transformer():
@@ -49,7 +36,7 @@ def _get_sentence_transformer():
         try:
             from sentence_transformers import SentenceTransformer
             _sentence_transformer = SentenceTransformer("all-MiniLM-L6-v2")
-            logger.info("✅ Loaded sentence-transformers for local embeddings (384 dims)")
+            logger.info("[OK] Loaded sentence-transformers for local embeddings (384 dims)")
         except ImportError:
             logger.warning("sentence-transformers not installed")
             _sentence_transformer = False
@@ -146,19 +133,15 @@ def _filter_generic_entity(name: str) -> bool:
 
 
 def extract_entities_and_relations(chunk: str) -> dict:
-    """Use LLM to extract domain-specific entities and relationships from a text chunk."""
+    """Use Gemini to extract domain-specific entities and relationships from a text chunk."""
     try:
-        client = _get_groq_client()
-        response = client.chat.completions.create(
-            model=LLM_MODEL,
-            messages=[
-                {"role": "system", "content": "You are a Machine Learning knowledge graph extraction engine. Extract ONLY domain-specific entities. Output only valid JSON, no markdown, no code blocks."},
-                {"role": "user", "content": ENTITY_EXTRACTION_PROMPT + chunk}
-            ],
+        response = gemini_generate(
+            system_prompt="You are a Machine Learning knowledge graph extraction engine. Extract ONLY domain-specific entities. Output only valid JSON, no markdown, no code blocks.",
+            user_prompt=ENTITY_EXTRACTION_PROMPT + chunk,
             temperature=0,
             max_tokens=3000,
         )
-        raw = response.choices[0].message.content.strip()
+        raw = response["answer"].strip()
         
         # Clean markdown code blocks if present
         if raw.startswith("```"):
@@ -358,7 +341,7 @@ class DocumentIngestionPipeline:
             self.stats["chunks_created"] += 1
 
         self.stats["docs_processed"] += 1
-        logger.info(f"  ✅ Ingested '{title}' — {len(all_entity_names)} unique entities")
+        logger.info(f"  [OK] Ingested '{title}' — {len(all_entity_names)} unique entities")
 
     def _make_entity_id(self, name: str) -> str:
         """Normalize entity name to a stable ID."""

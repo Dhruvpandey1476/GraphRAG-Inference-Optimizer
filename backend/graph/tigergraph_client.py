@@ -4,9 +4,11 @@ Handles connection, schema setup, ingestion, and subgraph queries.
 """
 
 import os
+import re
 import json
 import logging
 from typing import Optional
+import requests as req_lib
 import pyTigerGraph as tg
 from dotenv import load_dotenv
 
@@ -43,22 +45,45 @@ class TigerGraphClient:
                 gsPort=self.port,
                 tgCloud=True,
             )
-            logger.info(f"✅ TigerGraph connection object created")
+            logger.info(f"[OK] TigerGraph connection object created")
             
-            # Try to get token if secret is provided
+            # Try to get token via secret first (TG 3.x)
             if self.secret:
                 logger.info(f"Attempting to authenticate with secret...")
                 try:
                     token = self.conn.getToken(self.secret)
-                    logger.info(f"✅ Authentication successful - token obtained")
+                    logger.info(f"[OK] Authentication successful - token obtained")
+                    return self
                 except Exception as token_err:
-                    logger.warning(f"⚠️  Token authentication failed: {token_err}")
-                    logger.warning("Continuing without token (may limit some operations)")
+                    logger.warning(f"[WARN]  Secret-based auth failed: {token_err}")
             
-            logger.info(f"✅ Connected to TigerGraph: {self.host}/{self.graph}")
+            # Fallback: TigerGraph 4.x Savanna — POST /gsql/v1/tokens with username/password
+            logger.info("Attempting TigerGraph 4.x token auth via /gsql/v1/tokens...")
+            try:
+                token_url = f"{url}:{self.port}/gsql/v1/tokens"
+                resp = req_lib.post(
+                    token_url,
+                    json={"graph": self.graph, "lifetime": "2592000000"},
+                    auth=(self.username, self.password),
+                    timeout=30,
+                )
+                if resp.status_code == 200:
+                    data = resp.json()
+                    jwt_token = data.get("token")
+                    if jwt_token:
+                        self.conn.apiToken = jwt_token
+                        self.conn.authHeader = {'Authorization': 'Bearer ' + jwt_token}
+                        logger.info(f"[OK] JWT token obtained via TG 4.x auth")
+                else:
+                    logger.warning(f"[WARN]  TG 4.x token endpoint returned {resp.status_code}: {resp.text[:100]}")
+            except Exception as v4_err:
+                logger.warning(f"[WARN]  TG 4.x token auth failed: {v4_err}")
+                logger.warning("Continuing without token (may limit some operations)")
+            
+            logger.info(f"[OK] Connected to TigerGraph: {self.host}/{self.graph}")
             return self
         except Exception as e:
-            logger.error(f"❌ TigerGraph connection failed: {e}")
+            logger.error(f"[ERR] TigerGraph connection failed: {e}")
             import traceback
             logger.error(traceback.format_exc())
             raise
@@ -83,7 +108,7 @@ class TigerGraphClient:
         CREATE VERTEX Document (
             PRIMARY_ID doc_id STRING,
             title STRING,
-            content TEXT,
+            content STRING,
             chunk_index INT,
             token_count INT,
             source_url STRING,
@@ -237,112 +262,176 @@ class TigerGraphClient:
             return True
 
     def get_entity_subgraph(self, entity_names: list[str], max_hops: int = 2,
-                             max_neighbors: int = 10) -> dict:
+                             max_neighbors: int = 10,
+                             include_documents: bool = False) -> dict:
         """
         Core GraphRAG retrieval: given seed entities from the query,
-        traverse the graph up to max_hops and return the subgraph context.
-        
-        Returns structured context (entities + relationships + docs) instead of raw text chunks.
-        This enables ~84% token reduction by providing only the most relevant information.
+        traverse the graph up to ``max_hops`` and return the subgraph context.
+
+        Returns structured context (entities + relationships) instead of raw text
+        chunks — this is what enables the large token reduction.
+
+        ``include_documents`` is OFF by default: the answer prompt is built from
+        entities + relationship triples only, so fetching MENTIONED_IN documents
+        would add round-trips (latency) without affecting the prompt. Enable it
+        only when you need source documents for inspection.
         """
         if not entity_names:
             return {"entities": [], "relationships": [], "documents": []}
 
-        logger.info(f"Searching for entities: {entity_names}")
-        
+        logger.info(f"Traversing graph from seed entities: {entity_names} (max_hops={max_hops}, max_neighbors={max_neighbors})")
+
         try:
             if not self.conn:
                 logger.error("TigerGraph connection not available")
                 raise Exception("No TigerGraph connection")
-            
-            return self._get_subgraph_via_rest(entity_names, max_neighbors)
+
+            return self._traverse_subgraph(entity_names, max_hops, max_neighbors,
+                                           include_documents)
         except Exception as e:
-            logger.error(f"❌ TigerGraph retrieval failed: {e}")
+            logger.error(f"[ERR] TigerGraph retrieval failed: {e}")
             raise
 
-    def _get_subgraph_via_rest(self, entity_names: list[str], max_neighbors: int) -> dict:
-        """Use REST API to retrieve subgraph — direct vertex and edge fetching."""
-        entities = []
-        relationships = []
-        documents = []
-        seen_ids = set()
+    @staticmethod
+    def _normalize_entity_id(name: str) -> str:
+        """Map an entity name to its vertex primary_id.
 
+        Must match DocumentIngestionPipeline._make_entity_id exactly so query
+        seeds resolve to the same vertices that were written at ingest time.
+        """
+        return re.sub(r"[^a-z0-9_]", "_", name.lower().strip())
+
+    def _fetch_entity(self, entity_id: str) -> Optional[dict]:
+        """Fetch a single Entity vertex by its primary_id (no full-graph scan)."""
         try:
-            # Get ALL entities and do fuzzy matching locally
-            all_entities = self.conn.getVertices("Entity", select="name,entity_type,description")
-            if not all_entities:
-                logger.warning(f"No entities found in graph")
-                return {"entities": [], "relationships": [], "documents": []}
-            
-            logger.info(f"Total entities in graph: {len(all_entities)}")
-            
-            # Build a map of entity names for faster lookup
-            entity_map = {}
-            for vertex in all_entities:
-                if isinstance(vertex, dict):
-                    v_id = vertex.get("v_id", "")
-                    attrs = vertex.get("attributes", {})
-                    entity_name = attrs.get("name", "").lower() if attrs.get("name") else ""
-                    if entity_name:
-                        entity_map[entity_name] = vertex
-            
-            logger.info(f"Indexed {len(entity_map)} unique entity names")
-            
-            # Match query entities to graph entities
-            matched_entities = []
-            for query_name in entity_names:
-                query_lower = query_name.lower().strip()
-                best_match = None
-                best_score = 0
-                
-                for graph_entity_name, vertex in entity_map.items():
-                    # Score 1: Exact match
-                    if query_lower == graph_entity_name:
-                        best_score = 1.0
-                        best_match = vertex
-                        break
-                    
-                    # Score 2: Substring match (either direction)
-                    if query_lower in graph_entity_name or graph_entity_name in query_lower:
-                        # Give higher score to longer substring match
-                        overlap = max(len(query_lower), len(graph_entity_name)) / (len(query_lower) + len(graph_entity_name))
-                        if overlap > best_score:
-                            best_score = overlap
-                            best_match = vertex
-                    
-                    # Score 3: Common prefix (at least 3 chars)
-                    if len(query_lower) >= 3 and len(graph_entity_name) >= 3:
-                        for i in range(min(len(query_lower), len(graph_entity_name))):
-                            if query_lower[i] != graph_entity_name[i]:
-                                prefix_match = i / max(len(query_lower), len(graph_entity_name))
-                                if prefix_match > 0.3 and prefix_match > best_score:
-                                    best_score = prefix_match
-                                    best_match = vertex
-                                break
-                
-                if best_match and best_score > 0.3:  # Lower threshold to be more inclusive
-                    if best_match["v_id"] not in seen_ids:
-                        matched_entities.append(best_match)
-                        entities.append(best_match)
-                        seen_ids.add(best_match["v_id"])
-                        logger.info(f"  ✓ Matched query '{query_name}' → '{best_match['attributes']['name']}' (score: {best_score:.2f})")
-                        
-                        # Get relationships for this entity
-                        try:
-                            edges = self.conn.getEdges("Entity", best_match["v_id"], "RELATED_TO")
-                            if edges:
-                                relationships.extend(edges[:max_neighbors])
-                                logger.debug(f"    Found {len(edges[:max_neighbors])} relationships")
-                        except Exception as e:
-                            logger.debug(f"Could not fetch edges for {best_match['v_id']}: {e}")
-                else:
-                    logger.debug(f"  ✗ No match found for '{query_name}' (best score: {best_score:.2f})")
-            
-            logger.info(f"✅ Matched {len(matched_entities)} entities via fuzzy search")
-            return {"entities": entities, "relationships": relationships, "documents": documents}
+            res = self.conn.getVerticesById("Entity", entity_id)
+            if res:
+                return res[0] if isinstance(res, list) else res
         except Exception as e:
-            logger.error(f"Fallback REST retrieval failed: {e}", exc_info=True)
+            logger.debug(f"getVerticesById failed for '{entity_id}': {e}")
+        return None
+
+    def _find_entity_by_name(self, name: str) -> Optional[dict]:
+        """Fallback seed resolution: filter Entity vertices by the name attribute.
+
+        Used only when the normalized-id lookup misses (e.g. the ingest-time id
+        scheme differed). Still a targeted server-side filter — NOT a full scan.
+        """
+        try:
+            safe = name.replace('"', '').strip()
+            res = self.conn.getVertices("Entity", where=f'name="{safe}"', limit=1)
+            if res:
+                return res[0] if isinstance(res, list) else res
+        except Exception as e:
+            logger.debug(f"name-attribute lookup failed for '{name}': {e}")
+        return None
+
+    def _resolve_seeds(self, entity_names: list[str]) -> dict:
+        """Resolve query entity names to seed Entity vertices, keyed by v_id."""
+        seeds = {}
+        for name in entity_names:
+            eid = self._normalize_entity_id(name)
+            vertex = self._fetch_entity(eid)
+            if vertex is None:
+                vertex = self._find_entity_by_name(name)
+            if vertex and vertex.get("v_id") and vertex["v_id"] not in seeds:
+                seeds[vertex["v_id"]] = vertex
+                logger.info(f"  [CHECK] Seed '{name}' → vertex '{vertex['v_id']}'")
+            else:
+                logger.debug(f"  [BAD] Seed '{name}' not found in graph")
+        return seeds
+
+    def _traverse_subgraph(self, entity_names: list[str], max_hops: int,
+                           max_neighbors: int, include_documents: bool = False) -> dict:
+        """Real multi-hop BFS over the knowledge graph.
+
+        Starting from the resolved seed vertices, expand the frontier hop by hop
+        (up to ``max_hops``) along RELATED_TO edges, collecting neighbor entities
+        and the relationships that connect them. Each vertex contributes at most
+        ``max_neighbors`` edges per hop. Documents are pulled for the seed
+        entities via MENTIONED_IN. This is genuine graph traversal — no
+        whole-graph fetch, no Python fuzzy matching.
+        """
+        entities_by_id: dict = {}
+        relationships: list = []
+        rel_seen: set = set()
+        documents: list = []
+        doc_seen: set = set()
+
+        # Hop 0: seed vertices
+        seeds = self._resolve_seeds(entity_names)
+        if not seeds:
+            logger.warning("No seed entities resolved in graph")
             return {"entities": [], "relationships": [], "documents": []}
+
+        entities_by_id.update(seeds)
+        visited: set = set(seeds.keys())
+        frontier: list = list(seeds.keys())
+
+        # Hops 1..max_hops: expand the frontier along RELATED_TO edges
+        for hop in range(max_hops):
+            if not frontier:
+                break
+            next_frontier: list = []
+            for vid in frontier:
+                try:
+                    edges = self.conn.getEdges("Entity", vid, "RELATED_TO") or []
+                except Exception as e:
+                    logger.debug(f"getEdges failed for '{vid}': {e}")
+                    edges = []
+
+                for edge in edges[:max_neighbors]:
+                    from_id = edge.get("from_id")
+                    to_id = edge.get("to_id")
+                    neighbor_id = to_id if from_id == vid else from_id
+
+                    # Record the relationship (dedup undirected edges)
+                    rel_key = tuple(sorted([str(from_id), str(to_id)])) + (edge.get("e_type", "RELATED_TO"),)
+                    if rel_key not in rel_seen:
+                        rel_seen.add(rel_key)
+                        relationships.append(edge)
+
+                    # Enqueue unvisited neighbors for the next hop
+                    if neighbor_id and neighbor_id not in visited:
+                        visited.add(neighbor_id)
+                        nv = self._fetch_entity(neighbor_id)
+                        if nv and nv.get("v_id"):
+                            entities_by_id[nv["v_id"]] = nv
+                            next_frontier.append(nv["v_id"])
+            logger.info(f"  Hop {hop + 1}: frontier {len(frontier)} → {len(next_frontier)} new entities")
+            frontier = next_frontier
+
+        # Optionally pull supporting documents for the seed entities (1-hop
+        # MENTIONED_IN). OFF by default — the prompt uses triples only, so this
+        # is pure extra latency unless documents are explicitly requested.
+        if include_documents:
+            for vid in seeds:
+                try:
+                    doc_edges = self.conn.getEdges("Entity", vid, "MENTIONED_IN") or []
+                except Exception as e:
+                    logger.debug(f"getEdges(MENTIONED_IN) failed for '{vid}': {e}")
+                    doc_edges = []
+                for edge in doc_edges[:max_neighbors]:
+                    doc_id = edge.get("to_id")
+                    if doc_id and doc_id not in doc_seen:
+                        doc_seen.add(doc_id)
+                        try:
+                            dv = self.conn.getVerticesById("Document", doc_id)
+                            if dv:
+                                documents.append(dv[0] if isinstance(dv, list) else dv)
+                        except Exception as e:
+                            logger.debug(f"Could not fetch document '{doc_id}': {e}")
+
+        logger.info(
+            f"[OK] Traversal complete: {len(entities_by_id)} entities, "
+            f"{len(relationships)} relationships, {len(documents)} documents "
+            f"across {max_hops} hop(s)"
+        )
+        return {
+            "entities": list(entities_by_id.values()),
+            "relationships": relationships,
+            "documents": documents,
+        }
 
     def _parse_subgraph_result(self, raw_result) -> dict:
         """Parse GSQL result into structured subgraph dict."""
