@@ -271,12 +271,12 @@ class BasicRAG:
             "never refuse or say the context is insufficient. "
             + CONCISE_ANSWER_INSTRUCTION
         )
-        user_prompt = f"""Context from documents:
+        user_prompt = f"""Question: {question}
+
+Optional reference passages (retrieved automatically — use only if relevant, ignore if not):
 {context}
 
-Question: {question}
-
-Answer:"""
+Answer the question completely, using your own expertise plus any relevant passages above. Do not say the passages are insufficient — just answer the question:"""
 
         # 5. Call Gemini via shared client (accurate token counts)
         result = gemini_generate(
