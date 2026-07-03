@@ -307,8 +307,7 @@ class GraphRAG:
 
         if self.tg and entities:
             try:
-                subgraph = self.tg.get_entity_subgraph(entities, max_hops, max_neighbors,
-                                                        include_documents=True)
+                subgraph = self.tg.get_entity_subgraph(entities, max_hops, max_neighbors)
                 entity_count = len(subgraph.get("entities", []))
                 rel_count = len(subgraph.get("relationships", []))
                 logger.info(f"[OK] Retrieved {entity_count} entities, {rel_count} relationships from TigerGraph")
