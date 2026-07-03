@@ -302,7 +302,17 @@ class BenchmarkRunner:
         bert_basic = {"f1": 0.0, "f1_raw": 0.0, "per_query": []}
         bert_graph = {"f1": 0.0, "f1_raw": 0.0, "per_query": []}
         
+        # Persist core results NOW, before the heavy BERTScore step, so a
+        # completed (expensive) run is never lost if BERTScore crashes/OOMs.
+        try:
+            self._save_results(results, self._build_summary(results, dataset_name,
+                                bert_llm, bert_basic, bert_graph))
+            logger.info("[SAVE] Core results persisted before BERTScore.")
+        except Exception as e:
+            logger.warning(f"Pre-BERTScore save failed (non-fatal): {e}")
+
         if ground_truths:
+          try:
             logger.info("Computing BERTScore for all 3 pipelines...")
             bert_llm_raw = compute_bert_score(llm_answers_for_bert, ground_truths, return_per_query=True)
             bert_basic_raw = compute_bert_score(basic_answers_for_bert, ground_truths, return_per_query=True)
@@ -312,7 +322,7 @@ class BenchmarkRunner:
             bert_llm = bert_llm_raw
             bert_basic = bert_basic_raw
             bert_graph = bert_graph_raw
-            
+
             # Update individual query results with per-query BERTScore
             for i, r in enumerate(results):
                 if i < len(bert_llm.get("per_query", [])):
@@ -329,9 +339,18 @@ class BenchmarkRunner:
             for i, r in enumerate(results):
                 if r.ground_truth:
                     print(f"  {i+1:>3} | {r.llm_bert_f1:>6.3f} | {r.basic_bert_f1:>6.3f} | {r.graph_bert_f1:>6.3f}")
+          except Exception as e:
+            logger.warning(f"BERTScore step failed (results already saved): {e}")
 
+        summary = self._build_summary(results, dataset_name, bert_llm, bert_basic, bert_graph)
+
+        self._save_results(results, summary)
+        self._print_summary(summary)
+        return summary
+
+    def _build_summary(self, results, dataset_name, bert_llm, bert_basic, bert_graph):
         n = len(results)
-        summary = BenchmarkSummary(
+        return BenchmarkSummary(
             total_queries=n,
             timestamp=datetime.now().isoformat(),
             dataset=dataset_name,
@@ -367,10 +386,6 @@ class BenchmarkRunner:
                 sum(1 for r in results if r.graph_used_tigergraph) / n * 100, 1
             ),
         )
-
-        self._save_results(results, summary)
-        self._print_summary(summary)
-        return summary
 
     def _save_results(self, results, summary):
         ts = datetime.now().strftime("%Y%m%d_%H%M%S")
