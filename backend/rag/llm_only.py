@@ -42,8 +42,8 @@ class LLMOnly:
         t0 = time.time()
 
         system_prompt = (
-            "You are a knowledgeable assistant. Answer the question using your "
-            "training knowledge. " + CONCISE_ANSWER_INSTRUCTION
+            "You are an expert assistant. Answer the question accurately and "
+            "completely using your knowledge. " + CONCISE_ANSWER_INSTRUCTION
         )
 
         result = gemini_generate(

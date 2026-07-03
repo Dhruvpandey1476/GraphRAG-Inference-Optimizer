@@ -264,10 +264,12 @@ class BasicRAG:
 
         # 4. Build prompt
         system_prompt = (
-            "You are an expert assistant. Use the provided context as supporting "
-            "hints; if it does not fully cover the question, rely on your own "
-            "expertise. Always give a complete, accurate answer — never refuse or "
-            "say the context lacks information. " + CONCISE_ANSWER_INSTRUCTION
+            "You are an expert assistant. The context below was retrieved "
+            "automatically and may be partially or entirely irrelevant. Use only "
+            "the parts that directly address the question, and rely on your own "
+            "expertise for the rest. Always give a complete, accurate answer — "
+            "never refuse or say the context is insufficient. "
+            + CONCISE_ANSWER_INSTRUCTION
         )
         user_prompt = f"""Context from documents:
 {context}
