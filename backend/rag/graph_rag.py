@@ -41,7 +41,7 @@ load_dotenv(Path(__file__).parent.parent.parent / ".env", override=True)
 logger = logging.getLogger(__name__)
 
 MAX_HOPS = int((os.getenv("MAX_HOPS_GRAPH_RAG", "2") or "2").strip())
-MAX_NEIGHBORS = int((os.getenv("MAX_NEIGHBORS", "10") or "10").strip())
+MAX_NEIGHBORS = int((os.getenv("MAX_NEIGHBORS", "5") or "5").strip())
 
 
 @dataclass
@@ -137,9 +137,17 @@ def extract_query_entities(question: str) -> list[str]:
                     seen.add(entity_name.lower())
     
     # TIER 3: Capitalized phrases (fallback for domain-specific terms)
+    # Skip question words / stopwords so seeds stay on-topic (e.g. "What", "How").
+    stopwords = {
+        "what", "how", "why", "when", "where", "which", "who", "whose", "whom",
+        "does", "do", "is", "are", "the", "a", "an", "and", "or", "of", "in",
+        "compare", "difference", "differences", "relationship", "between",
+    }
     if len(entities) < 7:
         capitalized = re.findall(r"\b[A-Z][a-z]+(?: [A-Z][a-z]+)*\b", question)
         for phrase in capitalized:
+            if phrase.lower() in stopwords:
+                continue
             if phrase.lower() not in seen and len(phrase) > 2:
                 entities.append(phrase)
                 seen.add(phrase.lower())
@@ -223,12 +231,25 @@ def serialize_subgraph(subgraph: dict) -> str:
         if len(ent_tags) >= 5:  # top 5 only
             break
 
+    # Grounded snippets: 1-2 SHORT source excerpts from the linked documents
+    # (Phase 3). Keeps the token advantage tiny while giving the LLM real corpus
+    # text to answer from — not just triples.
+    doc_lines = []
+    for d in subgraph.get("documents", [])[:2]:
+        attrs = d.get("attributes", d) if isinstance(d, dict) else {}
+        content = (attrs.get("content") or "").strip().replace("\n", " ")
+        if content:
+            doc_lines.append(content[:280])
+
     lines = []
     if ent_tags:
         lines.append("Entities: " + ", ".join(ent_tags))
     if rel_lines:
         lines.append("Facts:")
         lines.extend(rel_lines)
+    if doc_lines:
+        lines.append("Sources:")
+        lines.extend(doc_lines)
 
     return "\n".join(lines)
 
@@ -286,7 +307,8 @@ class GraphRAG:
 
         if self.tg and entities:
             try:
-                subgraph = self.tg.get_entity_subgraph(entities, max_hops, max_neighbors)
+                subgraph = self.tg.get_entity_subgraph(entities, max_hops, max_neighbors,
+                                                        include_documents=True)
                 entity_count = len(subgraph.get("entities", []))
                 rel_count = len(subgraph.get("relationships", []))
                 logger.info(f"[OK] Retrieved {entity_count} entities, {rel_count} relationships from TigerGraph")
@@ -341,8 +363,10 @@ class GraphRAG:
         # comparison is fair (no forced 3-bullet JSON schema).
         system_prompt = (
             "You are an AI assistant with expertise in machine learning and "
-            "artificial intelligence. Answer grounded in the provided knowledge "
-            "graph context when available. " + CONCISE_ANSWER_INSTRUCTION
+            "artificial intelligence. Use the knowledge-graph context below as "
+            "supporting hints; if it does not fully cover the question, rely on "
+            "your own expertise. Always give a complete, accurate answer — never "
+            "refuse or say the context lacks information. " + CONCISE_ANSWER_INSTRUCTION
         )
 
         user_prompt = f"""Knowledge Graph Context:

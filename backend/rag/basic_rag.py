@@ -45,6 +45,9 @@ USE_SENTENCE_TRANSFORMERS = (os.getenv("USE_SENTENCE_TRANSFORMERS", "true") or "
 
 # Corpus directory (relative to project root). Defaults to the full arXiv bulk dataset.
 RAG_DATA_DIR = (os.getenv("RAG_DATA_DIR", "data/arxiv_bulk") or "data/arxiv_bulk").strip()
+# Load the full prebuilt arxiv index by default — the fair, dataset-scale baseline
+# the hackathon requires (Basic RAG must run on the same large corpus as GraphRAG).
+RAG_USE_PREBUILT_INDEX = (os.getenv("RAG_USE_PREBUILT_INDEX", "true") or "true").lower().strip() == "true"
 
 
 def _assert_real_embeddings(vectors: np.ndarray) -> None:
@@ -127,7 +130,7 @@ class BasicRAG:
         logger.info(f"Attempting to load FAISS index from: {faiss_path}")
         logger.info(f"Path exists: {faiss_path.exists()}")
 
-        if faiss_path.exists():
+        if faiss_path.exists() and RAG_USE_PREBUILT_INDEX:
             try:
                 import pickle
                 with open(faiss_path, "rb") as f:
@@ -261,8 +264,10 @@ class BasicRAG:
 
         # 4. Build prompt
         system_prompt = (
-            "You are an expert assistant. Use the provided context when available; "
-            "otherwise use your knowledge. " + CONCISE_ANSWER_INSTRUCTION
+            "You are an expert assistant. Use the provided context as supporting "
+            "hints; if it does not fully cover the question, rely on your own "
+            "expertise. Always give a complete, accurate answer — never refuse or "
+            "say the context lacks information. " + CONCISE_ANSWER_INSTRUCTION
         )
         user_prompt = f"""Context from documents:
 {context}
