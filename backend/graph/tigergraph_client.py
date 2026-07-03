@@ -391,13 +391,21 @@ class TigerGraphClient:
                         rel_seen.add(rel_key)
                         relationships.append(edge)
 
-                    # Enqueue unvisited neighbors for the next hop
+                    # Enqueue unvisited neighbors for the next hop.
+                    # Build the neighbor vertex LOCALLY from its id (which is the
+                    # normalized entity name) instead of a per-neighbor
+                    # getVerticesById REST call — that fetch was the dominant
+                    # latency cost (30-50 sequential round-trips/query). The id
+                    # already yields a readable name (e.g. "knowledge_graph" ->
+                    # "knowledge graph"), which is all serialization needs.
                     if neighbor_id and neighbor_id not in visited:
                         visited.add(neighbor_id)
-                        nv = self._fetch_entity(neighbor_id)
-                        if nv and nv.get("v_id"):
-                            entities_by_id[nv["v_id"]] = nv
-                            next_frontier.append(nv["v_id"])
+                        entities_by_id[neighbor_id] = {
+                            "v_id": neighbor_id,
+                            "attributes": {"name": neighbor_id.replace("_", " "),
+                                           "entity_type": ""},
+                        }
+                        next_frontier.append(neighbor_id)
             logger.info(f"  Hop {hop + 1}: frontier {len(frontier)} → {len(next_frontier)} new entities")
             frontier = next_frontier
 
