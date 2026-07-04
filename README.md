@@ -237,5 +237,5 @@ MIT License — Built for TigerGraph GraphRAG Inference Hackathon 2026
 
 ---
 
-**For details:** See [docs/architecture.md](docs/architecture.md), [docs/blog_post.md](docs/blog_post.md)
+**For details:** See [docs/architecture.md](docs/architecture.md), [docs/blog_post.md](docs/blog_post.md) [Hashnode blog](https://tokenninja-graphrag-inference-optimizer.hashnode.dev/how-we-cut-llm-token-costs-by-91-5-without-losing-answer-quality-a-graphrag-deep-dive)
 
