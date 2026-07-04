@@ -301,16 +301,9 @@ class BenchmarkRunner:
         bert_llm = {"f1": 0.0, "f1_raw": 0.0, "per_query": []}
         bert_basic = {"f1": 0.0, "f1_raw": 0.0, "per_query": []}
         bert_graph = {"f1": 0.0, "f1_raw": 0.0, "per_query": []}
-        
-        # Persist core results NOW, before the heavy BERTScore step, so a
-        # completed (expensive) run is never lost if BERTScore crashes/OOMs.
-        try:
-            self._save_results(results, self._build_summary(results, dataset_name,
-                                bert_llm, bert_basic, bert_graph))
-            logger.info("[SAVE] Core results persisted before BERTScore.")
-        except Exception as e:
-            logger.warning(f"Pre-BERTScore save failed (non-fatal): {e}")
 
+        # BERTScore is wrapped in try/except so a failure here can't crash the
+        # run — the results are saved once, at the end, regardless.
         if ground_truths:
           try:
             logger.info("Computing BERTScore for all 3 pipelines...")
@@ -340,7 +333,7 @@ class BenchmarkRunner:
                 if r.ground_truth:
                     print(f"  {i+1:>3} | {r.llm_bert_f1:>6.3f} | {r.basic_bert_f1:>6.3f} | {r.graph_bert_f1:>6.3f}")
           except Exception as e:
-            logger.warning(f"BERTScore step failed (results already saved): {e}")
+            logger.warning(f"BERTScore skipped ({e}); core metrics still saved below.")
 
         summary = self._build_summary(results, dataset_name, bert_llm, bert_basic, bert_graph)
 
