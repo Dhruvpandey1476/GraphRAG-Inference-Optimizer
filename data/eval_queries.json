@@ -52,16 +52,16 @@
     "ground_truth": "FAISS enables efficient similarity search by using approximate nearest neighbor algorithms like IVF (inverted file index) and HNSW (hierarchical navigable small world graphs) that trade small accuracy losses for massive speed gains, allowing billion-scale vector search in milliseconds."
   },
   {
-    "question": "What is the significance of BERTScore F1 in evaluating generated text?",
-    "ground_truth": "BERTScore F1 measures semantic similarity between generated and reference text using contextual BERT embeddings, capturing meaning-level overlap rather than just surface lexical matches. An F1 above 0.88 indicates strong semantic equivalence between the generated answer and the ground truth."
+    "question": "How do attention mechanisms and positional encoding work together to let Transformers model word order in a sequence?",
+    "ground_truth": "Transformers process all tokens in parallel and have no inherent sense of order, so positional encodings inject sequence-position information into the token embeddings. The self-attention mechanism then weighs relationships between all token pairs using these position-aware representations. Together, attention captures content relationships while positional encoding preserves order."
   },
   {
     "question": "How do knowledge graph entity types improve retrieval precision?",
     "ground_truth": "Entity type classification (Person, Organization, Concept, Location, Event) allows the retrieval system to filter and prioritize entities relevant to the query type, reducing irrelevant traversal paths and improving the signal-to-noise ratio of retrieved context."
   },
   {
-    "question": "What is the LLM-as-a-Judge evaluation methodology?",
-    "ground_truth": "LLM-as-a-Judge uses a powerful LLM to evaluate generated answers on dimensions like correctness, completeness, relevance, and clarity by comparing them to reference answers or grading them independently. It provides scalable quality assessment without requiring large human annotation teams."
+    "question": "How does GraphRAG use knowledge-graph relationships to cut token usage compared with feeding raw document chunks?",
+    "ground_truth": "GraphRAG represents knowledge as compact entity-relationship triples rather than long text passages, so the prompt carries dense structured facts instead of verbose chunks. By retrieving only the relevant subgraph around the query's entities, it feeds the LLM far fewer tokens than vector RAG's retrieved documents while preserving the key facts, producing large token and cost reductions."
   },
   {
     "question": "How does GraphRAG handle queries that require information from multiple documents?",
@@ -92,12 +92,12 @@
     "ground_truth": "Self-attention computes attention over the same sequence (Q, K, V all from the same input), allowing tokens to attend to all positions in the input. Cross-attention computes attention from one sequence to another (Q from decoder, K and V from encoder), enabling information transfer between different inputs."
   },
   {
-    "question": "How does layer normalization improve transformer training stability?",
-    "ground_truth": "Layer normalization normalizes activations across feature dimensions to have zero mean and unit variance, reducing internal covariate shift and stabilizing gradient flow during training. It allows higher learning rates, enables training of deeper models, and improves convergence speed compared to batch normalization."
+    "question": "How do embedding models, semantic similarity, and vector retrieval work together in a RAG pipeline?",
+    "ground_truth": "Embedding models map text into dense vectors where semantically similar content lies close together. At query time the question is embedded and compared against document vectors via similarity metrics like cosine, and the closest matches are retrieved. This lets a RAG system fetch semantically relevant passages even when they share no exact keywords with the query."
   },
   {
-    "question": "What is the role of feed-forward networks in transformer blocks?",
-    "ground_truth": "Feed-forward networks in transformers consist of two dense layers with a non-linearity (usually ReLU or GELU) between them. They expand the hidden dimension, learn non-linear transformations, and introduce model capacity while maintaining the same output dimension for residual connections."
+    "question": "How does BERT's bidirectional encoding relate to its masked language modeling pre-training objective?",
+    "ground_truth": "BERT is pre-trained with masked language modeling, where random tokens are hidden and predicted from both left and right context. This objective is what makes BERT bidirectional: predicting a masked token requires attending to the whole surrounding sentence, so its encoder learns representations conditioned on full context rather than left-to-right only."
   },
   {
     "question": "How does scaling relate to transformer model performance?",
@@ -132,8 +132,8 @@
     "ground_truth": "Emergent capabilities are abilities that appear suddenly as model scale increases but are absent in smaller models. Examples include in-context learning, chain-of-thought reasoning, and instruction following. These emerge due to increased model capacity and diversity of learned representations at larger scales."
   },
   {
-    "question": "How do sparse transformers reduce computational complexity?",
-    "ground_truth": "Sparse transformers use structured sparsity patterns (strided, local, or learned patterns) instead of full attention, reducing complexity from O(n²) to O(n·√n) or O(n). This enables processing longer sequences while maintaining expressive power through strategic attention connections."
+    "question": "How does fine-tuning build on pre-training to adapt large language models to downstream tasks?",
+    "ground_truth": "Pre-training teaches an LLM broad language and world knowledge from large unlabeled corpora. Fine-tuning then continues training on a smaller task-specific labeled dataset, adjusting the pre-trained weights to specialize the model. This transfer-learning approach reaches strong task performance with far less labeled data than training from scratch."
   },
   {
     "question": "What is the difference between parametric and non-parametric knowledge in LLMs?",
@@ -184,8 +184,8 @@
     "ground_truth": "Contrastive learning minimizes distance between query and relevant passages while maximizing distance from irrelevant passages. This teaches the model to group semantically similar items and separate dissimilar ones, learning robust representations that generalize to new domains and queries."
   },
   {
-    "question": "What is the significance of semantic textual similarity datasets for evaluating embeddings?",
-    "ground_truth": "STS datasets contain sentence pairs with human-assigned similarity scores. Evaluating embeddings on STS provides direct measurement of whether models capture semantic relationships as humans perceive them. Good STS performance correlates with downstream retrieval and ranking effectiveness."
+    "question": "How do encoder and decoder components interact with attention in sequence-to-sequence models?",
+    "ground_truth": "In sequence-to-sequence models the encoder reads the input and produces contextual representations, while the decoder generates the output one token at a time. Cross-attention lets each decoder step attend over the encoder's representations to focus on the most relevant input, and the decoder's self-attention conditions each new token on those already generated."
   },
   {
     "question": "How does active learning reduce annotation requirements for training retrievers?",
