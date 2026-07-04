@@ -1,22 +1,23 @@
 # 🐯 GraphRAG Inference Optimizer
 ### TigerGraph GraphRAG Inference Hackathon
 
-> **84.1% token reduction with fair quality comparison using TigerGraph knowledge graph retrieval + Gemini 2.5 Flash.**
+> **91.5% token reduction with maintained answer quality, using TigerGraph 2-hop knowledge-graph retrieval + Gemini 2.5 Flash. 100% of GraphRAG answers are grounded in a real TigerGraph traversal.**
 
 ---
 
-## 🎯 Benchmark Results (50 Fair Queries)
+## 🎯 Benchmark Results (50 queries, live TigerGraph run)
 
-| Metric | LLM-Only | Basic RAG | **GraphRAG** | **Improvement** |
+| Metric | LLM-Only | Basic RAG | **GraphRAG** | **vs Basic RAG** |
 |--------|----------|-----------|-------------|-----------------|
-| **Avg Tokens** | 345 | 1,424 | **199** | **84.1% ↓** |
-| **Judge Score** | 7.02/10 | 8.24/10 | **8.08/10** | Fair (Δ0.16) |
-| **Cost/1k** | $0.172 | $0.448 | **$0.075** | **80.2% ↓** |
-| **Latency** | 2,757ms | 4,777ms | **3,103ms** | **35% faster** |
-| **Pass Rate ≥7/10** | 65% | **92%** | **90%** | Production ✅ |
-| **BERTScore F1** | 0.77 | 0.8288 | **0.8733** | **better** |
+| **Avg Tokens** | 134 | 2,843 | **242** | **91.5% ↓** |
+| **Judge Score** | 8.38/10 | 8.26/10 | **8.20/10** | Maintained (Δ0.06) |
+| **BERTScore F1 (raw)** | 0.882 | 0.876 | **0.883** | **highest** |
+| **Cost / 1k queries** | $0.057 | $0.472 | **$0.071** | **84.9% ↓** |
+| **Latency** | 1,284ms | 1,881ms | 3,474ms | graph-traversal trade-off |
+| **Pass Rate ≥7/10** | 98% | 94% | **96%** | ✅ |
+| **TigerGraph-sourced** | — | — | **100% (50/50)** | provenance ✅ |
 
-**Status:** Production-ready. Fair baseline ensures credibility. Annual savings: **$136,145 @ 1M queries/day**
+**Status:** Submission-ready. Fair baselines (all ~8/10 — no handicapping). GraphRAG matches accuracy at a fraction of the tokens, with every answer provably from the graph. Annual savings: **~$146,000 @ 1M queries/day** vs Basic RAG.
 
 ---
 
@@ -53,9 +54,9 @@ npm run dev
 from backend.rag.graph_rag import graph_rag
 
 result = graph_rag("What is transformer architecture?")
-print(f"Tokens: {result['total_tokens']}")      # Expected: ~169
+print(f"Tokens: {result['total_tokens']}")      # Expected: ~242
 print(f"Answer: {result['answer']}")
-print(f"Judge Score: {result['judge_score']}")  # Expected: ~9.0
+print(f"Judge Score: {result['judge_score']}")  # Expected: ~8.2
 ```
 
 ---
@@ -110,8 +111,8 @@ graphrag-hackathon/
 │   └── sample_docs/ai_knowledge_base.md
 |
 ├── results/                           # Evaluation Results
-│   ├── benchmark.json                 # 50-query benchmark (84.1% token reduction)
-│   └── BENCHMARK_REPORT_VISUAL.html   [HTML reports generated from benchmark]
+│   ├── benchmark_<timestamp>.json      # 50-query benchmark (91.5% token reduction)
+│   └── report_<timestamp>.html         # HTML report generated per run
 |
 ├── Dockerfile                         # Docker container config
 ├── requirements.txt                   # Python dependencies
@@ -138,21 +139,21 @@ Compare all 3 pipelines on a single query.
 {
   "llm_only": {
     "answer": "Transformers are neural network architectures...",
-    "tokens": 339,
-    "latency_ms": 1500,
-    "judge_score": 7.8
+    "tokens": 134,
+    "latency_ms": 1284,
+    "judge_score": 8.4
   },
   "basic_rag": {
     "answer": "Transformers introduced the self-attention mechanism...",
-    "tokens": 1666,
-    "latency_ms": 3200,
-    "judge_score": 8.6
+    "tokens": 2843,
+    "latency_ms": 1881,
+    "judge_score": 8.3
   },
   "graph_rag": {
-    "answer": "• Transformers use multi-head self-attention\n• Key innovation: parallel processing over sequential\n• Powers GPT, BERT, LLaMA models",
-    "tokens": 169,
-    "latency_ms": 3500,
-    "judge_score": 9.0
+    "answer": "Transformers use multi-head self-attention for parallel sequence processing; the architecture underpins BERT and GPT.",
+    "tokens": 242,
+    "latency_ms": 3474,
+    "judge_score": 8.2
   }
 }
 ```
@@ -185,28 +186,27 @@ GEMINI_MODEL=gemini-2.5-flash
 APP_ENV=production
 LOG_LEVEL=INFO
 MAX_HOPS_GRAPH_RAG=2
-MAX_NEIGHBORS=10
+MAX_NEIGHBORS=5
+MAX_FRONTIER=6
 ```
 
 ---
 
 ## 💡 Key Optimizations
 
-### 1. **JSON Schema Forcing**
-- Constrains Gemini to return exactly 3 bullet-point responses
-- Eliminates padding tokens and hallucinations
-- Result: **96% token reduction** (75 → now 169 with quality improvement)
+### 1. **Graph-Native Retrieval**
+- 2-hop TigerGraph traversal from query entities instead of top-K text chunks
+- Compact entity + relationship *triples* as context, not raw prose
+- Result: **91.5% fewer tokens** than Basic RAG, 100% graph-sourced
 
-### 2. **Graph-Native Retrieval**
-- Subgraph traversal instead of top-K text chunks
-- Semantic relationships instead of vector similarity
-- Result: **90.7% token reduction** vs Basic RAG
+### 2. **Dense Subgraph Serialization**
+- Top entities + highest-confidence relationships, deduplicated
+- ~70 context tokens vs ~2,800 for concatenated document chunks
 
-### 3. **Prompt Engineering**
-- System prompt: "Focus on relevance and clarity over brevity"
-- User prompt: Explicit 3-bullet format with context
-- Temperature: 0.1 (deterministic output)
-- Result: **Consistent 9.0/10** quality scores
+### 3. **Fair, Consistent Prompting**
+- All three pipelines share the same model, temperature (0.1), output cap, and conciseness instruction
+- Retrieved context used as support with fallback to the model's own expertise — no pipeline handicapped
+- Result: **all pipelines ~8.2–8.4/10** — the gain is efficiency, not quality loss
 
 ---
 
@@ -225,9 +225,9 @@ python -m evaluation.benchmark --queries data/eval_queries.json
 ## 🎯 Why GraphRAG Wins
 
 1. **Radical Token Efficiency** — Graph-native retrieval vs vector brute-force
-2. **Consistent Quality** — 9.0/10 judge scores on an average across all test queries  
+2. **Maintained Quality** — ~8.2/10 judge score, matching Basic RAG and the raw LLM, with the highest BERTScore of the three
 3. **Engineering Excellence** — Clean modular code, live dashboard, reproducible benchmarks
-4. **Cost-Effective** — 83% cheaper than BasicRAG on cloud APIs
+4. **Cost-Effective** — ~85% cheaper than Basic RAG on cloud APIs
 
 ---
 
