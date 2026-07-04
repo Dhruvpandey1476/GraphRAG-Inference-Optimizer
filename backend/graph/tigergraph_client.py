@@ -15,6 +15,12 @@ from dotenv import load_dotenv
 load_dotenv()
 logger = logging.getLogger(__name__)
 
+# Cap how many nodes we expand per hop. One getEdges REST call is made per
+# frontier node, so bounding the frontier bounds latency (robust to a slow/
+# variable TigerGraph cloud instance) while keeping genuine multi-hop traversal.
+# Serialization only uses the top few entities/relationships anyway.
+MAX_FRONTIER = int((os.getenv("MAX_FRONTIER", "6") or "6").strip())
+
 
 class TigerGraphClient:
     """Production-ready TigerGraph client for GraphRAG operations."""
@@ -373,7 +379,9 @@ class TigerGraphClient:
             if not frontier:
                 break
             next_frontier: list = []
-            for vid in frontier:
+            # Cap frontier expansion to bound the number of getEdges calls (and
+            # thus latency) — still a real second hop, just not an unbounded fan-out.
+            for vid in frontier[:MAX_FRONTIER]:
                 try:
                     edges = self.conn.getEdges("Entity", vid, "RELATED_TO") or []
                 except Exception as e:
