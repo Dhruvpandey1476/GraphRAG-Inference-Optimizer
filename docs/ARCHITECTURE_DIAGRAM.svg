@@ -174,7 +174,7 @@
 
     <g class="box">
       <rect x="1025" y="720" width="325" height="80" rx="8" fill="#e8f5e9" stroke="#27ae60" stroke-width="2"/>
-      <text x="1187" y="745" class="label" text-anchor="middle" fill="#27ae60" font-size="13" font-weight="bold">Provenance & Semantic Quality</text>
+      <text x="1187" y="745" class="label" text-anchor="middle" fill="#27ae60" font-size="13" font-weight="bold">Provenance &amp; Semantic Quality</text>
       <text x="1187" y="768" class="improvement" text-anchor="middle" font-size="12">100% TigerGraph (50/50) · 96% pass ≥7</text>
       <text x="1187" y="790" class="metric" text-anchor="middle" fill="#27ae60">BERTScore F1 (raw) 0.883 — highest of 3</text>
     </g>
