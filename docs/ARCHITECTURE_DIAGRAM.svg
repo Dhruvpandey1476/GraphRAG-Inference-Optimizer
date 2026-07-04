@@ -39,16 +39,16 @@
   <!-- Title Section -->
   <g>
     <text x="700" y="45" class="title" text-anchor="middle">GraphRAG Inference Architecture</text>
-    <text x="700" y="65" class="subtitle" text-anchor="middle">Fair Benchmark: 84.1% Token Reduction with Comparable Quality</text>
-    <rect x="350" y="75" width="700" height="22" rx="4" fill="#fff3cd" stroke="#d35400" stroke-width="1"/>
-    <text x="700" y="91" class="fairness-note" text-anchor="middle">✓ FAIRNESS FIX: BasicRAG system prompt relaxed (commit 799cd4dc) for fair baseline comparison</text>
+    <text x="700" y="65" class="subtitle" text-anchor="middle">Fair Benchmark: 91.5% Token Reduction with Maintained Quality — 100% TigerGraph-sourced</text>
+    <rect x="300" y="75" width="800" height="22" rx="4" fill="#fff3cd" stroke="#d35400" stroke-width="1"/>
+    <text x="700" y="91" class="fairness-note" text-anchor="middle">✓ FAIR BASELINES: all three pipelines share the same model, output cap, temperature, and prompting policy</text>
   </g>
 
   <!-- INPUT SECTION -->
   <g class="box">
     <rect x="500" y="120" width="400" height="60" rx="8" fill="url(#grad1)" />
     <text x="700" y="145" class="box-title" text-anchor="middle">User Query Input</text>
-    <text x="700" y="165" class="box-text" text-anchor="middle" font-size="11" fill="white">50 LLM/RAG/Graph Queries</text>
+    <text x="700" y="165" class="box-text" text-anchor="middle" font-size="11" fill="white">50 benchmark queries — same question to all 3 pipelines</text>
   </g>
 
   <!-- Arrows down -->
@@ -57,156 +57,126 @@
   <g id="pipelines">
     <!-- LLM-ONLY PIPELINE (Left) -->
     <g class="box">
-      <!-- Main container -->
       <rect x="50" y="220" width="350" height="450" rx="10" fill="url(#grad2)" stroke="#667eea" stroke-width="2"/>
-      
-      <!-- Header -->
       <rect x="50" y="220" width="350" height="45" rx="10" fill="#667eea"/>
       <text x="225" y="252" class="box-title" text-anchor="middle" font-size="15">LLM-Only</text>
-      
-      <!-- Step 1 -->
+
       <rect x="70" y="285" width="310" height="55" rx="6" fill="white" stroke="#667eea" stroke-width="1.5"/>
-      <text x="225" y="305" class="label" text-anchor="middle">Direct Gemini 2.5 Call</text>
-      <text x="225" y="325" class="metric" text-anchor="middle">No retrieval, parametric knowledge only</text>
-      
-      <!-- Arrow -->
+      <text x="225" y="305" class="label" text-anchor="middle">Direct Gemini 2.5 Flash Call</text>
+      <text x="225" y="325" class="metric" text-anchor="middle">No retrieval — parametric knowledge only</text>
+
       <path d="M 225 340 L 225 375" stroke="#667eea" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
-      
-      <!-- Output -->
+
       <rect x="70" y="375" width="310" height="120" rx="6" fill="white" stroke="#e74c3c" stroke-width="1.5"/>
       <text x="225" y="398" class="label" text-anchor="middle" font-weight="bold">Output Metrics</text>
-      <text x="85" y="420" class="metric">▪ Tokens: 345</text>
-      <text x="85" y="438" class="metric">▪ Judge Score: 7.02/10</text>
-      <text x="85" y="456" class="metric">▪ Latency: 2,757 ms</text>
-      <text x="85" y="474" class="metric">▪ Cost: $0.172/1k</text>
-      
-      <!-- Arrow -->
+      <text x="85" y="420" class="metric">▪ Tokens: 134</text>
+      <text x="85" y="438" class="metric">▪ Judge Score: 8.38/10</text>
+      <text x="85" y="456" class="metric">▪ Latency: 1,284 ms</text>
+      <text x="85" y="474" class="metric">▪ Cost: $0.057/1k</text>
+
       <path d="M 225 495 L 225 525" stroke="#667eea" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
-      
-      <!-- Baseline indicator -->
+
       <rect x="70" y="525" width="310" height="40" rx="6" fill="#ffe6e6" stroke="#e74c3c" stroke-width="1.5"/>
       <text x="225" y="550" class="label" text-anchor="middle" font-weight="bold" fill="#e74c3c">Baseline (Parametric Only)</text>
     </g>
 
     <!-- BASIC RAG PIPELINE (Middle) -->
     <g class="box">
-      <!-- Main container -->
       <rect x="525" y="220" width="350" height="450" rx="10" fill="url(#grad2)" stroke="#f39c12" stroke-width="2"/>
-      
-      <!-- Header -->
       <rect x="525" y="220" width="350" height="45" rx="10" fill="#f39c12"/>
       <text x="700" y="252" class="box-title" text-anchor="middle" font-size="15">Basic RAG</text>
-      
-      <!-- Step 1: Embedding -->
+
       <rect x="545" y="285" width="310" height="50" rx="6" fill="white" stroke="#f39c12" stroke-width="1.5"/>
       <text x="700" y="308" class="label" text-anchor="middle">1. Embed Query (FAISS)</text>
-      <text x="700" y="325" class="metric" text-anchor="middle">384-dim embeddings</text>
-      
-      <!-- Arrow -->
+      <text x="700" y="325" class="metric" text-anchor="middle">384-dim sentence-transformer embeddings</text>
+
       <path d="M 700 335 L 700 360" stroke="#f39c12" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
-      
-      <!-- Step 2: FAISS Search -->
+
       <rect x="545" y="360" width="310" height="55" rx="6" fill="white" stroke="#f39c12" stroke-width="1.5"/>
       <text x="700" y="380" class="label" text-anchor="middle">2. FAISS Top-5 Search</text>
-      <text x="700" y="400" class="metric" text-anchor="middle">193 chunks × cosine similarity</text>
-      
-      <!-- Arrow -->
+      <text x="700" y="400" class="metric" text-anchor="middle">300,161 chunks × cosine similarity</text>
+
       <path d="M 700 415 L 700 445" stroke="#f39c12" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
-      
-      <!-- Step 3: LLM with fairness note -->
+
       <rect x="545" y="445" width="310" height="60" rx="6" fill="white" stroke="#f39c12" stroke-width="1.5"/>
       <text x="700" y="465" class="label" text-anchor="middle">3. Gemini LLM (Fair Prompt)</text>
-      <text x="700" y="485" class="metric" text-anchor="middle">✓ Allow parametric fallback if</text>
-      <text x="700" y="500" class="metric" text-anchor="middle">context insufficient (fairness fix)</text>
-      
-      <!-- Arrow -->
+      <text x="700" y="485" class="metric" text-anchor="middle">Uses relevant context + own expertise;</text>
+      <text x="700" y="500" class="metric" text-anchor="middle">no forced format, no refusal</text>
+
       <path d="M 700 505 L 700 535" stroke="#f39c12" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
-      
-      <!-- Output -->
+
       <rect x="545" y="535" width="310" height="105" rx="6" fill="white" stroke="#f39c12" stroke-width="1.5"/>
       <text x="700" y="558" class="label" text-anchor="middle" font-weight="bold">Output Metrics</text>
-      <text x="560" y="578" class="metric">▪ Tokens: 1,424 (unfair baseline)</text>
-      <text x="560" y="596" class="metric">▪ Judge Score: 8.24/10 (fair now)</text>
-      <text x="560" y="614" class="metric">▪ Latency: 4,777 ms</text>
-      <text x="560" y="632" class="metric">▪ Cost: $0.448/1k</text>
+      <text x="560" y="578" class="metric">▪ Tokens: 2,843</text>
+      <text x="560" y="596" class="metric">▪ Judge Score: 8.26/10</text>
+      <text x="560" y="614" class="metric">▪ Latency: 1,881 ms</text>
+      <text x="560" y="632" class="metric">▪ Cost: $0.472/1k</text>
     </g>
 
     <!-- GRAPHRAG PIPELINE (Right) -->
     <g class="box">
-      <!-- Main container -->
       <rect x="1000" y="220" width="350" height="450" rx="10" fill="url(#grad3)" stroke="#27ae60" stroke-width="3"/>
-      
-      <!-- Header - Highlighted -->
       <rect x="1000" y="220" width="350" height="45" rx="10" fill="#27ae60"/>
       <text x="1175" y="252" class="box-title" text-anchor="middle" font-size="15">GraphRAG ✓</text>
-      
-      <!-- Step 1: Entity Extraction -->
+
       <rect x="1020" y="285" width="310" height="50" rx="6" fill="white" stroke="#27ae60" stroke-width="1.5"/>
       <text x="1175" y="308" class="label" text-anchor="middle" fill="#27ae60">1. Entity Extraction</text>
-      <text x="1175" y="325" class="metric" text-anchor="middle" fill="#27ae60">Gemini: 444 entities (TG)</text>
-      
-      <!-- Arrow -->
+      <text x="1175" y="325" class="metric" text-anchor="middle" fill="#27ae60">Query entities (ML vocab + patterns)</text>
+
       <path d="M 1175 335 L 1175 360" stroke="#27ae60" stroke-width="2" fill="none" marker-end="url(#arrowhead-green)"/>
-      
-      <!-- Step 2: Graph Traversal -->
+
       <rect x="1020" y="360" width="310" height="55" rx="6" fill="white" stroke="#27ae60" stroke-width="1.5"/>
-      <text x="1175" y="380" class="label" text-anchor="middle" fill="#27ae60">2. TigerGraph Traversal</text>
-      <text x="1175" y="400" class="metric" text-anchor="middle" fill="#27ae60">Fuzzy entity matching + 1-hop</text>
-      
-      <!-- Arrow -->
+      <text x="1175" y="380" class="label" text-anchor="middle" fill="#27ae60">2. Real 2-hop TigerGraph Traversal</text>
+      <text x="1175" y="400" class="metric" text-anchor="middle" fill="#27ae60">BFS over RELATED_TO edges (frontier-capped)</text>
+
       <path d="M 1175 415 L 1175 445" stroke="#27ae60" stroke-width="2" fill="none" marker-end="url(#arrowhead-green)"/>
-      
-      <!-- Step 3: Subgraph + LLM -->
+
       <rect x="1020" y="445" width="310" height="60" rx="6" fill="white" stroke="#27ae60" stroke-width="1.5"/>
       <text x="1175" y="465" class="label" text-anchor="middle" fill="#27ae60">3. Structured Context → Gemini</text>
-      <text x="1175" y="485" class="metric" text-anchor="middle" fill="#27ae60">Entity-relationship subgraph</text>
-      <text x="1175" y="500" class="metric" text-anchor="middle" fill="#27ae60">(max 120 tokens quality mode)</text>
-      
-      <!-- Arrow -->
+      <text x="1175" y="485" class="metric" text-anchor="middle" fill="#27ae60">Dense entity + relationship triples</text>
+      <text x="1175" y="500" class="metric" text-anchor="middle" fill="#27ae60">(~70 context tokens; same output cap)</text>
+
       <path d="M 1175 505 L 1175 535" stroke="#27ae60" stroke-width="2" fill="none" marker-end="url(#arrowhead-green)"/>
-      
-      <!-- Output - Highlighted -->
+
       <rect x="1020" y="535" width="310" height="105" rx="6" fill="white" stroke="#27ae60" stroke-width="2.5"/>
-      <text x="1175" y="558" class="label" text-anchor="middle" font-weight="bold" fill="#27ae60">✓ Output Metrics</text>
-      <text x="1035" y="578" class="metric-green">▪ Tokens: 199.4 (84.1% ↓)</text>
-      <text x="1035" y="596" class="metric-green">▪ Judge Score: 8.08/10 (fair)</text>
-      <text x="1035" y="614" class="metric-green">▪ Latency: 3,103 ms (35% faster)</text>
-      <text x="1035" y="632" class="metric-green">▪ Cost: $0.075/1k (80% ↓)</text>
+      <text x="1175" y="558" class="label" text-anchor="middle" font-weight="bold" fill="#27ae60">✓ Output Metrics — 100% TigerGraph</text>
+      <text x="1035" y="578" class="metric-green">▪ Tokens: 242 (91.5% ↓ vs Basic)</text>
+      <text x="1035" y="596" class="metric-green">▪ Judge Score: 8.20/10 (maintained)</text>
+      <text x="1035" y="614" class="metric-green">▪ Latency: 3,474 ms</text>
+      <text x="1035" y="632" class="metric-green">▪ Cost: $0.071/1k (84.9% ↓)</text>
     </g>
   </g>
 
   <!-- COMPARISON METRICS SECTION -->
   <g>
-    <!-- Divider line -->
     <line x1="50" y1="700" x2="1350" y2="700" stroke="#ddd" stroke-width="1"/>
-    
-    <!-- Metric boxes -->
+
     <g class="box">
       <rect x="50" y="720" width="300" height="80" rx="8" fill="#e8f5e9" stroke="#27ae60" stroke-width="2"/>
       <text x="200" y="745" class="label" text-anchor="middle" fill="#27ae60" font-size="13" font-weight="bold">Token Efficiency</text>
-      <text x="200" y="768" class="improvement" text-anchor="middle" font-size="14">84.1% Reduction</text>
-      <text x="200" y="790" class="metric" text-anchor="middle" fill="#27ae60">1,424 → 199 avg tokens</text>
+      <text x="200" y="768" class="improvement" text-anchor="middle" font-size="14">91.5% Reduction</text>
+      <text x="200" y="790" class="metric" text-anchor="middle" fill="#27ae60">2,843 → 242 avg tokens</text>
     </g>
-    
+
     <g class="box">
       <rect x="375" y="720" width="300" height="80" rx="8" fill="#e8f5e9" stroke="#27ae60" stroke-width="2"/>
       <text x="525" y="745" class="label" text-anchor="middle" fill="#27ae60" font-size="13" font-weight="bold">Quality Parity</text>
-      <text x="525" y="768" class="improvement" text-anchor="middle" font-size="14">Fair Comparison</text>
-      <text x="525" y="790" class="metric" text-anchor="middle" fill="#27ae60">Judge: 8.24 vs 8.08 (Δ0.16)</text>
+      <text x="525" y="768" class="improvement" text-anchor="middle" font-size="14">Maintained</text>
+      <text x="525" y="790" class="metric" text-anchor="middle" fill="#27ae60">Judge: 8.26 vs 8.20 (Δ0.06)</text>
     </g>
-    
+
     <g class="box">
       <rect x="700" y="720" width="300" height="80" rx="8" fill="#e8f5e9" stroke="#27ae60" stroke-width="2"/>
       <text x="850" y="745" class="label" text-anchor="middle" fill="#27ae60" font-size="13" font-weight="bold">Cost Savings</text>
-      <text x="850" y="768" class="improvement" text-anchor="middle" font-size="14">80.2% Reduction</text>
-      <text x="850" y="790" class="metric" text-anchor="middle" fill="#27ae60">$0.448 → $0.075 per 1k</text>
+      <text x="850" y="768" class="improvement" text-anchor="middle" font-size="14">84.9% Reduction</text>
+      <text x="850" y="790" class="metric" text-anchor="middle" fill="#27ae60">$0.472 → $0.071 per 1k</text>
     </g>
-    
+
     <g class="box">
       <rect x="1025" y="720" width="325" height="80" rx="8" fill="#e8f5e9" stroke="#27ae60" stroke-width="2"/>
-      <text x="1187" y="745" class="label" text-anchor="middle" fill="#27ae60" font-size="13" font-weight="bold">Semantic Quality (BERTScore)</text>
-      <text x="1187" y="768" class="improvement" text-anchor="middle" font-size="12">2.4x Better (0.249 vs -0.014)</text>
-      <text x="1187" y="790" class="metric" text-anchor="middle" fill="#27ae60">90% pass rate (score ≥7/10)</text>
+      <text x="1187" y="745" class="label" text-anchor="middle" fill="#27ae60" font-size="13" font-weight="bold">Provenance & Semantic Quality</text>
+      <text x="1187" y="768" class="improvement" text-anchor="middle" font-size="12">100% TigerGraph (50/50) · 96% pass ≥7</text>
+      <text x="1187" y="790" class="metric" text-anchor="middle" fill="#27ae60">BERTScore F1 (raw) 0.883 — highest of 3</text>
     </g>
   </g>
 
@@ -214,13 +184,13 @@
   <g class="box">
     <rect x="100" y="830" width="1200" height="70" rx="8" fill="#f0f0f0" stroke="#667eea" stroke-width="2"/>
     <text x="700" y="855" class="label" text-anchor="middle" font-size="14" font-weight="bold">Evaluation Pipeline</text>
-    <text x="700" y="878" class="metric" text-anchor="middle">All 3 pipelines → LLM-as-Judge (1-10 correctness/completeness/clarity/relevance) + BERTScore Semantic Match + Token Counter + Cost Calculator</text>
+    <text x="700" y="878" class="metric" text-anchor="middle">All 3 pipelines → LLM-as-Judge (1-10: correctness/completeness/clarity/relevance) + BERTScore semantic match + token counter + cost calculator</text>
   </g>
 
   <!-- FOOTER - Implementation Details -->
   <g>
-    <text x="50" y="930" class="metric" font-size="11" font-weight="bold">Key Components:</text>
-    <text x="50" y="945" class="metric" font-size="10">• Backend: FastAPI + Gemini 2.5-Flash API • Retrieval: FAISS (193 chunks) + TigerGraph (444 entities, 3,234 relationships)</text>
-    <text x="400" y="945" class="metric" font-size="10">• Fairness: BasicRAG system prompt updated to allow parametric knowledge fallback • Deployment: Docker multi-stage build on Railway + HuggingFace</text>
+    <text x="50" y="928" class="metric" font-size="11" font-weight="bold">Key Components:</text>
+    <text x="50" y="943" class="metric" font-size="10">• Backend: FastAPI + Gemini 2.5-Flash • Retrieval: FAISS (300,161 chunks, arXiv corpus) + TigerGraph (knowledge graph built from the SAME corpus, real 2-hop traversal)</text>
+    <text x="50" y="957" class="metric" font-size="10">• Provenance: every GraphRAG answer logs whether TigerGraph was used + entities/relationships pulled — 100% graph-sourced in this run (0 fallbacks)</text>
   </g>
 </svg>
