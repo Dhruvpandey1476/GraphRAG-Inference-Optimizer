@@ -17,7 +17,7 @@
 | **Pass Rate ≥7/10** | 98% | 94% | **96%** | ✅ |
 | **TigerGraph-sourced** | — | — | **100% (50/50)** | provenance ✅ |
 
-**Status:** Submission-ready. Fair baselines (all ~8/10 — no handicapping). GraphRAG matches accuracy at a fraction of the tokens, with every answer provably from the graph. Annual savings: **~$146,000 @ 1M queries/day** vs Basic RAG.
+**Status:** Submission-ready. Fair baselines (all ≈8/10 — no handicapping). GraphRAG matches accuracy at a fraction of the tokens, with every answer provably from the graph. Annual savings: **≈$146,000 @ 1M queries/day** vs Basic RAG.
 
 ---
 
@@ -201,12 +201,12 @@ MAX_FRONTIER=6
 
 ### 2. **Dense Subgraph Serialization**
 - Top entities + highest-confidence relationships, deduplicated
-- ~70 context tokens vs ~2,800 for concatenated document chunks
+- ≈70 context tokens vs ≈2,800 for concatenated document chunks
 
 ### 3. **Fair, Consistent Prompting**
 - All three pipelines share the same model, temperature (0.1), output cap, and conciseness instruction
 - Retrieved context used as support with fallback to the model's own expertise — no pipeline handicapped
-- Result: **all pipelines ~8.2–8.4/10** — the gain is efficiency, not quality loss
+- Result: **all pipelines ≈8.2–8.4/10** — the gain is efficiency, not quality loss
 
 ---
 
@@ -225,9 +225,9 @@ python -m evaluation.benchmark --queries data/eval_queries.json
 ## 🎯 Why GraphRAG Wins
 
 1. **Radical Token Efficiency** — Graph-native retrieval vs vector brute-force
-2. **Maintained Quality** — ~8.2/10 judge score, matching Basic RAG and the raw LLM, with the highest BERTScore of the three
+2. **Maintained Quality** — ≈8.2/10 judge score, matching Basic RAG and the raw LLM, with the highest BERTScore of the three
 3. **Engineering Excellence** — Clean modular code, live dashboard, reproducible benchmarks
-4. **Cost-Effective** — ~85% cheaper than Basic RAG on cloud APIs
+4. **Cost-Effective** — ≈85% cheaper than Basic RAG on cloud APIs
 
 ---
 
