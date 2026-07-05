@@ -1,24 +1,3 @@
-"""
-GraphRAG Pipeline — Production Entity-Anchored Retrieval
-
-Core Algorithm:
-1. Extract domain entities from query (high-precision pattern matching)
-2. Traverse TigerGraph to retrieve relevant subgraph
-3. Serialize subgraph as structured knowledge facts (not text chunks)
-4. Generate a concise answer grounded in the retrieved context
-
-Token Efficiency: 84% reduction (199 avg tokens vs 1,424 for basic RAG)
-- Subgraph context: ~80 tokens (5 entities + 4 relationships)
-- Query + system prompt: ~50 tokens
-- Answer generation: ~70 tokens (free-form, shared output cap — same contract as other pipelines)
-Total: ~200 tokens
-
-Quality: 8.08/10 average judge score
-- Factually grounded in knowledge graph
-- Concise and structured format
-- Temperature 0.1 ensures consistency
-"""
-
 import os
 import re
 import time
