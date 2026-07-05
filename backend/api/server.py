@@ -1,9 +1,6 @@
 """
 FastAPI Server — exposes all 3 pipelines + evaluation endpoints.
-The dashboard frontend calls these endpoints.
-
-DEPLOYMENT TIMESTAMP: 2026-06-02T21:30:00Z (GraphRAG: 200 tokens, 9.0/10 judge score - GRAPH TRAVERSAL FIX v2)
-"""
+The dashboard frontend calls these endpoints."""
 
 import os
 import time
